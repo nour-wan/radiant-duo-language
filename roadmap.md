@@ -8,3 +8,6 @@
 - [x] Add 60+ bilingual catalog products
 - [x] Connect every product to relevant industries
 - [x] Verify Arabic and English search and filtering
+
+- [x] Create and assign one unique matching image to every catalog product
+- [x] Verify all 63 product image files are distinct and display correctly
