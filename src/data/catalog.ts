@@ -103,7 +103,7 @@ const seeds:Seed[]=[
 
 export const products:Product[]=seeds.map((s,index)=>{
  const category=categories.find(c=>c.id===s.cat);
- const applicationPairs=[...new Set(s.inds.flatMap(i=>apps[i]||apps.food).map(x=>x.join("|")))].slice(0,3).map(x=>{const [ar,en]=x.split("|");return t(ar||"تصنيع غذائي",en||"Food manufacturing")});
+ const applicationPairs=[...new Set(s.inds.flatMap(i=>apps[i]||apps["food"]||[]).map(x=>x.join("|")))].slice(0,3).map(value=>{const parts=value.split("|");return t(parts[0]??"تصنيع غذائي",parts[1]??"Food manufacturing")});
  return {id:s.id,slug:s.id,name:t(s.ar,s.en),shortDescription:t(`${s.ar} لتطبيقات صناعية غذائية متعددة.`,`${s.en} for multiple food manufacturing applications.`),description:t(`مكوّن ضمن فئة ${category?.name.ar||"المكونات الغذائية"}، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.`,`An ingredient in ${category?.name.en||"food ingredients"}, available for discussion based on application, specification and packaging needs.`),categoryId:s.cat,image:images[s.cat],gallery:[images[s.cat]],industryIds:s.inds,applications:applicationPairs,specifications:specs(s.formAr||"حسب مواصفة المنتج",s.formEn||"Per product specification"),packaging:t("خيارات تعبئة صناعية — التفاصيل عند الطلب","Industrial packaging options — details on request"),featured:s.featured??index%13===0,keywords:[s.ar,s.en,s.cat,...(s.keywords||[])]};
 });
 
