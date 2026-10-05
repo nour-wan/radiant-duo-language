@@ -9,6 +9,12 @@ import type { Category, Industry, Product } from "@/types/catalog";
 const t=(ar:string,en:string)=>({ar,en});
 const images={chocolate:cocoa,dried:apricots,nuts:hazelnuts,bakery,icecream,flavors:icecream,oils:filling,sweeteners:bakery,stabilizers:bakery,general:hazelnuts};
 type CategoryId=keyof typeof images;
+const productImageModules=import.meta.glob("../assets/products/catalog/*.jpg",{eager:true,import:"default",query:"?url"}) as Record<string,string>;
+const productImage=(id:string)=>{
+ const image=productImageModules[`../assets/products/catalog/${id}.jpg`];
+ if(!image)throw new Error(`Missing unique catalog image for ${id}`);
+ return image;
+};
 
 export const categories:Category[]=[
  {id:"chocolate",slug:"chocolate-cocoa",name:t("الشوكولا والكاكاو","Chocolate & Cocoa"),description:t("كاكاو وشوكولا ومشتقاتها للتصنيع.","Cocoa, chocolate and derivatives for manufacturing."),image:cocoa},
@@ -104,8 +110,13 @@ const seeds:Seed[]=[
 export const products:Product[]=seeds.map((s,index)=>{
  const category=categories.find(c=>c.id===s.cat);
  const applicationPairs=[...new Set(s.inds.flatMap(i=>apps[i]||apps["food"]||[]).map(x=>x.join("|")))].slice(0,3).map(value=>{const parts=value.split("|");return t(parts[0]??"تصنيع غذائي",parts[1]??"Food manufacturing")});
- return {id:s.id,slug:s.id,name:t(s.ar,s.en),shortDescription:t(`${s.ar} لتطبيقات صناعية غذائية متعددة.`,`${s.en} for multiple food manufacturing applications.`),description:t(`مكوّن ضمن فئة ${category?.name.ar||"المكونات الغذائية"}، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.`,`An ingredient in ${category?.name.en||"food ingredients"}, available for discussion based on application, specification and packaging needs.`),categoryId:s.cat,image:images[s.cat],gallery:[images[s.cat]],industryIds:s.inds,applications:applicationPairs,specifications:specs(s.formAr||"حسب مواصفة المنتج",s.formEn||"Per product specification"),packaging:t("خيارات تعبئة صناعية — التفاصيل عند الطلب","Industrial packaging options — details on request"),featured:s.featured??index%13===0,keywords:[s.ar,s.en,s.cat,...(s.keywords||[])]};
+ const image=productImage(s.id);
+ return {id:s.id,slug:s.id,name:t(s.ar,s.en),shortDescription:t(`${s.ar} لتطبيقات صناعية غذائية متعددة.`,`${s.en} for multiple food manufacturing applications.`),description:t(`مكوّن ضمن فئة ${category?.name.ar||"المكونات الغذائية"}، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.`,`An ingredient in ${category?.name.en||"food ingredients"}, available for discussion based on application, specification and packaging needs.`),categoryId:s.cat,image,gallery:[image],industryIds:s.inds,applications:applicationPairs,specifications:specs(s.formAr||"حسب مواصفة المنتج",s.formEn||"Per product specification"),packaging:t("خيارات تعبئة صناعية — التفاصيل عند الطلب","Industrial packaging options — details on request"),featured:s.featured??index%13===0,keywords:[s.ar,s.en,s.cat,...(s.keywords||[])]};
 });
+
+if(new Set(products.map(product=>product.image)).size!==products.length){
+ throw new Error("Every catalog product must have a unique image");
+}
 
 const industrySeeds=[
  ["choc","chocolate-confectionery","معامل الشوكولا والحلويات","Chocolate & Confectionery","كاكاو وشوكولا ومكسرات وحشوات لتطبيقات متنوعة.","Cocoa, chocolate, nuts and fillings for varied applications.",cocoa],
