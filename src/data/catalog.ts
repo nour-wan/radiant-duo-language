@@ -4,6 +4,9 @@ import hazelnuts from "@/assets/products/hazelnuts.jpg";
 import filling from "@/assets/products/filling.jpg";
 import bakery from "@/assets/products/bakery.jpg";
 import icecream from "@/assets/products/icecream.jpg";
+import cannedTropicalFruits from "@/assets/products/catalog/canned-tropical-fruits.jpg";
+import syrups from "@/assets/products/catalog/syrups.jpg";
+import fruitPurees from "@/assets/products/catalog/fruit-purees.jpg";
 import type { Category, Industry, Product } from "@/types/catalog";
 
 const t=(ar:string,en:string)=>({ar,en});
@@ -11,6 +14,9 @@ const images={chocolate:cocoa,dried:apricots,nuts:hazelnuts,bakery,icecream,flav
 type CategoryId=keyof typeof images;
 const productImageModules=import.meta.glob("../assets/products/catalog/*.jpg",{eager:true,import:"default",query:"?url"}) as Record<string,string>;
 const productImage=(id:string)=>{
+ if(id==="canned-tropical-fruits")return cannedTropicalFruits;
+ if(id==="syrups")return syrups;
+ if(id==="fruit-purees")return fruitPurees;
  const image=productImageModules[`../assets/products/catalog/${id}.jpg`];
  if(!image)throw new Error(`Missing unique catalog image for ${id}`);
  return image;
@@ -40,7 +46,7 @@ const apps:Record<string,[string,string][]>={
  ice:[["الآيس كريم","Ice cream"],["الألبان والحلويات المجمدة","Dairy & frozen desserts"]],
  food:[["تصنيع الأغذية","Food manufacturing"],["المشروبات والخلطات","Beverages & mixes"]],
 };
-type Seed={id:string;ar:string;en:string;cat:CategoryId;inds:string[];formAr?:string;formEn?:string;featured?:boolean;keywords?:string[]};
+type Seed={id:string;ar:string;en:string;cat:CategoryId;inds:string[];formAr?:string;formEn?:string;featured?:boolean;keywords?:string[];shortAr?:string;shortEn?:string;descriptionAr?:string;descriptionEn?:string;applicationPairs?:[string,string][]};
 const seeds:Seed[]=[
  {id:"natural-cocoa",ar:"مسحوق كاكاو طبيعي",en:"Natural Cocoa Powder",cat:"chocolate",inds:["choc","bakeries","biscuits","cakes","beverages"],featured:true},
  {id:"alkalized-cocoa",ar:"مسحوق كاكاو معالج",en:"Alkalized Cocoa Powder",cat:"chocolate",inds:["choc","bakeries","biscuits","ice","beverages"]},
@@ -105,13 +111,16 @@ const seeds:Seed[]=[
  {id:"food-grade-salt",ar:"ملح غذائي",en:"Food Grade Salt",cat:"general",inds:["bakeries","biscuits","food"],formAr:"بلورات",formEn:"Crystals"},
  {id:"potassium-sorbate",ar:"سوربات البوتاسيوم",en:"Potassium Sorbate",cat:"general",inds:["bakeries","cakes","beverages","food"],formAr:"مسحوق أو حبيبات",formEn:"Powder or granules"},
  {id:"sodium-benzoate",ar:"بنزوات الصوديوم",en:"Sodium Benzoate",cat:"general",inds:["beverages","food"],formAr:"مسحوق أو حبيبات",formEn:"Powder or granules"},
+  {id:"canned-tropical-fruits",ar:"فواكه معلبة استوائية",en:"Canned Tropical Fruits",cat:"general",inds:["bakeries","cakes","ice","food"],formAr:"قطع فواكه معلبة",formEn:"Canned fruit pieces",keywords:["أناناس","مانجو","بابايا","معلبات","pineapple","mango","papaya","canned"],shortAr:"فواكه استوائية معلبة لتطبيقات الحلويات والمخبوزات والآيس كريم.",shortEn:"Canned tropical fruits for desserts, bakery and ice cream applications.",descriptionAr:"فواكه استوائية معلبة لاستخدامها في الحلويات وتزيين الكيك والمخبوزات والآيس كريم. تُناقش تشكيلة الفواكه وحجم القطع ووسط الحفظ والتعبئة بحسب احتياجات التطبيق.",descriptionEn:"Canned tropical fruits for desserts, cake decoration, baked goods and ice cream. Fruit selection, piece size, preserving medium and packaging are discussed according to application needs.",applicationPairs:[["الحلويات وتزيين الكيك","Desserts & cake decoration"],["المخبوزات","Baked goods"],["الآيس كريم","Ice cream"]]},
+  {id:"syrups",ar:"سيروبات",en:"Syrups",cat:"sweeteners",inds:["beverages","cakes","ice","bakeries","food"],formAr:"سائل لزج",formEn:"Viscous liquid",keywords:["سيروب","شراب","مشروبات","syrup","beverage"],shortAr:"سيروبات لتطبيقات المشروبات والحلويات والآيس كريم.",shortEn:"Syrups for beverages, desserts and ice cream applications.",descriptionAr:"سيروبات للاستخدام في المشروبات والحلويات والآيس كريم، مع مناقشة النكهة والتركيز والقوام والتعبئة المناسبة لكل تطبيق عند الاستفسار.",descriptionEn:"Syrups for beverages, desserts and ice cream. Flavor, concentration, consistency and suitable packaging are discussed for each application on inquiry.",applicationPairs:[["المشروبات والخلطات","Beverages & mixes"],["الحلويات","Desserts"],["الآيس كريم","Ice cream"]]},
+  {id:"fruit-purees",ar:"فواكه مهروسة للحشوات",en:"Fruit Purees for Fillings",cat:"bakery",inds:["bakeries","cakes","biscuits","ice","food"],formAr:"هريس فواكه",formEn:"Fruit puree",keywords:["هريس","بيوريه","حشوات","puree","purée","fillings"],shortAr:"هريس فواكه لتحضير حشوات المخبوزات والكيك والحلويات.",shortEn:"Fruit purees for preparing bakery, cake and dessert fillings.",descriptionAr:"فواكه مهروسة تستخدم كأساس لتحضير حشوات الكيك والمعجنات والحلويات. يُناقش نوع الفاكهة والقوام والمعالجة المطلوبة ومدى ملاءمتها للخَبز بحسب المنتج والتطبيق.",descriptionEn:"Fruit purees used as a base for cake, pastry and dessert fillings. Fruit type, texture, required processing and suitability for baking are discussed according to the product and application.",applicationPairs:[["حشوات المعجنات","Pastry fillings"],["حشوات الكيك والحلويات","Cake & dessert fillings"],["حشوات البسكويت","Biscuit fillings"]]},
 ];
 
 export const products:Product[]=seeds.map((s,index)=>{
  const category=categories.find(c=>c.id===s.cat);
- const applicationPairs=[...new Set(s.inds.flatMap(i=>apps[i]||apps["food"]||[]).map(x=>x.join("|")))].slice(0,3).map(value=>{const parts=value.split("|");return t(parts[0]??"تصنيع غذائي",parts[1]??"Food manufacturing")});
+  const applicationPairs=s.applicationPairs?.map(([ar,en])=>t(ar,en))??[...new Set(s.inds.flatMap(i=>apps[i]||apps["food"]||[]).map(x=>x.join("|")))].slice(0,3).map(value=>{const parts=value.split("|");return t(parts[0]??"تصنيع غذائي",parts[1]??"Food manufacturing")});
  const image=productImage(s.id);
- return {id:s.id,slug:s.id,name:t(s.ar,s.en),shortDescription:t(`${s.ar} لتطبيقات صناعية غذائية متعددة.`,`${s.en} for multiple food manufacturing applications.`),description:t(`مكوّن ضمن فئة ${category?.name.ar||"المكونات الغذائية"}، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.`,`An ingredient in ${category?.name.en||"food ingredients"}, available for discussion based on application, specification and packaging needs.`),categoryId:s.cat,image,gallery:[image],industryIds:s.inds,applications:applicationPairs,specifications:specs(s.formAr||"حسب مواصفة المنتج",s.formEn||"Per product specification"),packaging:t("خيارات تعبئة صناعية — التفاصيل عند الطلب","Industrial packaging options — details on request"),featured:s.featured??index%13===0,keywords:[s.ar,s.en,s.cat,...(s.keywords||[])]};
+  return {id:s.id,slug:s.id,name:t(s.ar,s.en),shortDescription:t(s.shortAr??`${s.ar} لتطبيقات صناعية غذائية متعددة.`,s.shortEn??`${s.en} for multiple food manufacturing applications.`),description:t(s.descriptionAr??`مكوّن ضمن فئة ${category?.name.ar||"المكونات الغذائية"}، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.`,s.descriptionEn??`An ingredient in ${category?.name.en||"food ingredients"}, available for discussion based on application, specification and packaging needs.`),categoryId:s.cat,image,gallery:[image],industryIds:s.inds,applications:applicationPairs,specifications:specs(s.formAr||"حسب مواصفة المنتج",s.formEn||"Per product specification"),packaging:t("خيارات تعبئة صناعية — التفاصيل عند الطلب","Industrial packaging options — details on request"),featured:s.featured??index%13===0,keywords:[s.ar,s.en,s.cat,...(s.keywords||[])]};
 });
 
 if(new Set(products.map(product=>product.image)).size!==products.length){

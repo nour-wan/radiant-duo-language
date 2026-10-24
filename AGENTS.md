@@ -5,3 +5,4 @@
 
 - Keep all catalog content behind `src/services/catalog.ts` so a future Django REST API can replace local mock data without page changes.
 - Keep locale and theme state in the shared site context so every route uses consistent RTL/LTR and persisted appearance.
+- Catalog seeds may override localized descriptions and applications so ingredient-specific content remains in the data layer rather than pages.
