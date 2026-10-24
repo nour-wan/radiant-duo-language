@@ -1,7 +1,7 @@
 # Roadmap
-- [ ] Replace company branding in Arabic and English throughout the site
-- [ ] Add canned tropical fruits, syrups, and fruit purees with unique images
-- [ ] Verify new product details, bilingual search, and company name layout
+- [x] Replace company branding in Arabic and English throughout the site
+- [x] Add canned tropical fruits, syrups, and fruit purees with unique images
+- [x] Verify new product details, bilingual search, and company name layout
 - [x] Build bilingual theme system and shared navigation
 - [x] Build localized data/service layer and reusable catalog components
 - [x] Build all six requested page types
