@@ -1,4 +1,7 @@
 # Roadmap
+- [x] Pin Ubuntu VPS builds to Nitro Node output while preserving the server entry
+- [x] Document installation, deployment, and checks for the existing systemd service
+- [x] Validate deployment configuration and existing routing/catalog tests; automated build reports OK (Ubuntu Node artifact must still be built and checked on the VPS)
 - [x] Replace company branding in Arabic and English throughout the site
 - [x] Add canned tropical fruits, syrups, and fruit purees with unique images
 - [x] Verify new product details, bilingual search, and company name layout
