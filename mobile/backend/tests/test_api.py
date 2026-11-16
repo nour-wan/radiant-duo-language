@@ -576,3 +576,40 @@ class WhatsAppConfigTests(Base):
         self.assertEqual(r.data["channel"], "whatsapp")
         url, token, body = call.call_args.args
         self.assertEqual((url.rsplit("/", 2)[-2], token, body["to"], body["template"]["name"]), ("555", "T", "963944123456", "alas_otp"))
+
+
+class WhatsAppGatewayTests(Base):
+    def test_codes_go_through_the_linked_number(self):
+        from unittest import mock
+
+        with mock.patch("apps.accounts.whatsapp.gateway", return_value={"ok": True}) as gw:
+            r = self.client.post("/api/v1/auth/phone-code/", {"phone": "0944123456", "purpose": "register"}, format="json")
+        self.assertEqual(r.data["channel"], "whatsapp")
+        method, path, body = gw.call_args.args
+        self.assertEqual((method, path, body["to"]), ("POST", "/send", "+963944123456"))
+        self.assertIn("رمز التحقق", body["text"])
+
+    def test_number_without_whatsapp_is_reported(self):
+        from unittest import mock
+
+        from apps.accounts.whatsapp import WhatsAppError
+
+        with mock.patch("apps.accounts.whatsapp.gateway", side_effect=WhatsAppError("not_on_whatsapp")):
+            r = self.client.post("/api/v1/auth/phone-code/", {"phone": "0944123456", "purpose": "register"}, format="json")
+        self.assertEqual(r.data["code"], "not_on_whatsapp")
+
+    def test_gateway_down_falls_back_to_admin(self):
+        from unittest import mock
+
+        from apps.accounts.whatsapp import WhatsAppError
+
+        with mock.patch("apps.accounts.whatsapp.gateway", side_effect=WhatsAppError("not_linked")):
+            r = self.client.post("/api/v1/auth/phone-code/", {"phone": "0944123456", "purpose": "register"}, format="json")
+        self.assertEqual(r.data["channel"], "manual")
+
+    def test_link_status_is_admin_only(self):
+        self.login(self.user)
+        self.assertEqual(self.client.get("/api/v1/admin/whatsapp/link/").status_code, 403)
+        self.login(self.admin)
+        r = self.client.get("/api/v1/admin/whatsapp/link/")
+        self.assertEqual((r.status_code, r.data["status"]), (200, "unavailable"))  # no gateway in tests

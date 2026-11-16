@@ -277,6 +277,10 @@ class AdminApi {
   Future<Map<String, dynamic>> whatsApp() async => Map<String, dynamic>.from(await client.get('/admin/whatsapp/') as Map);
   Future<Map<String, dynamic>> saveWhatsApp(Map<String, dynamic> data) async =>
       Map<String, dynamic>.from(await client.patch('/admin/whatsapp/', data: data) as Map);
+  Future<Map<String, dynamic>> whatsAppLink() async => Map<String, dynamic>.from(await client.get('/admin/whatsapp/link/') as Map);
+  Future<void> unlinkWhatsApp() => client.post('/admin/whatsapp/link/', data: {});
+  Future<String> pairWhatsApp(String phone) async =>
+      ((await client.post('/admin/whatsapp/link/', data: {'action': 'pair', 'phone': phone})) as Map)['code'] as String;
   Future<Map<String, dynamic>> testWhatsApp(String phone) async =>
       Map<String, dynamic>.from(await client.post('/admin/whatsapp/', data: {'phone': phone}) as Map);
   Future<List<LegalPage>> legalPages() async => _list(await client.get('/admin/legal/'), LegalPage.fromJson);

@@ -573,11 +573,41 @@ class WhatsAppConfigView(AdminMixin, APIView):
         phone = normalize_phone(request.data.get("phone"))
         if not phone:
             raise BusinessError("invalid_phone")
-        if not whatsapp.configured():
-            return Response({"ok": False, "error": "not_configured"})
         try:
-            number, name = whatsapp.sender_number()
-            whatsapp._send_template(phone, "123456", "ar")
+            if whatsapp.configured():
+                number, name = whatsapp.sender_number()
+                whatsapp._send_template(phone, "123456", "ar")
+            else:
+                status = whatsapp.gateway_status()
+                if status.get("status") != "open":
+                    return Response({"ok": False, "error": "not_configured"})
+                number, name = status.get("me") or "", ""
+                whatsapp.send_via_gateway(phone, whatsapp.message_text("123456", "ar"))
         except whatsapp.WhatsAppError as e:
             return Response({"ok": False, "error": str(e)})
         return Response({"ok": True, "from": number, "name": name, "to": phone})
+
+
+class WhatsAppLinkView(AdminMixin, APIView):
+    """The store number linked to the gateway: GET shows the state or the QR to scan, POST unlinks."""
+
+    def get(self, request):
+        from apps.accounts import whatsapp
+
+        return Response(whatsapp.gateway_status())
+
+    def post(self, request):
+        """{"action": "pair", "phone": "09..."} returns a code to type on the phone; otherwise unlinks."""
+        from apps.accounts import whatsapp
+        from apps.accounts.phone import normalize_phone
+
+        try:
+            if request.data.get("action") == "pair":
+                phone = normalize_phone(request.data.get("phone"))
+                if not phone:
+                    raise BusinessError("invalid_phone")
+                return Response(whatsapp.gateway("POST", "/pair", {"phone": phone}))
+            whatsapp.gateway("POST", "/logout", {})
+        except whatsapp.WhatsAppError as e:
+            raise BusinessError(str(e))
+        return Response({"ok": True})

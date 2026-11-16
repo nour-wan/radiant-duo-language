@@ -22,6 +22,7 @@ urlpatterns = [
     path("dashboard/", views.DashboardView.as_view()),
     path("settings/", views.SettingsView.as_view()),
     path("whatsapp/", views.WhatsAppConfigView.as_view()),
+    path("whatsapp/link/", views.WhatsAppLinkView.as_view()),
     path("reports/", views.ReportView.as_view()),
     path("receivables/", views.ReceivablesView.as_view()),
 ] + router.urls

@@ -159,6 +159,7 @@ const sharedStrings = <String, List<String>>{
   'err.not_found': ['العنصر غير موجود.', 'Not found.'],
   'err.throttled': ['محاولات كثيرة، انتظر قليلاً ثم حاول.', 'Too many attempts. Please wait a moment.'],
   'err.invalid_credentials': ['بيانات الدخول غير صحيحة، تأكد من الرقم وكلمة السر.', 'Incorrect login details. Check the number and password.'],
+  'err.not_on_whatsapp': ['هذا الرقم ليس عليه واتساب. اكتب رقماً عليه واتساب لتصلك رسالة التحقق.', 'This number has no WhatsApp. Use a number with WhatsApp to receive the code.'],
   'err.invalid_phone': ['رقم الهاتف غير صحيح. اكتبه مثل 0944123456', 'Invalid phone number. Write it like 0944123456'],
   'err.phone_taken': ['هذا الرقم مسجّل مسبقاً. سجّل الدخول أو استعد كلمة السر.', 'This number is already registered. Log in or reset your password.'],
   'err.code_invalid': ['رمز التحقق غير صحيح أو انتهت صلاحيته.', 'The verification code is wrong or expired.'],

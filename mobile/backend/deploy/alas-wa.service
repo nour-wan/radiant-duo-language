@@ -1,0 +1,30 @@
+# /etc/systemd/system/alas-wa.service
+[Unit]
+Description=Alas WhatsApp gateway (verification codes, local only)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=alaswa
+Group=alaswa
+WorkingDirectory=/opt/alas-wa
+Environment=NODE_ENV=production
+Environment=WA_PORT=8110
+Environment=WA_AUTH_DIR=/var/lib/alas-wa/auth
+Environment=WA_KEY_FILE=/etc/alas-wa/key
+ExecStart=/usr/bin/node /opt/alas-wa/index.mjs
+Restart=always
+RestartSec=5
+
+# Hardening: can only write its own WhatsApp session folder
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/alas-wa
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,8 +1,8 @@
-"""Delivers phone verification codes on WhatsApp.
+"""Delivers phone verification codes on WhatsApp, trying in order:
 
-With the WhatsApp Cloud API configured (WHATSAPP_* settings) the code is sent automatically from
-an approved authentication template. Otherwise it goes to the admin app: the admin taps the
-notification and WhatsApp opens with the message ready to send to the customer.
+1. WhatsApp Cloud API (Meta), when configured in the admin app or the server env.
+2. The local gateway (wa_gateway/): the store's number linked by QR, like WhatsApp Web.
+3. The admin app: the admin taps the notification and WhatsApp opens with the message ready.
 """
 
 import json
@@ -20,8 +20,8 @@ AUTO, MANUAL = "whatsapp", "manual"
 
 def message_text(code, language):
     if language == "en":
-        return f"Your Alas Foodstuff verification code is: {code}"
-    return f"رمز التحقق الخاص بك في تطبيق آلاس: {code}"
+        return f"Your Alas Foodstuff verification code is: {code}\nDo not share this code with anyone."
+    return f"رمز التحقق الخاص بك في تطبيق آلاس: {code}\nلا تشارك هذا الرمز مع أحد."
 
 
 GRAPH = "https://graph.facebook.com/v21.0"
@@ -104,6 +104,49 @@ def _send_to_admins(phone, code, language, purpose):
     phone_code_for_admin(phone, code, purpose, link)
 
 
+def _gateway_key():
+    try:
+        with open(settings.WA_GATEWAY_KEY_FILE, encoding="utf-8") as fh:
+            return fh.read().strip()
+    except OSError:
+        return ""
+
+
+def gateway(method, path, body=None, timeout=25):
+    """Calls the local gateway; raises WhatsAppError with its error code."""
+    key = _gateway_key()
+    if not key:
+        raise WhatsAppError("gateway_not_installed")
+    req = urllib.request.Request(
+        settings.WA_GATEWAY_URL.rstrip("/") + path,
+        data=json.dumps(body).encode() if body is not None else None,
+        headers={"X-Api-Key": key, "Content-Type": "application/json"},
+        method=method,
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as res:
+            return json.loads(res.read() or b"{}")
+    except urllib.error.HTTPError as e:
+        try:
+            raise WhatsAppError(json.loads(e.read()).get("error") or str(e)) from e
+        except ValueError:
+            raise WhatsAppError(str(e)) from e
+    except (urllib.error.URLError, OSError) as e:
+        raise WhatsAppError("gateway_unavailable") from e
+
+
+def gateway_status():
+    """{'status': 'open' | 'qr' | 'connecting' | 'closed' | 'unavailable', 'qr': data-URL or None, 'me': number}"""
+    try:
+        return gateway("GET", "/status", timeout=5)
+    except WhatsAppError as e:
+        return {"status": "unavailable", "qr": None, "me": None, "error": str(e)}
+
+
+def send_via_gateway(phone, text):
+    gateway("POST", "/send", {"to": phone, "text": text})
+
+
 def send_code(phone, code, language, purpose):
     """Returns the channel used: 'whatsapp' (sent automatically) or 'manual' (sent by an admin)."""
     if configured():
@@ -111,6 +154,17 @@ def send_code(phone, code, language, purpose):
             if _send_template(phone, code, language):
                 return AUTO
         except WhatsAppError:
-            log.exception("WhatsApp code to %s failed; falling back to the admin app", phone)
+            log.exception("WhatsApp code to %s failed; trying the next way", phone)
+    try:
+        send_via_gateway(phone, message_text(code, language))
+        return AUTO
+    except WhatsAppError as e:
+        if str(e) == "not_on_whatsapp":
+            # Nobody could deliver it: tell the customer instead of waiting for nothing
+            from apps.core.errors import BusinessError
+
+            raise BusinessError("not_on_whatsapp")
+        if str(e) not in ("gateway_not_installed",):
+            log.warning("WhatsApp gateway could not send to %s (%s); sending through the admin app", phone, e)
     _send_to_admins(phone, code, language, purpose)
     return MANUAL

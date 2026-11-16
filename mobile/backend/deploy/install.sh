@@ -62,6 +62,8 @@ run_manage collectstatic --noinput -v0
 chown -R root:root "$APP/staticfiles"
 run_manage seed_store
 
+bash "$SRC/deploy/install_wa_gateway.sh"
+
 echo "==> systemd service"
 install -m 644 "$APP/deploy/alas-api.service" /etc/systemd/system/alas-api.service
 systemctl daemon-reload
