@@ -13,7 +13,7 @@ class AdminLoginScreen extends StatefulWidget {
 
 class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final _form = GlobalKey<FormState>();
-  final _email = TextEditingController(text: 'info@alasfoodstuff.com');
+  final _email = TextEditingController();
   final _password = TextEditingController();
   bool _busy = false, _obscure = true;
 
@@ -55,8 +55,13 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             TextFormField(
               controller: _email,
               keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(labelText: context.tr('app.email'), prefixIcon: const Icon(Icons.mail_outline)),
-              validator: (v) => (v == null || !v.contains('@')) ? context.tr('app.invalid_email') : null,
+              textDirection: TextDirection.ltr,
+              decoration: InputDecoration(
+                labelText: context.tr('login.id'),
+                helperText: context.tr('login.id_hint'),
+                prefixIcon: const Icon(Icons.person_outline),
+              ),
+              validator: (v) => (v == null || v.trim().length < 6) ? context.tr('app.required') : null,
             ),
             const SizedBox(height: 14),
             TextFormField(

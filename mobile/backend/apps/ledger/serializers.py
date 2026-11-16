@@ -15,7 +15,7 @@ class LedgerEntrySerializer(serializers.ModelSerializer):
 
 
 class AdminLedgerEntrySerializer(LedgerEntrySerializer):
-    created_by = serializers.CharField(source="created_by.email", read_only=True, default=None)
+    created_by = serializers.CharField(source="created_by.display_name", read_only=True, default=None)
 
     class Meta(LedgerEntrySerializer.Meta):
         fields = LedgerEntrySerializer.Meta.fields + ["created_by"]

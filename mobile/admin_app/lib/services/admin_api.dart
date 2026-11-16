@@ -274,6 +274,13 @@ class AdminApi {
   // Settings & policies
   Future<StoreInfo> settings() async => StoreInfo.fromJson(await client.get('/admin/settings/'));
   Future<StoreInfo> saveSettings(Map<String, dynamic> data) async => StoreInfo.fromJson(await client.patch('/admin/settings/', data: data));
+  Future<List<Map<String, dynamic>>> staff() async =>
+      ((await client.get('/admin/staff/')) as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+  Future<void> addStaff(Map<String, dynamic> data) => client.post('/admin/staff/', data: data);
+  Future<void> updateStaff(int id, Map<String, dynamic> data) => client.patch('/admin/staff/$id/', data: data);
+  Future<Map<String, dynamic>> collections(DateTime from, DateTime to, {int? staffId}) async => Map<String, dynamic>.from(
+      await client.get('/admin/collections/', query: {'from': _day(from), 'to': _day(to), if (staffId != null) 'staff': staffId}) as Map);
+  static String _day(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   Future<Map<String, dynamic>> whatsApp() async => Map<String, dynamic>.from(await client.get('/admin/whatsapp/') as Map);
   Future<Map<String, dynamic>> saveWhatsApp(Map<String, dynamic> data) async =>
       Map<String, dynamic>.from(await client.patch('/admin/whatsapp/', data: data) as Map);

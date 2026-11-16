@@ -48,8 +48,8 @@ class LoginView(APIView):
         s = LoginSerializer(data=request.data)
         s.is_valid(raise_exception=True)
         d = s.validated_data
-        if d.get("phone") and not self.require_staff:
-            user = services.login_with_phone(d["phone"], d["password"])
+        if d.get("phone"):
+            user = services.login_with_phone(d["phone"], d["password"], staff_only=self.require_staff)
         elif d.get("email"):
             user = authenticate(request, email=d["email"].lower(), password=d["password"])
         else:

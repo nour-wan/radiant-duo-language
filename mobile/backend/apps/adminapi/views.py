@@ -1,5 +1,6 @@
 import csv
-from datetime import datetime, time, timedelta
+from datetime import date, datetime, time, timedelta
+from decimal import Decimal
 
 from django.db import transaction
 from django.db.models import Count, DecimalField, Max, OuterRef, Q, Subquery, Sum, Value
@@ -10,6 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -19,7 +21,7 @@ from apps.catalog.models import Category, Product, ProductImage, Variant
 from apps.catalog.serializers import ImageSerializer
 from apps.core.errors import BusinessError
 from apps.core.images import process_upload
-from apps.core.permissions import IsStoreAdmin
+from apps.core.permissions import IsOwner, IsStoreAdmin
 from apps.ledger import services as ledger
 from apps.ledger.models import LedgerEntry
 from apps.ledger.serializers import AdjustmentSerializer, AdminLedgerEntrySerializer, PaymentSerializer
@@ -40,6 +42,23 @@ SALE_STATUSES = [Order.PENDING, Order.CONFIRMED, Order.SHIPPED, Order.DELIVERED]
 
 class AdminMixin:
     permission_classes = [IsStoreAdmin]
+
+
+class OwnerMixin:
+    """Only the store owner: employees, store settings, WhatsApp, credit, corrections, cash report."""
+
+    permission_classes = [IsOwner]
+
+
+def _end_sessions(user):
+    """Signs the account out everywhere and stops its push notifications."""
+    from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
+
+    from apps.notifications.models import DeviceToken
+
+    for token in OutstandingToken.objects.filter(user=user):
+        BlacklistedToken.objects.get_or_create(token=token)
+    DeviceToken.objects.filter(user=user).delete()
 
 
 def _local_day_start(day):
@@ -305,6 +324,12 @@ class CustomerViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMix
             qs = qs.filter(balance__gt=0)
         return qs.prefetch_related("interests").order_by("-date_joined")
 
+    def perform_update(self, serializer):
+        # Buying on credit and its limit are the owner's decision
+        if {"credit_enabled", "credit_limit"} & set(self.request.data) and not self.request.user.is_superuser:
+            raise PermissionDenied("owner_only")
+        serializer.save()
+
     @action(detail=True, methods=["get"])
     def statement(self, request, pk=None):
         customer = self.get_object()
@@ -324,9 +349,10 @@ class CustomerViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMix
         _notify_payment(entry)
         return Response(AdminLedgerEntrySerializer(entry).data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["post"], permission_classes=[IsOwner])
     def adjustments(self, request, pk=None):
-        """Correction entry with a reason (entries are never edited or deleted)."""
+        """Correction entry with a reason (entries are never edited or deleted). Owner only: a
+        correction could otherwise hide a payment an employee received."""
         customer = self.get_object()
         data = AdjustmentSerializer(data=request.data)
         data.is_valid(raise_exception=True)
@@ -403,7 +429,7 @@ class BannerViewSet(AdminMixin, ImageUploadMixin, viewsets.ModelViewSet):
         instance.delete()
 
 
-class SettingsView(AdminMixin, APIView):
+class SettingsView(OwnerMixin, APIView):
     def get(self, request):
         return Response(s.AdminSettingsSerializer(StoreSettings.load()).data)
 
@@ -551,7 +577,7 @@ class AdminInboxView(AdminMixin, mixins.ListModelMixin, viewsets.GenericViewSet)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class WhatsAppConfigView(AdminMixin, APIView):
+class WhatsAppConfigView(OwnerMixin, APIView):
     """WhatsApp account for verification codes. POST sends a test code to a number."""
 
     def get(self, request):
@@ -588,7 +614,7 @@ class WhatsAppConfigView(AdminMixin, APIView):
         return Response({"ok": True, "from": number, "name": name, "to": phone})
 
 
-class WhatsAppLinkView(AdminMixin, APIView):
+class WhatsAppLinkView(OwnerMixin, APIView):
     """The store number linked to the gateway: GET shows the state or the QR to scan, POST unlinks."""
 
     def get(self, request):
@@ -611,3 +637,69 @@ class WhatsAppLinkView(AdminMixin, APIView):
         except whatsapp.WhatsAppError as e:
             raise BusinessError(str(e))
         return Response({"ok": True})
+
+
+class StaffViewSet(OwnerMixin, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    serializer_class = s.StaffSerializer
+    pagination_class = None
+    http_method_names = ["get", "post", "patch"]
+
+    def get_queryset(self):
+        return User.objects.filter(is_staff=True).order_by("-is_superuser", "-is_active", "full_name", "id")
+
+    def perform_update(self, serializer):
+        user = serializer.instance
+        was_active = user.is_active
+        password_changed = bool(serializer.validated_data.get("password"))
+        user = serializer.save()
+        if (was_active and not user.is_active) or (password_changed and user.pk != self.request.user.pk):
+            _end_sessions(user)
+
+
+class CollectionsView(OwnerMixin, APIView):
+    """Cash each staff member recorded as received, for a period (owner only).
+
+    ?from=YYYY-MM-DD&to=YYYY-MM-DD (default: today); &staff=<id> adds that person's payments.
+    """
+
+    def get(self, request):
+        from apps.ledger.models import LedgerEntry
+
+        p = request.query_params
+        today = timezone.localdate()
+        try:
+            date_from = date.fromisoformat(p["from"]) if p.get("from") else today
+            date_to = date.fromisoformat(p["to"]) if p.get("to") else today
+        except ValueError:
+            raise BusinessError("invalid_date")
+        qs = LedgerEntry.objects.filter(
+            kind=LedgerEntry.PAYMENT,
+            created_at__gte=_local_day_start(date_from),
+            created_at__lt=_local_day_start(date_to + timedelta(days=1)),
+        ).select_related("created_by", "user", "order")
+        rows = {}
+        for e in qs:
+            key = e.created_by_id or 0
+            row = rows.setdefault(key, {
+                "id": e.created_by_id, "name": e.created_by.display_name if e.created_by_id else None,
+                "total": Decimal("0"), "count": 0,
+            })
+            row["total"] += -e.amount
+            row["count"] += 1
+        staff = sorted(rows.values(), key=lambda r: -r["total"])
+        data = {
+            "from": date_from, "to": date_to,
+            "total": str(sum((r["total"] for r in staff), Decimal("0"))),
+            "staff": [{**r, "total": str(r["total"])} for r in staff],
+        }
+        if p.get("staff") is not None:
+            sid = int(p["staff"]) if str(p["staff"]).isdigit() and p["staff"] != "0" else None
+            data["entries"] = [
+                {
+                    "amount": str(-e.amount), "created_at": e.created_at, "note": e.note,
+                    "customer": (e.user.business_name or e.user.full_name) if e.user_id else None,
+                    "customer_id": e.user_id, "order_id": e.order_id, "order_number": e.order.number if e.order_id else None,
+                }
+                for e in qs.filter(created_by_id=sid).order_by("-created_at")
+            ]
+        return Response(data)

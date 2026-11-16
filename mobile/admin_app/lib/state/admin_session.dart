@@ -9,6 +9,7 @@ class AdminSession extends ChangeNotifier {
   AppUser? user;
 
   bool get loggedIn => user != null;
+  bool get isOwner => user?.isOwner ?? false;
 
   Future<void> restore() async {
     await client.tokens.load();
@@ -26,8 +27,11 @@ class AdminSession extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> login(String email, String password) async {
-    final data = await client.post<Map<String, dynamic>>('/admin/auth/login/', data: {'email': email.trim(), 'password': password}, noAuth: true);
+  /// The owner signs in with the email, employees with their phone number.
+  Future<void> login(String emailOrPhone, String password) async {
+    final id = emailOrPhone.trim();
+    final data = await client.post<Map<String, dynamic>>('/admin/auth/login/',
+        data: {id.contains('@') ? 'email' : 'phone': id, 'password': password}, noAuth: true);
     final tokens = data['tokens'] as Map;
     await client.tokens.save(tokens['access'] as String, tokens['refresh'] as String);
     user = AppUser.fromJson(data['user'] as Map<String, dynamic>);

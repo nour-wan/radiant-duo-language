@@ -82,9 +82,12 @@ def customers_with_phone(phone):
     return User.objects.filter(phone=phone, is_active=True).order_by("-phone_verified", "-last_login", "-id")
 
 
-def login_with_phone(phone, password):
+def login_with_phone(phone, password, staff_only=False):
     """Old accounts may share a number; the one whose password matches signs in."""
-    for user in customers_with_phone(phone):
+    users = customers_with_phone(phone)
+    if staff_only:
+        users = users.filter(is_staff=True)
+    for user in users:
         if user.check_password(password):
             return user
     return None

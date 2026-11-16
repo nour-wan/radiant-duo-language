@@ -118,12 +118,36 @@ class AdminOrderListSerializer(serializers.ModelSerializer):
         ]
 
 
+class AdminOrderEventSerializer(serializers.Serializer):
+    status = serializers.CharField()
+    note = serializers.CharField()
+    created_at = serializers.DateTimeField()
+    by_name = serializers.SerializerMethodField()
+
+    def get_by_name(self, obj):
+        return obj.by.display_name if obj.by_id else None
+
+
 class AdminOrderDetailSerializer(OrderDetailSerializer):
     user_id = serializers.IntegerField(read_only=True)
     allowed_statuses = serializers.SerializerMethodField()
+    events = AdminOrderEventSerializer(many=True, read_only=True)
+    payments = serializers.SerializerMethodField()
 
     class Meta(OrderDetailSerializer.Meta):
-        fields = OrderDetailSerializer.Meta.fields + ["customer_email", "user_id", "admin_note", "customer_deleted", "allowed_statuses"]
+        fields = OrderDetailSerializer.Meta.fields + [
+            "customer_email", "user_id", "admin_note", "customer_deleted", "allowed_statuses", "payments",
+        ]
+
+    def get_payments(self, obj):
+        """Cash received for this order and who took it."""
+        from apps.ledger.models import LedgerEntry
+
+        return [
+            {"amount": str(-e.amount), "by_name": e.created_by.display_name if e.created_by_id else None,
+             "note": e.note, "created_at": e.created_at}
+            for e in LedgerEntry.objects.filter(order=obj, kind=LedgerEntry.PAYMENT).select_related("created_by").order_by("created_at")
+        ]
 
     def get_allowed_statuses(self, obj):
         return sorted(Order.TRANSITIONS.get(obj.status, set()))
@@ -299,3 +323,64 @@ class AdminWhatsAppSerializer(serializers.Serializer):
             setattr(instance, k, v)
         instance.save()
         return instance
+
+
+class StaffSerializer(serializers.ModelSerializer):
+    """Admin app accounts. The owner adds employees, renames them, resets passwords, disables them."""
+
+    is_owner = serializers.BooleanField(source="is_superuser", read_only=True)
+    phone = serializers.CharField(max_length=32, required=False, allow_blank=True)
+    password = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = User
+        fields = ["id", "full_name", "phone", "email", "is_owner", "is_active", "last_login", "date_joined", "password"]
+        read_only_fields = ["id", "email", "is_owner", "last_login", "date_joined"]
+
+    def validate_phone(self, value):
+        from apps.accounts.phone import normalize_phone
+
+        if not value:
+            return value
+        phone = normalize_phone(value)
+        if not phone:
+            raise serializers.ValidationError("invalid_phone")
+        others = User.objects.filter(phone=phone)
+        if self.instance is not None:
+            others = others.exclude(pk=self.instance.pk)
+        if others.exists():
+            raise serializers.ValidationError("phone_taken")
+        return phone
+
+    def validate_password(self, value):
+        from django.contrib.auth import password_validation
+
+        password_validation.validate_password(value)
+        return value
+
+    def validate(self, data):
+        if self.instance is None:
+            if not data.get("full_name", "").strip():
+                raise serializers.ValidationError({"full_name": "required"})
+            if not data.get("phone"):
+                raise serializers.ValidationError({"phone": "required"})
+            if not data.get("password"):
+                raise serializers.ValidationError({"password": "required"})
+        elif self.instance.is_superuser and data.get("is_active") is False:
+            raise serializers.ValidationError({"is_active": "owner_cannot_be_disabled"})
+        return data
+
+    def create(self, data):
+        return User.objects.create_user(
+            phone=data["phone"], password=data["password"], full_name=data["full_name"].strip(),
+            is_staff=True, phone_verified=True,
+        )
+
+    def update(self, user, data):
+        password = data.pop("password", None)
+        for k, v in data.items():
+            setattr(user, k, v)
+        if password:
+            user.set_password(password)
+        user.save()
+        return user

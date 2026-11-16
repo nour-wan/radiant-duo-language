@@ -210,7 +210,8 @@ class AppUser {
         profileComplete = j['profile_complete'] as bool? ?? true,
         phoneVerified = j['phone_verified'] as bool? ?? false,
         creditEnabled = j['credit_enabled'] as bool? ?? false,
-        showStatement = j['show_statement'] as bool? ?? true;
+        showStatement = j['show_statement'] as bool? ?? true,
+        isOwner = j['is_owner'] as bool? ?? false;
 
   final int id;
   final String email, fullName, phone, businessName, businessType, areaName, address, language;
@@ -220,6 +221,12 @@ class AppUser {
 
   /// The account statement is hidden until the store enables credit (or something is owed).
   final bool showStatement;
+
+  /// Store owner in the admin app (employees, settings, corrections, cash report).
+  final bool isOwner;
+
+  /// Name shown to staff on orders and payments.
+  String get displayName => fullName.isNotEmpty ? fullName : (phone.isNotEmpty ? phone : email);
 }
 
 /// Business types customers choose at sign-up (labels in l10n: 'biz.<code>').
@@ -366,9 +373,27 @@ class OrderEvent {
   OrderEvent.fromJson(Map<String, dynamic> j)
       : status = j['status'] as String? ?? '',
         note = j['note'] as String? ?? '',
+        byName = j['by_name'] as String?,
         createdAt = toDate(j['created_at']);
 
   final String status, note;
+
+  /// Staff member who made the change (admin app only).
+  final String? byName;
+  final DateTime createdAt;
+}
+
+/// Cash received for an order and the staff member who took it (admin app only).
+class OrderPayment {
+  OrderPayment.fromJson(Map<String, dynamic> j)
+      : amount = toMoney(j['amount']),
+        byName = j['by_name'] as String?,
+        note = j['note'] as String? ?? '',
+        createdAt = toDate(j['created_at']);
+
+  final double amount;
+  final String? byName;
+  final String note;
   final DateTime createdAt;
 }
 
@@ -424,6 +449,7 @@ class OrderDetail {
         total = toMoney(j['total']),
         items = (j['items'] as List? ?? []).map((e) => OrderItem.fromJson(e as Map<String, dynamic>)).toList(),
         events = (j['events'] as List? ?? []).map((e) => OrderEvent.fromJson(e as Map<String, dynamic>)).toList(),
+        payments = (j['payments'] as List? ?? []).map((e) => OrderPayment.fromJson(e as Map<String, dynamic>)).toList(),
         canCancel = j['can_cancel'] as bool? ?? false,
         paidAmount = toMoney(j['paid_amount']),
         remaining = j['remaining'] == null ? null : toMoney(j['remaining']),
@@ -444,6 +470,7 @@ class OrderDetail {
   bool get isPickup => deliveryMethod == 'pickup';
   final List<OrderItem> items;
   final List<OrderEvent> events;
+  final List<OrderPayment> payments;
   final bool canCancel, customerDeleted;
   final int? userId;
   final List<String> allowedStatuses;

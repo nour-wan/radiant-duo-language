@@ -295,6 +295,21 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                     ]),
                     if (o.status != 'cancelled')
                       FormCard(title: context.tr('pay.title'), children: [
+                        for (final p in o.payments)
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6),
+                            child: Row(children: [
+                              const Icon(Icons.payments_outlined, size: 18, color: AlasColors.primary),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  context.tr('staff.received_by', {'v': money(p.amount), 'n': p.byName ?? context.tr('staff.unknown')}),
+                                  style: t.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                                ),
+                              ),
+                              Text(formatDateTime(p.createdAt, lang), style: t.textTheme.bodySmall),
+                            ]),
+                          ),
                         _row(context, context.tr('ledger.paid'), money(o.paidAmount)),
                         if (o.remaining != null) _row(context, context.tr('ledger.remaining'), money(o.remaining), bold: true),
                         if (o.userId == null)
@@ -321,7 +336,10 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                           Expanded(
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Text(statusLabel(context, e.status, pickup: o.isPickup), style: t.textTheme.titleSmall),
-                              Text(formatDateTime(e.createdAt, lang), style: t.textTheme.bodySmall),
+                              Text(
+                                [formatDateTime(e.createdAt, lang), if (e.byName != null) context.tr('staff.by', {'n': e.byName})].join(' · '),
+                                style: t.textTheme.bodySmall,
+                              ),
                               if (e.note.isNotEmpty) Text(e.note, style: t.textTheme.bodySmall),
                             ]),
                           ),

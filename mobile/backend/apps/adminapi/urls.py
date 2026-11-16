@@ -16,6 +16,7 @@ router.register("legal", views.LegalViewSet, basename="admin-legal")
 router.register("notifications", views.NotificationViewSet, basename="admin-notification")
 router.register("zones", views.ZoneViewSet, basename="admin-zone")
 router.register("inbox", views.AdminInboxView, basename="admin-inbox")
+router.register("staff", views.StaffViewSet, basename="admin-staff")
 
 urlpatterns = [
     path("auth/login/", AdminLoginView.as_view()),
@@ -25,4 +26,5 @@ urlpatterns = [
     path("whatsapp/link/", views.WhatsAppLinkView.as_view()),
     path("reports/", views.ReportView.as_view()),
     path("receivables/", views.ReceivablesView.as_view()),
+    path("collections/", views.CollectionsView.as_view()),
 ] + router.urls

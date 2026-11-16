@@ -261,7 +261,7 @@ def change_status(order, new_status, note="", by_admin=True, by=None):
             redemption.delete()
     order.status = new_status
     order.save(update_fields=["status", "updated_at"])
-    OrderEvent.objects.create(order=order, status=new_status, note=note, by_admin=by_admin)
+    OrderEvent.objects.create(order=order, status=new_status, note=note, by_admin=by_admin, by=by if by_admin else None)
     if new_status == Order.DELIVERED:
         ledger.record_order_delivered(order, by)
     return order

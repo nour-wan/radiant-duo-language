@@ -9,6 +9,7 @@ import '../widgets/admin_widgets.dart';
 import 'manage_screens.dart';
 import 'notify_screen.dart';
 import 'reports_screen.dart';
+import 'staff_screens.dart';
 import 'whatsapp_screen.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -17,12 +18,31 @@ class MoreScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<AppSettings>();
+    final session = context.watch<AdminSession>();
+    final owner = session.isOwner;
     void open(Widget w) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
     Widget tile(IconData i, String key, Widget page) =>
         ListTile(leading: Icon(i), title: Text(context.tr(key)), trailing: const Icon(Icons.chevron_right), onTap: () => open(page));
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('nav.more'))),
       body: ListView(padding: const EdgeInsets.all(12), children: [
+        Card(
+          child: ListTile(
+            leading: CircleAvatar(child: Icon(owner ? Icons.workspace_premium_outlined : Icons.badge_outlined)),
+            title: Text(session.user?.displayName ?? ''),
+            subtitle: Text(context.tr(owner ? 'staff.role_owner' : 'staff.role_employee')),
+          ),
+        ),
+        const SizedBox(height: 12),
+        if (owner) ...[
+          Card(
+            child: Column(children: [
+              tile(Icons.groups_outlined, 'staff.title', const StaffScreen()),
+              tile(Icons.price_check, 'collect.title', const CollectionsScreen()),
+            ]),
+          ),
+          const SizedBox(height: 12),
+        ],
         Card(
           child: Column(children: [
             tile(Icons.category_outlined, 'more.categories', const CategoriesScreen()),
@@ -37,7 +57,7 @@ class MoreScreen extends StatelessWidget {
         const SizedBox(height: 12),
         Card(
           child: Column(children: [
-            tile(Icons.storefront_outlined, 'more.settings', const StoreSettingsScreen()),
+            if (owner) tile(Icons.storefront_outlined, 'more.settings', const StoreSettingsScreen()),
             tile(Icons.gavel_outlined, 'more.legal', const LegalPagesScreen()),
           ]),
         ),

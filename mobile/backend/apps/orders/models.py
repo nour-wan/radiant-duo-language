@@ -95,6 +95,8 @@ class OrderEvent(models.Model):
     status = models.CharField(max_length=12, choices=Order.STATUSES)
     note = models.CharField(max_length=500, blank=True)
     by_admin = models.BooleanField(default=False)
+    # The staff member who made the change (kept if the account is later disabled)
+    by = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

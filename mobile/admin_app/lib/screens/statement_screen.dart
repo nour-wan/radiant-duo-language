@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/admin_api.dart';
+import '../state/admin_session.dart';
 import '../widgets/admin_widgets.dart';
 import 'orders_screen.dart';
 
@@ -107,6 +108,7 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
   Widget build(BuildContext context) {
     final c = _customer, st = _statement;
     final t = Theme.of(context);
+    final owner = context.watch<AdminSession>().isOwner;
     return Scaffold(
       appBar: AppBar(
         title: Text(c == null ? context.tr('ledger.title') : (c.businessName.isNotEmpty ? c.businessName : c.fullName)),
@@ -125,13 +127,14 @@ class _CustomerStatementScreenState extends State<CustomerStatementScreen> {
                         secondary: Icon(Icons.credit_score_outlined, color: c.creditEnabled ? t.colorScheme.primary : null),
                         title: Text(context.tr('credit.enable')),
                         subtitle: Text(context.tr(c.creditEnabled ? 'credit.on_hint' : 'credit.off_hint')),
-                        onChanged: (on) => _run(() => context.read<AdminApi>().setCreditEnabled(widget.customerId, on), 'app.saved'),
+                        // Only the owner decides who may buy on credit
+                        onChanged: owner ? (on) => _run(() => context.read<AdminApi>().setCreditEnabled(widget.customerId, on), 'app.saved') : null,
                       ),
                     ),
                     BalanceCard(summary: st.summary, admin: true, actions: [
                       FilledButton.icon(onPressed: _payment, icon: const Icon(Icons.payments_outlined), label: Text(context.tr('pay.record'))),
-                      OutlinedButton.icon(onPressed: _adjust, icon: const Icon(Icons.edit_note), label: Text(context.tr('pay.adjust'))),
-                      if (c.creditEnabled)
+                      if (owner) OutlinedButton.icon(onPressed: _adjust, icon: const Icon(Icons.edit_note), label: Text(context.tr('pay.adjust'))),
+                      if (owner && c.creditEnabled)
                         OutlinedButton.icon(onPressed: _editLimit, icon: const Icon(Icons.speed), label: Text(context.tr('pay.limit'))),
                     ]),
                     if (c.creditEnabled && c.creditLimit != null)

@@ -48,13 +48,14 @@ class UserSerializer(ProfileFieldsMixin, serializers.ModelSerializer):
     has_password = serializers.SerializerMethodField()
     profile_complete = serializers.SerializerMethodField()
     show_statement = serializers.SerializerMethodField()
+    is_owner = serializers.BooleanField(source="is_superuser", read_only=True)
 
     class Meta:
         model = User
         fields = [
             "id", "email", "full_name", "phone", "phone_verified", "business_name", "business_type", "delivery_area",
             "area_name", "address", "interests", "language", "is_staff", "has_password", "profile_complete",
-            "credit_enabled", "show_statement", "date_joined",
+            "credit_enabled", "show_statement", "is_owner", "date_joined",
         ]
         # The phone changes only through a WhatsApp code (me/phone/)
         read_only_fields = [

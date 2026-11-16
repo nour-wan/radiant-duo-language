@@ -613,3 +613,69 @@ class WhatsAppGatewayTests(Base):
         self.login(self.admin)
         r = self.client.get("/api/v1/admin/whatsapp/link/")
         self.assertEqual((r.status_code, r.data["status"]), (200, "unavailable"))  # no gateway in tests
+
+
+class StaffTests(Base):
+    def add_employee(self, name="Ahmad", phone="0933111222"):
+        self.login(self.admin)
+        r = self.client.post("/api/v1/admin/staff/", {"full_name": name, "phone": phone, "password": "Empl0yee-pass!"}, format="json")
+        self.assertEqual(r.status_code, 201, r.data)
+        return User.objects.get(pk=r.data["id"])
+
+    def test_owner_adds_employee_who_signs_in_with_phone(self):
+        emp = self.add_employee()
+        self.assertTrue(emp.is_staff and not emp.is_superuser)
+        self.client.force_authenticate(user=None)
+        r = self.client.post("/api/v1/admin/auth/login/", {"phone": "0933111222", "password": "Empl0yee-pass!"}, format="json")
+        self.assertEqual(r.status_code, 200, r.data)
+        self.assertFalse(r.data["user"]["is_owner"])
+        # A customer can't use the admin login with their phone
+        self.user.phone = "+963999111222"
+        self.user.save()
+        r = self.client.post("/api/v1/admin/auth/login/", {"phone": "0999111222", "password": "Str0ng-pass!"}, format="json")
+        self.assertEqual(r.data["code"], "invalid_credentials")
+
+    def test_employee_cannot_use_owner_screens(self):
+        emp = self.add_employee()
+        self.login(emp)
+        for url in ["/api/v1/admin/staff/", "/api/v1/admin/settings/", "/api/v1/admin/collections/", "/api/v1/admin/whatsapp/"]:
+            self.assertEqual(self.client.get(url).status_code, 403, url)
+        r = self.client.post(f"/api/v1/admin/customers/{self.user.id}/adjustments/", {"amount": "-50", "note": "x"}, format="json")
+        self.assertEqual(r.status_code, 403)
+        r = self.client.patch(f"/api/v1/admin/customers/{self.user.id}/", {"credit_enabled": True}, format="json")
+        self.assertEqual(r.status_code, 403)
+        # Day-to-day work is allowed
+        self.assertEqual(self.client.get("/api/v1/admin/orders/").status_code, 200)
+
+    def test_who_delivered_and_took_the_cash(self):
+        emp = self.add_employee()
+        self.login(self.user)
+        order_id = self.order([{"variant_id": self.v1.id, "quantity": 5}]).data["id"]
+        self.login(self.admin)
+        self.client.post(f"/api/v1/admin/orders/{order_id}/status/", {"status": "confirmed"}, format="json")
+        self.client.post(f"/api/v1/admin/orders/{order_id}/status/", {"status": "shipped"}, format="json")
+        self.login(emp)
+        r = self.client.post(f"/api/v1/admin/orders/{order_id}/status/", {"status": "delivered", "paid_amount": "100"}, format="json")
+        self.assertEqual(r.status_code, 200, r.data)
+        self.assertEqual(r.data["events"][-1]["by_name"], "Ahmad")
+        self.assertEqual((r.data["payments"][0]["amount"], r.data["payments"][0]["by_name"]), ("100.00", "Ahmad"))
+        # The owner's cash report
+        self.login(self.admin)
+        r = self.client.get(f"/api/v1/admin/collections/?staff={emp.id}")
+        self.assertEqual((r.data["total"], r.data["staff"][0]["name"], r.data["staff"][0]["count"]), ("100.00", "Ahmad", 1))
+        self.assertEqual(r.data["entries"][0]["order_id"], order_id)
+        # Customers never see staff names
+        self.login(self.user)
+        self.assertNotIn("by_name", str(self.client.get(f"/api/v1/orders/{order_id}/").data))
+
+    def test_disabled_employee_is_locked_out(self):
+        emp = self.add_employee()
+        r = self.client.patch(f"/api/v1/admin/staff/{emp.id}/", {"is_active": False}, format="json")
+        self.assertFalse(r.data["is_active"])
+        self.client.force_authenticate(user=None)
+        r = self.client.post("/api/v1/admin/auth/login/", {"phone": "0933111222", "password": "Empl0yee-pass!"}, format="json")
+        self.assertEqual(r.status_code, 400)
+        r = self.client.patch(f"/api/v1/admin/staff/{self.admin.id}/", {"is_active": False}, format="json")
+        self.login(self.admin)
+        r = self.client.patch(f"/api/v1/admin/staff/{self.admin.id}/", {"is_active": False}, format="json")
+        self.assertEqual(r.status_code, 400)

@@ -79,6 +79,11 @@ class User(AbstractUser):
     def __str__(self):
         return self.email or self.phone or f"#{self.pk}"
 
+    @property
+    def display_name(self):
+        """How staff see each other on orders and payments."""
+        return self.full_name or self.phone or self.email or f"#{self.pk}"
+
 
 class Address(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
