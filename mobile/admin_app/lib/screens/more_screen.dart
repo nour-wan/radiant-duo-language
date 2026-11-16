@@ -39,6 +39,7 @@ class MoreScreen extends StatelessWidget {
             child: Column(children: [
               tile(Icons.groups_outlined, 'staff.title', const StaffScreen()),
               tile(Icons.price_check, 'collect.title', const CollectionsScreen()),
+              tile(Icons.history, 'audit.title', const AuditLogScreen()),
             ]),
           ),
           const SizedBox(height: 12),

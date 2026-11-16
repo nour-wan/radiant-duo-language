@@ -50,11 +50,13 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # Accept-Language from the apps (default Arabic)
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.adminapi.audit.AuditMiddleware",
 ]
 
 ROOT_URLCONF = "alas_api.urls"
@@ -102,6 +104,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = "ar"
+LANGUAGES = [("ar", "العربية"), ("en", "English")]
 TIME_ZONE = "Asia/Damascus"
 USE_I18N = True
 USE_TZ = True

@@ -40,7 +40,7 @@ class OrderListCreateView(generics.ListAPIView):
         return super().get_throttles() if self.request.method == "POST" else []
 
     def get_queryset(self):
-        qs = Order.objects.filter(user=self.request.user).prefetch_related("items")
+        qs = Order.objects.filter(user=self.request.user).prefetch_related("items").order_by("-created_at", "-id")
         if self.request.query_params.get("status"):
             qs = qs.filter(status=self.request.query_params["status"])
         return qs

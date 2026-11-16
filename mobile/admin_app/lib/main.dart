@@ -26,7 +26,7 @@ Future<void> main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final settings = AppSettings(prefs);
-  final client = ApiClient(tokens: TokenStore('admin'));
+  final client = ApiClient(tokens: TokenStore('admin'), language: () => settings.lang);
   final api = AdminApi(client);
   final session = AdminSession(client);
   client.onSessionExpired = session.expired;
@@ -74,6 +74,7 @@ class AdminApp extends StatelessWidget {
     final loggedIn = context.watch<AdminSession>().loggedIn;
     return MaterialApp(
       navigatorKey: navigatorKey,
+      builder: keepAboveSystemBar,
       title: 'Alas Admin',
       debugShowCheckedModeBanner: false,
       locale: settings.locale,

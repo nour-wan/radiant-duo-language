@@ -679,3 +679,49 @@ class StaffTests(Base):
         self.login(self.admin)
         r = self.client.patch(f"/api/v1/admin/staff/{self.admin.id}/", {"is_active": False}, format="json")
         self.assertEqual(r.status_code, 400)
+
+
+class AuditAndOrderingTests(Base):
+    def test_admin_actions_are_logged_for_the_owner(self):
+        self.login(self.admin)
+        r = self.client.post("/api/v1/admin/staff/", {"full_name": "Ahmad", "phone": "0933111222", "password": "Empl0yee-pass!"}, format="json")
+        emp = User.objects.get(pk=r.data["id"])
+        self.client.force_authenticate(user=None)
+        r = self.client.post("/api/v1/admin/auth/login/", {"phone": "0933111222", "password": "Empl0yee-pass!"}, format="json")
+        emp.refresh_from_db()
+        self.assertIsNotNone(emp.last_login)  # shown to the owner as last activity
+        self.client.post("/api/v1/admin/auth/login/", {"phone": "0933111222", "password": "wrong"}, format="json")
+        self.login(emp)
+        self.client.patch(f"/api/v1/admin/products/{self.product.id}/", {"name_ar": "اسم جديد"}, format="json")
+        self.assertEqual(self.client.get("/api/v1/admin/audit/").status_code, 403)
+        self.login(self.admin)
+        r = self.client.get("/api/v1/admin/audit/")
+        actions = [(e["actor_name"], e["action_en"]) for e in r.data["results"]]
+        self.assertIn(("Ahmad", "Product edited"), actions)
+        self.assertIn(("Ahmad", "Signed in"), actions)
+        self.assertIn(("", "Failed sign-in"), actions)
+        self.assertIn(("info@alasfoodstuff.com", "Employee added"), actions)
+        # Passwords never reach the log
+        self.assertNotIn("Empl0yee-pass!", str(r.data))
+        r = self.client.get("/api/v1/admin/audit/?format=csv")
+        self.assertIn("Product edited".encode() if False else "تعديل منتج".encode(), r.content)
+
+    def test_orders_newest_first(self):
+        self.login(self.user)
+        ids = [self.order([{"variant_id": self.v1.id, "quantity": 5}]).data["id"] for _ in range(3)]
+        self.login(self.admin)
+        listed = [o["id"] for o in self.client.get("/api/v1/admin/orders/").data["results"]]
+        self.assertEqual(listed[:3], ids[::-1])
+        self.login(self.user)
+        listed = [o["id"] for o in self.client.get("/api/v1/orders/").data["results"]]
+        self.assertEqual(listed[:3], ids[::-1])
+
+
+class LanguageTests(Base):
+    def test_server_messages_follow_the_app_language(self):
+        payload = {"phone": "0944123456", "code": "123456", "password": "12345678", "full_name": "N",
+                   "business_name": "B", "business_type": "cafe", "address": "x", "area_name": "y"}
+        r = self.client.post("/api/v1/auth/register/", payload, format="json", HTTP_ACCEPT_LANGUAGE="en")
+        self.assertIn("too common", str(r.data["errors"]["password"]))
+        r = self.client.post("/api/v1/auth/register/", payload, format="json")  # older apps: Arabic
+        self.assertIn("شائعة", str(r.data["errors"]["password"]))

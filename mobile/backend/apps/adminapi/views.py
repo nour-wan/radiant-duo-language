@@ -1,4 +1,5 @@
 import csv
+import json
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
@@ -21,6 +22,7 @@ from apps.catalog.models import Category, Product, ProductImage, Variant
 from apps.catalog.serializers import ImageSerializer
 from apps.core.errors import BusinessError
 from apps.core.images import process_upload
+from apps.core.pagination import Pagination
 from apps.core.permissions import IsOwner, IsStoreAdmin
 from apps.ledger import services as ledger
 from apps.ledger.models import LedgerEntry
@@ -216,7 +218,7 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
         return invoice_response(self.get_object(), request)
 
     def get_queryset(self):
-        qs = Order.objects.annotate(item_count=Count("items")).prefetch_related("items", "events")
+        qs = Order.objects.annotate(item_count=Count("items")).prefetch_related("items", "events__by").order_by("-created_at", "-id")
         p = self.request.query_params
         if p.get("status"):
             qs = qs.filter(status__in=p["status"].split(","))
@@ -703,3 +705,39 @@ class CollectionsView(OwnerMixin, APIView):
                 for e in qs.filter(created_by_id=sid).order_by("-created_at")
             ]
         return Response(data)
+
+
+class AuditLogView(OwnerMixin, APIView):
+    """Everything done in the admin app. ?staff=<id>&from=&to= ; &format=csv downloads it."""
+
+    def get(self, request):
+        from .models import AuditLog
+
+        p = request.query_params
+        qs = AuditLog.objects.all()
+        if p.get("staff"):
+            qs = qs.filter(actor_id=p["staff"])
+        try:
+            if p.get("from"):
+                qs = qs.filter(created_at__gte=_local_day_start(date.fromisoformat(p["from"])))
+            if p.get("to"):
+                qs = qs.filter(created_at__lt=_local_day_start(date.fromisoformat(p["to"]) + timedelta(days=1)))
+        except ValueError:
+            raise BusinessError("invalid_date")
+        if p.get("format") == "csv":
+            response = HttpResponse(content_type="text/csv; charset=utf-8")
+            response["Content-Disposition"] = 'attachment; filename="alas-activity-log.csv"'
+            response.write("\ufeff")  # BOM so Excel shows Arabic correctly
+            w = csv.writer(response)
+            w.writerow(["date", "employee", "action", "target", "details", "ip"])
+            for e in qs[:20000]:
+                w.writerow([timezone.localtime(e.created_at).strftime("%Y-%m-%d %H:%M:%S"), e.actor_name, e.action_ar, e.target,
+                            json.dumps(e.details, ensure_ascii=False) if e.details else "", e.ip or ""])
+            return response
+        paginator = Pagination()
+        page = paginator.paginate_queryset(qs, request, view=self)
+        return paginator.get_paginated_response([
+            {"id": e.id, "actor_id": e.actor_id, "actor_name": e.actor_name, "action_ar": e.action_ar, "action_en": e.action_en,
+             "target": e.target, "details": e.details, "created_at": e.created_at}
+            for e in page
+        ])

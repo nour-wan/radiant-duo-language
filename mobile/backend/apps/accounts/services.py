@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 
 
 def issue_tokens(user):
+    User.objects.filter(pk=user.pk).update(last_login=timezone.now())
     refresh = RefreshToken.for_user(user)
     return {"access": str(refresh.access_token), "refresh": str(refresh)}
 

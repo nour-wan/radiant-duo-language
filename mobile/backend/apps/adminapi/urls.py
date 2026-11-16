@@ -27,4 +27,5 @@ urlpatterns = [
     path("reports/", views.ReportView.as_view()),
     path("receivables/", views.ReceivablesView.as_view()),
     path("collections/", views.CollectionsView.as_view()),
+    path("audit/", views.AuditLogView.as_view()),
 ] + router.urls

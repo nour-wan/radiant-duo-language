@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from apps.core.errors import BusinessError
 
@@ -54,11 +55,17 @@ class LoginView(APIView):
             user = authenticate(request, email=d["email"].lower(), password=d["password"])
         else:
             user = None
-        if not user:
-            raise BusinessError("invalid_credentials")
-        if self.require_staff and not user.is_staff:
+        if not user or (self.require_staff and not user.is_staff):
+            if self.require_staff:
+                from apps.adminapi.audit import record
+
+                record(request, None, ("محاولة دخول فاشلة", "Failed sign-in"), d.get("phone") or d.get("email") or "")
             # Same message as wrong password: do not reveal that the customer account exists.
             raise BusinessError("invalid_credentials")
+        if self.require_staff:
+            from apps.adminapi.audit import record
+
+            record(request, user, ("تسجيل دخول", "Signed in"))
         return auth_response(user)
 
 
@@ -218,3 +225,21 @@ class AddressViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         self._sync_default(serializer.save())
+
+
+class RefreshView(TokenRefreshView):
+    """Token refresh that also marks the account as active now (shown to the owner as last activity)."""
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200 and response.data.get("refresh"):
+            from django.utils import timezone
+
+            from .models import User
+
+            try:
+                user_id = RefreshToken(response.data["refresh"]).get("user_id")
+                User.objects.filter(pk=user_id).update(last_login=timezone.now())
+            except TokenError:
+                pass
+        return response

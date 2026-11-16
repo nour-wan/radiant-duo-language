@@ -316,3 +316,12 @@ class SimpleRichText extends StatelessWidget {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children);
   }
 }
+
+
+/// MaterialApp.builder: keeps every screen above the phone's navigation buttons/gesture bar.
+/// Android 15+ always draws apps edge to edge, so without this the bottom of lists and
+/// buttons slides under the system bar.
+Widget keepAboveSystemBar(BuildContext context, Widget? child) => ColoredBox(
+      color: Theme.of(context).colorScheme.surface,
+      child: SafeArea(top: false, left: false, right: false, child: child ?? const SizedBox.shrink()),
+    );

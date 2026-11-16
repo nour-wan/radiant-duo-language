@@ -30,7 +30,7 @@ Future<void> main() async {
 
   final prefs = await SharedPreferences.getInstance();
   final settings = AppSettings(prefs);
-  final client = ApiClient(tokens: TokenStore('store'));
+  final client = ApiClient(tokens: TokenStore('store'), language: () => settings.lang);
   final api = StoreApi(client);
   final session = Session(client);
   client.onSessionExpired = session.expired;
@@ -88,6 +88,7 @@ class StoreApp extends StatelessWidget {
     final onboarded = settings.prefs.getBool('onboarded') ?? false;
     return MaterialApp(
       navigatorKey: navigatorKey,
+      builder: keepAboveSystemBar,
       title: 'Alas Foodstuff',
       debugShowCheckedModeBanner: false,
       locale: settings.locale,

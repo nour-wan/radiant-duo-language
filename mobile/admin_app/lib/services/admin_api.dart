@@ -281,6 +281,11 @@ class AdminApi {
   Future<Map<String, dynamic>> collections(DateTime from, DateTime to, {int? staffId}) async => Map<String, dynamic>.from(
       await client.get('/admin/collections/', query: {'from': _day(from), 'to': _day(to), if (staffId != null) 'staff': staffId}) as Map);
   static String _day(DateTime d) => '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  Future<PageResult<Map<String, dynamic>>> auditLog({int page = 1, int? staffId}) async => PageResult.fromJson(
+      await client.get<Map<String, dynamic>>('/admin/audit/', query: {'page': page, if (staffId != null) 'staff': staffId}),
+      (j) => j);
+  Future<List<int>> auditCsv({int? staffId}) =>
+      client.getBytes('/admin/audit/', query: {'format': 'csv', if (staffId != null) 'staff': staffId});
   Future<Map<String, dynamic>> whatsApp() async => Map<String, dynamic>.from(await client.get('/admin/whatsapp/') as Map);
   Future<Map<String, dynamic>> saveWhatsApp(Map<String, dynamic> data) async =>
       Map<String, dynamic>.from(await client.patch('/admin/whatsapp/', data: data) as Map);

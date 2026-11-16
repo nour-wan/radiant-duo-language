@@ -56,7 +56,7 @@ class TokenStore {
 /// Thin wrapper around Dio: adds the JWT, refreshes it once on 401, and turns
 /// every failure into an [ApiException].
 class ApiClient {
-  ApiClient({required this.tokens, this.onSessionExpired, String? baseUrl})
+  ApiClient({required this.tokens, this.onSessionExpired, this.language, String? baseUrl})
       : dio = Dio(BaseOptions(
           baseUrl: '${baseUrl ?? apiBaseUrl}/api/v1',
           connectTimeout: const Duration(seconds: 15),
@@ -65,6 +65,9 @@ class ApiClient {
         )) {
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
+        // Server messages (e.g. password rules) in the app's language
+        final lang = language?.call();
+        if (lang != null) options.headers['Accept-Language'] = lang;
         final token = tokens.access;
         if (token != null && options.extra['noAuth'] != true) {
           options.headers['Authorization'] = 'Bearer $token';
@@ -93,6 +96,9 @@ class ApiClient {
 
   final Dio dio;
   final TokenStore tokens;
+
+  /// Current app language ('ar' / 'en'), sent as Accept-Language.
+  String Function()? language;
   void Function()? onSessionExpired;
   Completer<bool>? _refreshing;
 
