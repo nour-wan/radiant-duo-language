@@ -68,6 +68,9 @@ class Quote {
         couponProblem = j['coupon_problem'] as String?,
         orderProblem = j['order_problem'] as String?,
         minOrderTotal = toMoney(j['min_order_total']),
+        accountCredit = toMoney(j['account_credit']),
+        creditToApply = toMoney(j['credit_to_apply']),
+        dueOnDelivery = j['due_on_delivery'] == null ? null : toMoney(j['due_on_delivery']),
         ok = j['ok'] as bool? ?? false;
 
   final List<QuoteLine> lines;
@@ -76,6 +79,10 @@ class Quote {
   final bool deliveryAreaListed;
   final String? couponCode, couponProblem, orderProblem;
   final bool ok;
+
+  /// Money the customer has with us, the part of it this order uses, and what is left to pay.
+  final double accountCredit, creditToApply;
+  final double? dueOnDelivery;
 
   String currency(String lang) => pick(lang, currencyAr, currencyEn);
 

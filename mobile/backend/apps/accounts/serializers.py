@@ -64,12 +64,9 @@ class UserSerializer(ProfileFieldsMixin, serializers.ModelSerializer):
         ]
 
     def get_show_statement(self, obj):
-        """The account statement is shown once credit is enabled, or while there is something on the account."""
-        if obj.credit_enabled:
-            return True
-        from apps.ledger.services import balance
-
-        return balance(obj) != 0
+        """Every customer sees their statement (fully paid / credit with us / amount due).
+        The credit limit itself stays hidden until credit is enabled."""
+        return True
 
     def get_has_password(self, obj):
         return obj.has_usable_password()

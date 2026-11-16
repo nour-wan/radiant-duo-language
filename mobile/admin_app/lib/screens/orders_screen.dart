@@ -144,6 +144,14 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
           TextField(controller: noteCtl, decoration: InputDecoration(labelText: ctx.tr('order.status_note'))),
           if (askPaid) ...[
             const SizedBox(height: 12),
+            if (o.creditApplied > 0)
+              Container(
+                padding: const EdgeInsets.all(10),
+                margin: const EdgeInsets.only(bottom: 8),
+                decoration: BoxDecoration(color: AlasColors.primary.withValues(alpha: .1), borderRadius: BorderRadius.circular(10)),
+                child: Text(ctx.tr('pay.credit_hint', {'c': money(o.creditApplied), 'd': money(o.toCollect ?? 0)}),
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
+              ),
             TextField(
               controller: paidCtl,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -152,7 +160,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                 helperText: ctx.tr('pay.paid_now_hint'),
                 helperMaxLines: 3,
                 suffix: TextButton(
-                  onPressed: () => paidCtl.text = (o.total - o.paidAmount).clamp(0, double.infinity).toStringAsFixed(2),
+                  onPressed: () => paidCtl.text = (o.toCollect ?? (o.total - o.paidAmount)).clamp(0, double.infinity).toStringAsFixed(2),
                   child: Text(ctx.tr('pay.full')),
                 ),
               ),
@@ -310,7 +318,9 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                               Text(formatDateTime(p.createdAt, lang), style: t.textTheme.bodySmall),
                             ]),
                           ),
+                        if (o.creditApplied > 0) _row(context, context.tr('ledger.credit_used_admin'), '- ${money(o.creditApplied)}'),
                         _row(context, context.tr('ledger.paid'), money(o.paidAmount)),
+                        if (o.remaining == null && o.toCollect != null) _row(context, context.tr('ledger.to_collect_admin'), money(o.toCollect), bold: true),
                         if (o.remaining != null) _row(context, context.tr('ledger.remaining'), money(o.remaining), bold: true),
                         if (o.userId == null)
                           Text(context.tr('pay.no_customer'), style: t.textTheme.bodySmall)

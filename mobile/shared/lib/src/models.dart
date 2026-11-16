@@ -453,6 +453,8 @@ class OrderDetail {
         canCancel = j['can_cancel'] as bool? ?? false,
         paidAmount = toMoney(j['paid_amount']),
         remaining = j['remaining'] == null ? null : toMoney(j['remaining']),
+        creditApplied = toMoney(j['credit_applied']),
+        toCollect = j['to_collect'] == null ? null : toMoney(j['to_collect']),
         userId = j['user_id'] as int?,
         customerDeleted = j['customer_deleted'] as bool? ?? false,
         allowedStatuses = (j['allowed_statuses'] as List? ?? []).cast<String>(),
@@ -467,6 +469,12 @@ class OrderDetail {
   /// Payments recorded against this order; [remaining] is set once the order is delivered.
   final double paidAmount;
   final double? remaining;
+
+  /// Paid from the customer's credit with the store (estimate until delivered).
+  final double creditApplied;
+
+  /// Cash to take on delivery (still owed once delivered); null when cancelled.
+  final double? toCollect;
   bool get isPickup => deliveryMethod == 'pickup';
   final List<OrderItem> items;
   final List<OrderEvent> events;

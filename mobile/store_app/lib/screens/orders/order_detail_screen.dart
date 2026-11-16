@@ -83,6 +83,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 SummaryRow('${context.tr('app_discount')} (${o.appDiscountPercent.toStringAsFixed(0)}%)', '- ${money(o.appDiscount)}', color: AlasColors.primary),
               SummaryRow(context.tr('cart.total'), money(o.total), bold: true),
               if (!o.isPickup && o.deliveryFee > 0) SummaryRow(context.tr('co.delivery_fee'), '+ ${o.deliveryFee.toStringAsFixed(0)} ${o.deliveryCurrency}'),
+              if (o.creditApplied > 0) ...[
+                const Divider(height: 20),
+                SummaryRow(context.tr('ledger.credit_used'), '- ${money(o.creditApplied)}', color: AlasColors.primary),
+                if (o.remaining == null && o.toCollect != null) SummaryRow(context.tr('ledger.to_collect'), money(o.toCollect), bold: true),
+              ],
               if (o.paidAmount > 0 || o.remaining != null) ...[
                 const Divider(height: 20),
                 SummaryRow(context.tr('ledger.paid'), money(o.paidAmount), color: AlasColors.primary),

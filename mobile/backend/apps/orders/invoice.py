@@ -61,6 +61,7 @@ TEXT = {
     "app_discount": ("خصم التطبيق", "App discount"),
     "total": ("الإجمالي", "Total"),
     "paid": ("المدفوع", "Paid"),
+    "credit_used": ("مخصوم من رصيد العميل", "Paid from account credit"),
     "remaining": ("المتبقي", "Balance due"),
     "payment": ("طريقة الدفع", "Payment"),
     "cod": ("الدفع نقدي عند الاستلام", "Cash on delivery"),
@@ -245,10 +246,11 @@ def build_invoice(order, lang="ar"):
     if order.app_discount > 0:
         rows.append((f"{pdf.t('app_discount')} ({order.app_discount_percent.normalize():f}%)", f"- {_money(order.app_discount)}", GREEN))
     paid = remaining = None
+    credit = ledger.credit_for_order(order) if order.status == Order.DELIVERED else ledger.ZERO
     if order.status == Order.DELIVERED:
         paid = ledger.order_paid(order)
-        remaining = max(ledger.ZERO, order.total - paid)
-    needed = 12 + len(rows) * 7 + 12 + (16 if paid is not None else 0)
+        remaining = ledger.to_collect(order)
+    needed = 12 + len(rows) * 7 + 12 + (16 if paid is not None else 0) + (7 if credit else 0)
     if y + needed > pdf.h - 24:
         pdf.add_page()
         y = M
@@ -263,6 +265,10 @@ def build_invoice(order, lang="ar"):
     pdf.text(tx + 4, y + 2.5, tw - 40, 8, pdf.t("total"), size=11, bold=True, color=WHITE)
     pdf.text(tx + tw - 40, y + 2.5, 36, 8, _money(order.total), size=12, bold=True, color=WHITE, align="end")
     y += 14
+    if credit:
+        pdf.text(tx, y, tw - 34, 7, pdf.t("credit_used"), size=9.5, color=MUTED)
+        pdf.text(tx + tw - 34, y, 34, 7, f"- {_money(credit)}", size=9.5, color=GREEN, align="end")
+        y += 7
     if paid is not None:
         pdf.text(tx, y, tw - 34, 7, pdf.t("paid"), size=9.5, color=MUTED)
         pdf.text(tx + tw - 34, y, 34, 7, _money(paid), size=9.5, color=GREEN, align="end")
@@ -282,7 +288,7 @@ def build_invoice(order, lang="ar"):
         info.append((pdf.t("delivery_fee"), f"{order.delivery_fee:,.0f} {currency} — {pdf.t('fee_note')}"))
     if order.notes:
         info.append((pdf.t("notes"), order.notes))
-    top = y - (14 + len(rows) * 7 + (14 if paid is not None else 0))
+    top = y - (14 + len(rows) * 7 + (14 if paid is not None else 0) + (7 if credit else 0))
     height = 6 + len(info) * 11
     pdf.box(bx, top, bw, height, CREAM_SOFT, border=LINE)
     for k, (label, value) in enumerate(info):

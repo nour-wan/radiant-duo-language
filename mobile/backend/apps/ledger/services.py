@@ -57,10 +57,43 @@ def credit_problem(user, order_total):
     return None
 
 
+def available_credit(user, exclude_order=None):
+    """Money the customer has with us (overpayments), not already promised to orders on their way."""
+    if not user:
+        return ZERO
+    open_orders = user.orders.filter(status__in=OPEN_STATUSES)
+    if exclude_order is not None:
+        open_orders = open_orders.exclude(pk=exclude_order.pk)
+    reserved = _money(open_orders.aggregate(s=Sum("total"))["s"])
+    return max(ZERO, -balance(user) - reserved)
+
+
+def credit_for_order(order):
+    """Credit that pays (or will pay) part of this order: fixed once delivered, an estimate before.
+    Older open orders use the credit first."""
+    if order.status == "delivered":
+        return order.credit_applied
+    if not order.user_id or order.status == "cancelled":
+        return ZERO
+    credit = max(ZERO, -balance(order.user))
+    older = order.user.orders.filter(status__in=OPEN_STATUSES, created_at__lt=order.created_at)
+    credit -= _money(older.aggregate(s=Sum("total"))["s"])
+    return min(order.total, max(ZERO, credit))
+
+
+def to_collect(order):
+    """Cash still to take for this order: total minus the credit used and payments on it."""
+    return max(ZERO, order.total - credit_for_order(order) - order_paid(order))
+
+
 def record_order_delivered(order, by=None):
-    """A delivered order is added to what the customer owes (once per order)."""
+    """A delivered order is added to what the customer owes (once per order). Any credit the
+    customer has with us pays for it first (the balance nets automatically; we record how much)."""
     if not order.user_id or order.total <= 0:
         return None
+    if not order.ledger_entries.filter(kind=LedgerEntry.ORDER).exists():
+        order.credit_applied = min(order.total, max(ZERO, -balance(order.user)))
+        order.save(update_fields=["credit_applied"])
     entry, _ = LedgerEntry.objects.get_or_create(
         order=order, kind=LedgerEntry.ORDER,
         defaults={"user_id": order.user_id, "amount": order.total, "created_by": by},

@@ -284,7 +284,7 @@ class AccountTests(Base):
         r = self.client.post("/api/v1/auth/login/", {"phone": "0944123456", "password": "Str0ng-pass!"}, format="json")
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {r.data['tokens']['access']}")
         me = self.client.get("/api/v1/me/").data
-        self.assertEqual((me["phone"], me["credit_enabled"], me["show_statement"]), ("+963944123456", False, False))
+        self.assertEqual((me["phone"], me["credit_enabled"], me["show_statement"]), ("+963944123456", False, True))
         # The phone can't be changed without a code
         self.client.patch("/api/v1/me/", {"phone": "0999999999"}, format="json")
         self.assertEqual(self.client.get("/api/v1/me/").data["phone"], "+963944123456")

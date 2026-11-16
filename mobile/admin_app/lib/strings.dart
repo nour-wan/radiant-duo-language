@@ -250,6 +250,7 @@ const adminStrings = <String, List<String>>{
   'pay.note': ['ملاحظة (اختياري)', 'Note (optional)'],
   'pay.done': ['تم تسجيل الدفعة وإشعار الزبون', 'Payment recorded and customer notified'],
   'pay.full': ['المبلغ كاملاً', 'Full amount'],
+  'pay.credit_hint': ['للزبون رصيد لدينا، يُخصم منه {c} لهذا الطلب. المطلوب تحصيله: {d}', 'The customer has credit: {c} goes to this order. To collect: {d}'],
   'pay.paid_now': ['المبلغ المستلم الآن (\$)', 'Amount received now (\$)'],
   'pay.paid_now_hint': ['فارغ = لم يدفع شيئاً. يُسجَّل الباقي ديناً في كشف حسابه.', 'Empty = nothing paid. The rest goes on the customer\'s account.'],
   'pay.adjust': ['تصحيح', 'Adjustment'],

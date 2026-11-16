@@ -52,6 +52,7 @@ class Quote:
     delivery_area: object = None
     delivery_fee: Decimal = Decimal("0")
     credit: dict | None = None
+    account_credit: Decimal = Decimal("0")
 
     @property
     def ok(self):
@@ -129,6 +130,7 @@ def build_quote(items, coupon_code, user, lock=False, delivery_method=None, area
     # Unpaid balance limit (customer's own limit, else the store default; none = unlimited)
     if user and user.is_authenticated:
         quote.credit = ledger.credit_info(user)
+        quote.account_credit = ledger.available_credit(user)
         if not quote.order_problem:
             quote.order_problem = ledger.credit_problem(user, quote.total)
 
@@ -180,6 +182,9 @@ def quote_payload(quote):
         "currency": "USD",
         "credit_limit": str(quote.credit["credit_limit"]) if quote.credit and quote.credit["credit_limit"] is not None else None,
         "credit_available": str(quote.credit["available"]) if quote.credit and quote.credit["available"] is not None else None,
+        "account_credit": str(quote.account_credit),
+        "credit_to_apply": str(min(quote.total, quote.account_credit)),
+        "due_on_delivery": str(max(Decimal("0"), quote.total - quote.account_credit)),
         "ok": quote.ok,
     }
 

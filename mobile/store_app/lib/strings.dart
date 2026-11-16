@@ -125,6 +125,7 @@ const storeStrings = <String, List<String>>{
   'co.pickup_hint': ['استلم طلبك من محلنا: {a}', 'Collect your order from our store: {a}'],
   'co.delivery_hint': ['نوصل طلبك إلى منشأتك، والرسوم حسب منطقتك.', 'We deliver to your business; the fee depends on your area.'],
   'co.delivery_fee': ['رسوم التوصيل', 'Delivery fee'],
+  'co.credit_note': ['لديك رصيد {c} لدينا، ويُخصم من هذا الطلب تلقائياً.', 'You have {c} credit with us; it is used for this order automatically.'],
   'co.delivery_fee_note': ['رسوم التوصيل تُدفع عند الاستلام.', 'Delivery fee is paid on delivery.'],
   'co.fee_estimate': ['منطقتك غير موجودة في القائمة، سيتم احتساب {fee} ويؤكده فريقنا.', 'Your area is not listed; {fee} applies and our team will confirm.'],
   'co.grand_total': ['المطلوب عند الاستلام', 'Due on delivery'],

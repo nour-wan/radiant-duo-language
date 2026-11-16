@@ -325,6 +325,15 @@ class OrderTotals extends StatelessWidget {
             color: AlasColors.primary),
       const Divider(height: 18),
       SummaryRow(context.tr('cart.total'), money(q?.total ?? fallbackSubtotal), bold: true),
+      if (q != null && q.creditToApply > 0) ...[
+        SummaryRow(context.tr('ledger.credit_used'), '- ${money(q.creditToApply)}', color: AlasColors.primary),
+        SummaryRow(context.tr('ledger.to_collect'), money(q.dueOnDelivery ?? 0), bold: true),
+        Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: Text(context.tr('co.credit_note', {'c': money(q.accountCredit)}),
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AlasColors.primary)),
+        ),
+      ],
       if (q != null && q.deliveryMethod == 'delivery' && q.deliveryFee > 0) ...[
         SummaryRow(context.tr('co.delivery_fee'), '+ ${q.deliveryFee.toStringAsFixed(0)} ${q.currency(lang)}'),
         Align(

@@ -136,3 +136,32 @@ class LedgerTests(Base):
         r = self.client.get("/api/v1/admin/reports/?format=csv")
         self.assertEqual(r.status_code, 200)
         self.assertTrue(r["Content-Type"].startswith("text/csv"))
+
+
+class OverpaymentTests(LedgerTests):
+    def test_overpayment_becomes_credit_used_by_the_next_order(self):
+        first = self.place()  # 280
+        self.deliver(first, paid="480")  # paid 200 too much
+        self.login(self.user)
+        st = self.client.get("/api/v1/me/statement/").data["summary"]
+        self.assertEqual(st["balance"], "-200.00")  # the customer has 200 with us
+        self.assertTrue(self.client.get("/api/v1/me/").data["show_statement"])
+        # Checkout shows the credit and what is left to pay on delivery
+        r = self.client.post("/api/v1/cart/quote/", {"items": [{"variant_id": self.v1.id, "quantity": 10}]}, format="json")
+        self.assertEqual((r.data["account_credit"], r.data["credit_to_apply"], r.data["due_on_delivery"]), ("200.00", "200.00", "80.00"))
+        second = self.place()  # 280
+        d = self.client.get(f"/api/v1/orders/{second}/").data
+        self.assertEqual((d["credit_applied"], d["to_collect"]), ("200.00", "80.00"))
+        # The employee is told to collect 80, not 280
+        self.login(self.admin)
+        self.assertEqual(self.client.get(f"/api/v1/admin/orders/{second}/").data["to_collect"], "80.00")
+        self.deliver(second, paid="80")
+        self.login(self.user)
+        d = self.client.get(f"/api/v1/orders/{second}/").data
+        self.assertEqual((d["credit_applied"], d["remaining"]), ("200.00", "0.00"))
+        self.assertEqual(self.client.get("/api/v1/me/statement/").data["summary"]["balance"], "0.00")
+        # The credit is used once: the first order is unchanged, a third order has none
+        self.assertEqual(self.client.get(f"/api/v1/orders/{first}/").data["credit_applied"], "0.00")
+        r = self.client.post("/api/v1/cart/quote/", {"items": [{"variant_id": self.v1.id, "quantity": 10}]}, format="json")
+        self.assertEqual(r.data["due_on_delivery"], "280.00")
+        self.assertEqual(self.client.get(f"/api/v1/orders/{second}/invoice/").status_code, 200)

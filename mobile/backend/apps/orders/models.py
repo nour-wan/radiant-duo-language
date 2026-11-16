@@ -41,6 +41,8 @@ class Order(models.Model):
 
     payment_method = models.CharField(max_length=10, default="cod")
     delivery_method = models.CharField(max_length=10, choices=DELIVERY_METHODS, default=DELIVERY)
+    # Customer's prepaid credit (money they had with us) used for this order, fixed at delivery
+    credit_applied = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     delivery_zone = models.CharField(max_length=100, blank=True)
     delivery_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # in the delivery currency (SYP)
     delivery_currency = models.CharField(max_length=20, blank=True)
