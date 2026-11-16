@@ -1,0 +1,58 @@
+# /etc/nginx/sites-available/api.alasfoodstuff.com  (new file — does not touch other sites)
+# Certbot adds the 443 server block and the HTTP→HTTPS redirect to this file only.
+
+limit_req_zone $binary_remote_addr zone=alas_api_auth:10m rate=10r/m;
+
+upstream alas_api {
+    server 127.0.0.1:8100;
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name api.alasfoodstuff.com;
+
+    client_max_body_size 30m;
+    server_tokens off;
+
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options DENY always;
+    add_header Referrer-Policy strict-origin-when-cross-origin always;
+
+    location /media/ {
+        alias /var/lib/alas-api/media/;
+        expires 30d;
+        add_header Cache-Control "public, immutable";
+        add_header X-Content-Type-Options nosniff always;
+        # Only images are ever stored here; never execute or render anything else
+        types { image/jpeg jpg jpeg; image/png png; image/webp webp; }
+        default_type application/octet-stream;
+    }
+
+    # Store app APK for customers who can't use Google Play (page at /download/)
+    location /download/files/ {
+        alias /var/lib/alas-api/downloads/;
+        types { application/vnd.android.package-archive apk; }
+        default_type application/octet-stream;
+        add_header Content-Disposition attachment always;
+        add_header X-Content-Type-Options nosniff always;
+        add_header Cache-Control "no-cache" always;
+    }
+
+    location /static/ {
+        alias /opt/alas-api/staticfiles/;
+        expires 7d;
+    }
+
+    location ~ ^/api/v1/(admin/)?auth/ {
+        limit_req zone=alas_api_auth burst=10 nodelay;
+        include proxy_params;
+        proxy_pass http://alas_api;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_read_timeout 60s;
+        proxy_pass http://alas_api;
+    }
+}

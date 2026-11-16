@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="{{ lang }}" dir="{% if lang == 'ar' %}rtl{% else %}ltr{% endif %}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% if lang == 'ar' %}تحميل التطبيق — {{ store.name_ar }}{% else %}Download the app — {{ store.name_en }}{% endif %}</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&family=Manrope:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8f3ea;--card:#fffdf9;--fg:#3a2a1e;--muted:#6f5e4f;--primary:#254f3d;--on-primary:#f3eadb;--border:#e0d3c0}
+@media (prefers-color-scheme:dark){:root{--bg:#211a15;--card:#2a221c;--fg:#efe7da;--muted:#bfb1a0;--primary:#7fbf98;--on-primary:#16241c;--border:#40362e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:"Noto Kufi Arabic","Manrope",sans-serif;line-height:1.9}
+header{background:#254f3d;color:#f3eadb;padding:18px 16px}
+header .wrap{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700}
+.brand svg{width:36px;height:36px}
+header a{color:#f3eadb}
+.wrap{max-width:620px;margin:0 auto}
+main{padding:24px 16px 48px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center}
+.icon{width:96px;height:96px;margin:0 auto 12px}
+h1{font-size:1.5rem;margin:0}
+.muted{color:var(--muted);font-size:.9rem}
+.num{font-family:"Manrope",sans-serif}
+.btn{display:inline-block;margin:20px 0 6px;padding:14px 28px;border-radius:12px;background:var(--primary);color:var(--on-primary);text-decoration:none;font-weight:700;font-size:1.1rem}
+.steps{text-align:start;margin-top:24px}
+h2{font-size:1.05rem;margin:0 0 6px;color:var(--primary)}
+ol{padding-inline-start:22px;margin:0}
+footer{margin-top:24px;font-size:.85rem;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <span class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#f3eadb"/><path d="M17 41c9-2 16-9 18-23 9 6 14 16 10 25-4 9-17 10-24 4 7-2 13-7 17-15-5 5-11 9-21 9Z" fill="#254f3d"/></svg>
+  {% if lang == 'ar' %}{{ store.name_ar }}{% else %}{{ store.name_en }}{% endif %}</span>
+  {% if lang == 'ar' %}<a href="?lang=en">English</a>{% else %}<a href="?lang=ar">العربية</a>{% endif %}
+</div></header>
+<main class="wrap">
+<div class="card">
+  <svg class="icon" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#254f3d"/><path d="M17 41c9-2 16-9 18-23 9 6 14 16 10 25-4 9-17 10-24 4 7-2 13-7 17-15-5 5-11 9-21 9Z" fill="#f3eadb"/></svg>
+  <h1>{% if lang == 'ar' %}تطبيق {{ store.name_ar }}{% else %}{{ store.name_en }} app{% endif %}</h1>
+  <p class="muted">{% if lang == 'ar' %}لأجهزة أندرويد · اطلب المكونات الغذائية بأسعار الجملة وتابع طلباتك وكشف حسابك{% else %}For Android · Order wholesale ingredients, track your orders and your account statement{% endif %}</p>
+  {% if apk %}
+    <a class="btn" href="/download/files/{{ apk.name }}" download>{% if lang == 'ar' %}تحميل التطبيق{% else %}Download the app{% endif %}</a>
+    <p class="muted">{% if lang == 'ar' %}الإصدار{% else %}Version{% endif %} <span class="num">{{ apk.version }}</span> · <span class="num">{{ apk.size_mb }} MB</span> · <span class="num">{{ apk.updated_at|date:"Y-m-d" }}</span></p>
+  {% else %}
+    <p class="btn" style="opacity:.6">{% if lang == 'ar' %}قريباً{% else %}Coming soon{% endif %}</p>
+  {% endif %}
+  <div class="steps">
+    {% if lang == 'ar' %}
+    <h2>طريقة التثبيت</h2>
+    <ol>
+      <li>اضغط «تحميل التطبيق» وانتظر انتهاء التحميل.</li>
+      <li>افتح الملف من الإشعارات أو من مجلد التنزيلات.</li>
+      <li>إذا ظهرت رسالة أمان، اضغط «الإعدادات» وفعّل «السماح من هذا المصدر»، ثم ارجع واضغط «تثبيت».</li>
+      <li>لتحديث التطبيق لاحقاً، حمّل الإصدار الجديد من هذه الصفحة وثبّته فوق القديم، وتبقى بياناتك كما هي.</li>
+    </ol>
+    {% else %}
+    <h2>How to install</h2>
+    <ol>
+      <li>Tap “Download the app” and wait for the download to finish.</li>
+      <li>Open the file from your notifications or the Downloads folder.</li>
+      <li>If a security prompt appears, tap “Settings”, allow installs from this source, then go back and tap “Install”.</li>
+      <li>To update later, download the new version from this page and install it over the old one; your data stays the same.</li>
+    </ol>
+    {% endif %}
+  </div>
+</div>
+<footer>{{ store.email }} · <span class="num" dir="ltr">{{ store.mobile }}</span> · {{ store.website }}</footer>
+</main>
+</body>
+</html>

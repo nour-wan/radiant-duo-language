@@ -1,0 +1,5872 @@
+{
+ "categories": [
+  {
+   "id": "chocolate",
+   "slug": "chocolate-cocoa",
+   "name": {
+    "ar": "الشوكولا والكاكاو",
+    "en": "Chocolate & Cocoa"
+   },
+   "description": {
+    "ar": "كاكاو وشوكولا ومشتقاتها للتصنيع.",
+    "en": "Cocoa, chocolate and derivatives for manufacturing."
+   },
+   "image": "cocoa.jpg"
+  },
+  {
+   "id": "nuts",
+   "slug": "nuts-seeds",
+   "name": {
+    "ar": "المكسرات والبذور",
+    "en": "Nuts & Seeds"
+   },
+   "description": {
+    "ar": "مكسرات وبذور كاملة ومجهزة ومعاجين.",
+    "en": "Whole and processed nuts, seeds and pastes."
+   },
+   "image": "hazelnuts.jpg"
+  },
+  {
+   "id": "dried",
+   "slug": "dried-fruits",
+   "name": {
+    "ar": "الفواكه المجففة",
+    "en": "Dried Fruits"
+   },
+   "description": {
+    "ar": "فواكه مجففة لتطبيقات غذائية متعددة.",
+    "en": "Dried fruits for diverse food applications."
+   },
+   "image": "apricots.jpg"
+  },
+  {
+   "id": "bakery",
+   "slug": "bakery-confectionery",
+   "name": {
+    "ar": "المخابز والحلويات",
+    "en": "Bakery & Confectionery"
+   },
+   "description": {
+    "ar": "خلطات وحشوات ومحسنات وتزيين.",
+    "en": "Mixes, fillings, improvers and decoration."
+   },
+   "image": "bakery.jpg"
+  },
+  {
+   "id": "icecream",
+   "slug": "ice-cream-dairy",
+   "name": {
+    "ar": "الآيس كريم والألبان",
+    "en": "Ice Cream & Dairy"
+   },
+   "description": {
+    "ar": "قواعد ومساحيق لمصنعي الألبان والمثلجات.",
+    "en": "Bases and powders for dairy and frozen desserts."
+   },
+   "image": "icecream.jpg"
+  },
+  {
+   "id": "flavors",
+   "slug": "flavors-colors",
+   "name": {
+    "ar": "النكهات والألوان",
+    "en": "Flavors & Colors"
+   },
+   "description": {
+    "ar": "نكهات وألوان لتطوير هوية المنتج.",
+    "en": "Flavors and colors for product development."
+   },
+   "image": "icecream.jpg"
+  },
+  {
+   "id": "oils",
+   "slug": "oils-fats",
+   "name": {
+    "ar": "الزيوت والدهون",
+    "en": "Oils & Fats"
+   },
+   "description": {
+    "ar": "دهون وزيوت لتطبيقات المخابز والحلويات.",
+    "en": "Fats and oils for bakery and confectionery."
+   },
+   "image": "filling.jpg"
+  },
+  {
+   "id": "sweeteners",
+   "slug": "sugars-sweeteners",
+   "name": {
+    "ar": "السكر والمحليات",
+    "en": "Sugars & Sweeteners"
+   },
+   "description": {
+    "ar": "سكريات وشرابات لتطبيقات التصنيع الغذائي.",
+    "en": "Sugars and syrups for food manufacturing."
+   },
+   "image": "bakery.jpg"
+  },
+  {
+   "id": "stabilizers",
+   "slug": "stabilizers-emulsifiers",
+   "name": {
+    "ar": "المثبتات والمستحلبات",
+    "en": "Stabilizers & Emulsifiers"
+   },
+   "description": {
+    "ar": "حلول للقوام والثبات وتجانس المنتج.",
+    "en": "Solutions for texture, stability and consistency."
+   },
+   "image": "bakery.jpg"
+  },
+  {
+   "id": "general",
+   "slug": "general-food-ingredients",
+   "name": {
+    "ar": "مكونات غذائية متنوعة",
+    "en": "General Food Ingredients"
+   },
+   "description": {
+    "ar": "أحماض وأملاح ومساحيق للاستخدام الصناعي.",
+    "en": "Acids, salts and powders for industrial use."
+   },
+   "image": "hazelnuts.jpg"
+  }
+ ],
+ "products": [
+  {
+   "id": "natural-cocoa",
+   "slug": "natural-cocoa",
+   "name": {
+    "ar": "مسحوق كاكاو طبيعي",
+    "en": "Natural Cocoa Powder"
+   },
+   "shortDescription": {
+    "ar": "مسحوق كاكاو طبيعي لتطبيقات صناعية غذائية متعددة.",
+    "en": "Natural Cocoa Powder for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الشوكولا والكاكاو، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Chocolate & Cocoa, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "chocolate",
+   "image": "natural-cocoa.jpg",
+   "gallery": [
+    "natural-cocoa.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "cakes",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "مسحوق كاكاو طبيعي",
+    "Natural Cocoa Powder",
+    "chocolate"
+   ]
+  },
+  {
+   "id": "alkalized-cocoa",
+   "slug": "alkalized-cocoa",
+   "name": {
+    "ar": "مسحوق كاكاو معالج",
+    "en": "Alkalized Cocoa Powder"
+   },
+   "shortDescription": {
+    "ar": "مسحوق كاكاو معالج لتطبيقات صناعية غذائية متعددة.",
+    "en": "Alkalized Cocoa Powder for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الشوكولا والكاكاو، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Chocolate & Cocoa, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "chocolate",
+   "image": "alkalized-cocoa.jpg",
+   "gallery": [
+    "alkalized-cocoa.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "ice",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "مسحوق كاكاو معالج",
+    "Alkalized Cocoa Powder",
+    "chocolate"
+   ]
+  },
+  {
+   "id": "cocoa-butter",
+   "slug": "cocoa-butter",
+   "name": {
+    "ar": "زبدة الكاكاو",
+    "en": "Cocoa Butter"
+   },
+   "shortDescription": {
+    "ar": "زبدة الكاكاو لتطبيقات صناعية غذائية متعددة.",
+    "en": "Cocoa Butter for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الشوكولا والكاكاو، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Chocolate & Cocoa, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "chocolate",
+   "image": "cocoa-butter.jpg",
+   "gallery": [
+    "cocoa-butter.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "كتل أو رقائق",
+      "en": "Blocks or chips"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "زبدة الكاكاو",
+    "Cocoa Butter",
+    "chocolate"
+   ]
+  },
+  {
+   "id": "cocoa-mass",
+   "slug": "cocoa-mass",
+   "name": {
+    "ar": "كتلة الكاكاو",
+    "en": "Cocoa Mass"
+   },
+   "shortDescription": {
+    "ar": "كتلة الكاكاو لتطبيقات صناعية غذائية متعددة.",
+    "en": "Cocoa Mass for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الشوكولا والكاكاو، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Chocolate & Cocoa, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "chocolate",
+   "image": "cocoa-mass.jpg",
+   "gallery": [
+    "cocoa-mass.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "cakes"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "كتل",
+      "en": "Blocks"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "كتلة الكاكاو",
+    "Cocoa Mass",
+    "chocolate"
+   ]
+  },
+  {
+   "id": "dark-couverture",
+   "slug": "dark-couverture",
+   "name": {
+    "ar": "شوكولا خام داكنة",
+    "en": "Dark Couverture Chocolate"
+   },
+   "shortDescription": {
+    "ar": "شوكولا خام داكنة لتطبيقات صناعية غذائية متعددة.",
+    "en": "Dark Couverture Chocolate for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الشوكولا والكاكاو، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Chocolate & Cocoa, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "chocolate",
+   "image": "dark-couverture.jpg",
+   "gallery": [
+    "dark-couverture.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "أقراص أو قطع",
+      "en": "Callets or blocks"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "شوكولا خام داكنة",
+    "Dark Couverture Chocolate",
+    "chocolate"
+   ]
+  },
+  {
+   "id": "milk-couverture",
+   "slug": "milk-couverture",
+   "name": {
+    "ar": "شوكولا خام بالحليب",
+    "en": "Milk Couverture Chocolate"
+   },
+   "shortDescription": {
+    "ar": "شوكولا خام بالحليب لتطبيقات صناعية غذائية متعددة.",
+    "en": "Milk Couverture Chocolate for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الشوكولا والكاكاو، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Chocolate & Cocoa, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "chocolate",
+   "image": "milk-couverture.jpg",
+   "gallery": [
+    "milk-couverture.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "أقراص أو قطع",
+      "en": "Callets or blocks"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "شوكولا خام بالحليب",
+    "Milk Couverture Chocolate",
+    "chocolate"
+   ]
+  },
+  {
+   "id": "white-couverture",
+   "slug": "white-couverture",
+   "name": {
+    "ar": "شوكولا خام بيضاء",
+    "en": "White Couverture Chocolate"
+   },
+   "shortDescription": {
+    "ar": "شوكولا خام بيضاء لتطبيقات صناعية غذائية متعددة.",
+    "en": "White Couverture Chocolate for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الشوكولا والكاكاو، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Chocolate & Cocoa, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "chocolate",
+   "image": "white-couverture.jpg",
+   "gallery": [
+    "white-couverture.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "أقراص أو قطع",
+      "en": "Callets or blocks"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "شوكولا خام بيضاء",
+    "White Couverture Chocolate",
+    "chocolate"
+   ]
+  },
+  {
+   "id": "chocolate-chips",
+   "slug": "chocolate-chips",
+   "name": {
+    "ar": "حبيبات شوكولا",
+    "en": "Chocolate Chips"
+   },
+   "shortDescription": {
+    "ar": "حبيبات شوكولا لتطبيقات صناعية غذائية متعددة.",
+    "en": "Chocolate Chips for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الشوكولا والكاكاو، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Chocolate & Cocoa, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "chocolate",
+   "image": "chocolate-chips.jpg",
+   "gallery": [
+    "chocolate-chips.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "cakes"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حبيبات",
+      "en": "Chips"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "حبيبات شوكولا",
+    "Chocolate Chips",
+    "chocolate"
+   ]
+  },
+  {
+   "id": "hazelnuts",
+   "slug": "hazelnuts",
+   "name": {
+    "ar": "بندق",
+    "en": "Hazelnuts"
+   },
+   "shortDescription": {
+    "ar": "بندق لتطبيقات صناعية غذائية متعددة.",
+    "en": "Hazelnuts for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المكسرات والبذور، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Nuts & Seeds, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "nuts",
+   "image": "hazelnuts.jpg",
+   "gallery": [
+    "hazelnuts.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "بندق",
+    "Hazelnuts",
+    "nuts"
+   ]
+  },
+  {
+   "id": "pistachios",
+   "slug": "pistachios",
+   "name": {
+    "ar": "فستق حلبي",
+    "en": "Pistachios"
+   },
+   "shortDescription": {
+    "ar": "فستق حلبي لتطبيقات صناعية غذائية متعددة.",
+    "en": "Pistachios for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المكسرات والبذور، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Nuts & Seeds, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "nuts",
+   "image": "pistachios.jpg",
+   "gallery": [
+    "pistachios.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "فستق حلبي",
+    "Pistachios",
+    "nuts"
+   ]
+  },
+  {
+   "id": "almonds",
+   "slug": "almonds",
+   "name": {
+    "ar": "لوز",
+    "en": "Almonds"
+   },
+   "shortDescription": {
+    "ar": "لوز لتطبيقات صناعية غذائية متعددة.",
+    "en": "Almonds for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المكسرات والبذور، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Nuts & Seeds, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "nuts",
+   "image": "almonds.jpg",
+   "gallery": [
+    "almonds.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "cakes"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "لوز",
+    "Almonds",
+    "nuts"
+   ]
+  },
+  {
+   "id": "cashews",
+   "slug": "cashews",
+   "name": {
+    "ar": "كاجو",
+    "en": "Cashews"
+   },
+   "shortDescription": {
+    "ar": "كاجو لتطبيقات صناعية غذائية متعددة.",
+    "en": "Cashews for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المكسرات والبذور، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Nuts & Seeds, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "nuts",
+   "image": "cashews.jpg",
+   "gallery": [
+    "cashews.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "كاجو",
+    "Cashews",
+    "nuts"
+   ]
+  },
+  {
+   "id": "walnuts",
+   "slug": "walnuts",
+   "name": {
+    "ar": "جوز",
+    "en": "Walnuts"
+   },
+   "shortDescription": {
+    "ar": "جوز لتطبيقات صناعية غذائية متعددة.",
+    "en": "Walnuts for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المكسرات والبذور، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Nuts & Seeds, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "nuts",
+   "image": "walnuts.jpg",
+   "gallery": [
+    "walnuts.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "جوز",
+    "Walnuts",
+    "nuts"
+   ]
+  },
+  {
+   "id": "peanuts",
+   "slug": "peanuts",
+   "name": {
+    "ar": "فول سوداني",
+    "en": "Peanuts"
+   },
+   "shortDescription": {
+    "ar": "فول سوداني لتطبيقات صناعية غذائية متعددة.",
+    "en": "Peanuts for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المكسرات والبذور، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Nuts & Seeds, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "nuts",
+   "image": "peanuts.jpg",
+   "gallery": [
+    "peanuts.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "فول سوداني",
+    "Peanuts",
+    "nuts"
+   ]
+  },
+  {
+   "id": "nut-paste",
+   "slug": "nut-paste",
+   "name": {
+    "ar": "معجون مكسرات",
+    "en": "Nut Paste"
+   },
+   "shortDescription": {
+    "ar": "معجون مكسرات لتطبيقات صناعية غذائية متعددة.",
+    "en": "Nut Paste for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المكسرات والبذور، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Nuts & Seeds, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "nuts",
+   "image": "nut-paste.jpg",
+   "gallery": [
+    "nut-paste.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "معجون",
+      "en": "Paste"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "معجون مكسرات",
+    "Nut Paste",
+    "nuts"
+   ]
+  },
+  {
+   "id": "sesame",
+   "slug": "sesame",
+   "name": {
+    "ar": "سمسم",
+    "en": "Sesame Seeds"
+   },
+   "shortDescription": {
+    "ar": "سمسم لتطبيقات صناعية غذائية متعددة.",
+    "en": "Sesame Seeds for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المكسرات والبذور، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Nuts & Seeds, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "nuts",
+   "image": "sesame.jpg",
+   "gallery": [
+    "sesame.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "بذور",
+      "en": "Seeds"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "سمسم",
+    "Sesame Seeds",
+    "nuts"
+   ]
+  },
+  {
+   "id": "dried-apricots",
+   "slug": "dried-apricots",
+   "name": {
+    "ar": "مشمش مجفف",
+    "en": "Dried Apricots"
+   },
+   "shortDescription": {
+    "ar": "مشمش مجفف لتطبيقات صناعية غذائية متعددة.",
+    "en": "Dried Apricots for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الفواكه المجففة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Dried Fruits, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "dried",
+   "image": "dried-apricots.jpg",
+   "gallery": [
+    "dried-apricots.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "مشمش مجفف",
+    "Dried Apricots",
+    "dried"
+   ]
+  },
+  {
+   "id": "raisins",
+   "slug": "raisins",
+   "name": {
+    "ar": "زبيب",
+    "en": "Raisins"
+   },
+   "shortDescription": {
+    "ar": "زبيب لتطبيقات صناعية غذائية متعددة.",
+    "en": "Raisins for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الفواكه المجففة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Dried Fruits, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "dried",
+   "image": "raisins.jpg",
+   "gallery": [
+    "raisins.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "cakes",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "زبيب",
+    "Raisins",
+    "dried"
+   ]
+  },
+  {
+   "id": "dried-dates",
+   "slug": "dried-dates",
+   "name": {
+    "ar": "تمر مجفف",
+    "en": "Dried Dates"
+   },
+   "shortDescription": {
+    "ar": "تمر مجفف لتطبيقات صناعية غذائية متعددة.",
+    "en": "Dried Dates for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الفواكه المجففة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Dried Fruits, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "dried",
+   "image": "dried-dates.jpg",
+   "gallery": [
+    "dried-dates.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "تمر مجفف",
+    "Dried Dates",
+    "dried"
+   ]
+  },
+  {
+   "id": "dried-figs",
+   "slug": "dried-figs",
+   "name": {
+    "ar": "تين مجفف",
+    "en": "Dried Figs"
+   },
+   "shortDescription": {
+    "ar": "تين مجفف لتطبيقات صناعية غذائية متعددة.",
+    "en": "Dried Figs for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الفواكه المجففة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Dried Fruits, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "dried",
+   "image": "dried-figs.jpg",
+   "gallery": [
+    "dried-figs.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "تين مجفف",
+    "Dried Figs",
+    "dried"
+   ]
+  },
+  {
+   "id": "dried-cranberries",
+   "slug": "dried-cranberries",
+   "name": {
+    "ar": "توت بري مجفف",
+    "en": "Dried Cranberries"
+   },
+   "shortDescription": {
+    "ar": "توت بري مجفف لتطبيقات صناعية غذائية متعددة.",
+    "en": "Dried Cranberries for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الفواكه المجففة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Dried Fruits, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "dried",
+   "image": "dried-cranberries.jpg",
+   "gallery": [
+    "dried-cranberries.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "توت بري مجفف",
+    "Dried Cranberries",
+    "dried"
+   ]
+  },
+  {
+   "id": "coconut-flakes",
+   "slug": "coconut-flakes",
+   "name": {
+    "ar": "رقائق جوز الهند",
+    "en": "Coconut Flakes"
+   },
+   "shortDescription": {
+    "ar": "رقائق جوز الهند لتطبيقات صناعية غذائية متعددة.",
+    "en": "Coconut Flakes for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الفواكه المجففة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Dried Fruits, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "dried",
+   "image": "coconut-flakes.jpg",
+   "gallery": [
+    "coconut-flakes.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "رقائق",
+      "en": "Flakes"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "رقائق جوز الهند",
+    "Coconut Flakes",
+    "dried"
+   ]
+  },
+  {
+   "id": "bakery-base-mix",
+   "slug": "bakery-base-mix",
+   "name": {
+    "ar": "خليط أساس للمخابز",
+    "en": "Bakery Base Mix"
+   },
+   "shortDescription": {
+    "ar": "خليط أساس للمخابز لتطبيقات صناعية غذائية متعددة.",
+    "en": "Bakery Base Mix for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المخابز والحلويات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Bakery & Confectionery, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "bakery",
+   "image": "bakery-base-mix.jpg",
+   "gallery": [
+    "bakery-base-mix.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "cakes"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "خليط أساس للمخابز",
+    "Bakery Base Mix",
+    "bakery"
+   ]
+  },
+  {
+   "id": "bread-improver",
+   "slug": "bread-improver",
+   "name": {
+    "ar": "محسن خبز",
+    "en": "Bread Improver"
+   },
+   "shortDescription": {
+    "ar": "محسن خبز لتطبيقات صناعية غذائية متعددة.",
+    "en": "Bread Improver for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المخابز والحلويات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Bakery & Confectionery, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "bakery",
+   "image": "bread-improver.jpg",
+   "gallery": [
+    "bread-improver.jpg"
+   ],
+   "industryIds": [
+    "bakeries"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "محسن خبز",
+    "Bread Improver",
+    "bakery"
+   ]
+  },
+  {
+   "id": "baking-powder",
+   "slug": "baking-powder",
+   "name": {
+    "ar": "مسحوق الخَبز",
+    "en": "Baking Powder"
+   },
+   "shortDescription": {
+    "ar": "مسحوق الخَبز لتطبيقات صناعية غذائية متعددة.",
+    "en": "Baking Powder for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المخابز والحلويات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Bakery & Confectionery, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "bakery",
+   "image": "baking-powder.jpg",
+   "gallery": [
+    "baking-powder.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "cakes"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "مسحوق الخَبز",
+    "Baking Powder",
+    "bakery"
+   ]
+  },
+  {
+   "id": "dry-yeast",
+   "slug": "dry-yeast",
+   "name": {
+    "ar": "خميرة جافة",
+    "en": "Dry Yeast"
+   },
+   "shortDescription": {
+    "ar": "خميرة جافة لتطبيقات صناعية غذائية متعددة.",
+    "en": "Dry Yeast for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المخابز والحلويات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Bakery & Confectionery, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "bakery",
+   "image": "dry-yeast.jpg",
+   "gallery": [
+    "dry-yeast.jpg"
+   ],
+   "industryIds": [
+    "bakeries"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حبيبات",
+      "en": "Granules"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "خميرة جافة",
+    "Dry Yeast",
+    "bakery"
+   ]
+  },
+  {
+   "id": "corn-starch",
+   "slug": "corn-starch",
+   "name": {
+    "ar": "نشا الذرة",
+    "en": "Corn Starch"
+   },
+   "shortDescription": {
+    "ar": "نشا الذرة لتطبيقات صناعية غذائية متعددة.",
+    "en": "Corn Starch for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المخابز والحلويات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Bakery & Confectionery, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "bakery",
+   "image": "corn-starch.jpg",
+   "gallery": [
+    "corn-starch.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "cakes",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "نشا الذرة",
+    "Corn Starch",
+    "bakery"
+   ]
+  },
+  {
+   "id": "chocolate-filling",
+   "slug": "chocolate-filling",
+   "name": {
+    "ar": "حشوة شوكولا",
+    "en": "Chocolate Filling"
+   },
+   "shortDescription": {
+    "ar": "حشوة شوكولا لتطبيقات صناعية غذائية متعددة.",
+    "en": "Chocolate Filling for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المخابز والحلويات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Bakery & Confectionery, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "bakery",
+   "image": "chocolate-filling.jpg",
+   "gallery": [
+    "chocolate-filling.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حشوة كريمية",
+      "en": "Cream filling"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "حشوة شوكولا",
+    "Chocolate Filling",
+    "bakery"
+   ]
+  },
+  {
+   "id": "fruit-filling",
+   "slug": "fruit-filling",
+   "name": {
+    "ar": "حشوة فواكه",
+    "en": "Fruit Filling"
+   },
+   "shortDescription": {
+    "ar": "حشوة فواكه لتطبيقات صناعية غذائية متعددة.",
+    "en": "Fruit Filling for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المخابز والحلويات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Bakery & Confectionery, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "bakery",
+   "image": "fruit-filling.jpg",
+   "gallery": [
+    "fruit-filling.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حشوة",
+      "en": "Filling"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "حشوة فواكه",
+    "Fruit Filling",
+    "bakery"
+   ]
+  },
+  {
+   "id": "neutral-glaze",
+   "slug": "neutral-glaze",
+   "name": {
+    "ar": "جيل تلميع محايد",
+    "en": "Neutral Glaze"
+   },
+   "shortDescription": {
+    "ar": "جيل تلميع محايد لتطبيقات صناعية غذائية متعددة.",
+    "en": "Neutral Glaze for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المخابز والحلويات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Bakery & Confectionery, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "bakery",
+   "image": "neutral-glaze.jpg",
+   "gallery": [
+    "neutral-glaze.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "جيل",
+      "en": "Gel"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "جيل تلميع محايد",
+    "Neutral Glaze",
+    "bakery"
+   ]
+  },
+  {
+   "id": "sprinkles",
+   "slug": "sprinkles",
+   "name": {
+    "ar": "حبيبات تزيين",
+    "en": "Decorative Sprinkles"
+   },
+   "shortDescription": {
+    "ar": "حبيبات تزيين لتطبيقات صناعية غذائية متعددة.",
+    "en": "Decorative Sprinkles for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المخابز والحلويات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Bakery & Confectionery, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "bakery",
+   "image": "sprinkles.jpg",
+   "gallery": [
+    "sprinkles.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حبيبات",
+      "en": "Sprinkles"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "حبيبات تزيين",
+    "Decorative Sprinkles",
+    "bakery"
+   ]
+  },
+  {
+   "id": "icecream-base",
+   "slug": "icecream-base",
+   "name": {
+    "ar": "قاعدة آيس كريم",
+    "en": "Ice Cream Base"
+   },
+   "shortDescription": {
+    "ar": "قاعدة آيس كريم لتطبيقات صناعية غذائية متعددة.",
+    "en": "Ice Cream Base for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الآيس كريم والألبان، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Ice Cream & Dairy, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "icecream",
+   "image": "icecream-base.jpg",
+   "gallery": [
+    "icecream-base.jpg"
+   ],
+   "industryIds": [
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    },
+    {
+     "ar": "الألبان والحلويات المجمدة",
+     "en": "Dairy & frozen desserts"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "قاعدة آيس كريم",
+    "Ice Cream Base",
+    "icecream"
+   ]
+  },
+  {
+   "id": "milk-powder",
+   "slug": "milk-powder",
+   "name": {
+    "ar": "حليب مجفف",
+    "en": "Milk Powder"
+   },
+   "shortDescription": {
+    "ar": "حليب مجفف لتطبيقات صناعية غذائية متعددة.",
+    "en": "Milk Powder for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الآيس كريم والألبان، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Ice Cream & Dairy, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "icecream",
+   "image": "milk-powder.jpg",
+   "gallery": [
+    "milk-powder.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "ice",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "حليب مجفف",
+    "Milk Powder",
+    "icecream"
+   ]
+  },
+  {
+   "id": "whey-powder",
+   "slug": "whey-powder",
+   "name": {
+    "ar": "مسحوق مصل الحليب",
+    "en": "Whey Powder"
+   },
+   "shortDescription": {
+    "ar": "مسحوق مصل الحليب لتطبيقات صناعية غذائية متعددة.",
+    "en": "Whey Powder for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الآيس كريم والألبان، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Ice Cream & Dairy, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "icecream",
+   "image": "whey-powder.jpg",
+   "gallery": [
+    "whey-powder.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "ice",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "مسحوق مصل الحليب",
+    "Whey Powder",
+    "icecream"
+   ]
+  },
+  {
+   "id": "cream-powder",
+   "slug": "cream-powder",
+   "name": {
+    "ar": "مسحوق القشطة",
+    "en": "Cream Powder"
+   },
+   "shortDescription": {
+    "ar": "مسحوق القشطة لتطبيقات صناعية غذائية متعددة.",
+    "en": "Cream Powder for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الآيس كريم والألبان، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Ice Cream & Dairy, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "icecream",
+   "image": "cream-powder.jpg",
+   "gallery": [
+    "cream-powder.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "مسحوق القشطة",
+    "Cream Powder",
+    "icecream"
+   ]
+  },
+  {
+   "id": "soft-serve-mix",
+   "slug": "soft-serve-mix",
+   "name": {
+    "ar": "خليط آيس كريم سوفت",
+    "en": "Soft Serve Mix"
+   },
+   "shortDescription": {
+    "ar": "خليط آيس كريم سوفت لتطبيقات صناعية غذائية متعددة.",
+    "en": "Soft Serve Mix for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الآيس كريم والألبان، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Ice Cream & Dairy, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "icecream",
+   "image": "soft-serve-mix.jpg",
+   "gallery": [
+    "soft-serve-mix.jpg"
+   ],
+   "industryIds": [
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    },
+    {
+     "ar": "الألبان والحلويات المجمدة",
+     "en": "Dairy & frozen desserts"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "خليط مسحوق",
+      "en": "Powder mix"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "خليط آيس كريم سوفت",
+    "Soft Serve Mix",
+    "icecream"
+   ]
+  },
+  {
+   "id": "vanilla-flavor",
+   "slug": "vanilla-flavor",
+   "name": {
+    "ar": "نكهة فانيلا",
+    "en": "Vanilla Flavor"
+   },
+   "shortDescription": {
+    "ar": "نكهة فانيلا لتطبيقات صناعية غذائية متعددة.",
+    "en": "Vanilla Flavor for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة النكهات والألوان، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Flavors & Colors, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "flavors",
+   "image": "vanilla-flavor.jpg",
+   "gallery": [
+    "vanilla-flavor.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "cakes",
+    "ice",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "سائل أو مسحوق",
+      "en": "Liquid or powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "نكهة فانيلا",
+    "Vanilla Flavor",
+    "flavors"
+   ]
+  },
+  {
+   "id": "strawberry-flavor",
+   "slug": "strawberry-flavor",
+   "name": {
+    "ar": "نكهة فراولة",
+    "en": "Strawberry Flavor"
+   },
+   "shortDescription": {
+    "ar": "نكهة فراولة لتطبيقات صناعية غذائية متعددة.",
+    "en": "Strawberry Flavor for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة النكهات والألوان، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Flavors & Colors, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "flavors",
+   "image": "strawberry-flavor.jpg",
+   "gallery": [
+    "strawberry-flavor.jpg"
+   ],
+   "industryIds": [
+    "cakes",
+    "ice",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "سائل أو مسحوق",
+      "en": "Liquid or powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "نكهة فراولة",
+    "Strawberry Flavor",
+    "flavors"
+   ]
+  },
+  {
+   "id": "caramel-flavor",
+   "slug": "caramel-flavor",
+   "name": {
+    "ar": "نكهة كراميل",
+    "en": "Caramel Flavor"
+   },
+   "shortDescription": {
+    "ar": "نكهة كراميل لتطبيقات صناعية غذائية متعددة.",
+    "en": "Caramel Flavor for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة النكهات والألوان، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Flavors & Colors, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "flavors",
+   "image": "caramel-flavor.jpg",
+   "gallery": [
+    "caramel-flavor.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "ice",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "نكهة كراميل",
+    "Caramel Flavor",
+    "flavors"
+   ]
+  },
+  {
+   "id": "food-colors",
+   "slug": "food-colors",
+   "name": {
+    "ar": "ألوان غذائية",
+    "en": "Food Colors"
+   },
+   "shortDescription": {
+    "ar": "ألوان غذائية لتطبيقات صناعية غذائية متعددة.",
+    "en": "Food Colors for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة النكهات والألوان، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Flavors & Colors, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "flavors",
+   "image": "food-colors.jpg",
+   "gallery": [
+    "food-colors.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "ice",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق أو سائل",
+      "en": "Powder or liquid"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "ألوان غذائية",
+    "Food Colors",
+    "flavors"
+   ]
+  },
+  {
+   "id": "palm-oil",
+   "slug": "palm-oil",
+   "name": {
+    "ar": "زيت نخيل مكرر",
+    "en": "Refined Palm Oil"
+   },
+   "shortDescription": {
+    "ar": "زيت نخيل مكرر لتطبيقات صناعية غذائية متعددة.",
+    "en": "Refined Palm Oil for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الزيوت والدهون، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Oils & Fats, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "oils",
+   "image": "palm-oil.jpg",
+   "gallery": [
+    "palm-oil.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "سائل أو نصف صلب",
+      "en": "Liquid or semi-solid"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "زيت نخيل مكرر",
+    "Refined Palm Oil",
+    "oils"
+   ]
+  },
+  {
+   "id": "bakery-shortening",
+   "slug": "bakery-shortening",
+   "name": {
+    "ar": "شورتنينغ للمخابز",
+    "en": "Bakery Shortening"
+   },
+   "shortDescription": {
+    "ar": "شورتنينغ للمخابز لتطبيقات صناعية غذائية متعددة.",
+    "en": "Bakery Shortening for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الزيوت والدهون، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Oils & Fats, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "oils",
+   "image": "bakery-shortening.jpg",
+   "gallery": [
+    "bakery-shortening.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "cakes"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "دهن نصف صلب",
+      "en": "Semi-solid fat"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "شورتنينغ للمخابز",
+    "Bakery Shortening",
+    "oils"
+   ]
+  },
+  {
+   "id": "industrial-margarine",
+   "slug": "industrial-margarine",
+   "name": {
+    "ar": "مارغرين صناعي",
+    "en": "Industrial Margarine"
+   },
+   "shortDescription": {
+    "ar": "مارغرين صناعي لتطبيقات صناعية غذائية متعددة.",
+    "en": "Industrial Margarine for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الزيوت والدهون، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Oils & Fats, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "oils",
+   "image": "industrial-margarine.jpg",
+   "gallery": [
+    "industrial-margarine.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "cakes"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "مارغرين صناعي",
+    "Industrial Margarine",
+    "oils"
+   ]
+  },
+  {
+   "id": "cocoa-butter-substitute",
+   "slug": "cocoa-butter-substitute",
+   "name": {
+    "ar": "بديل زبدة الكاكاو",
+    "en": "Cocoa Butter Substitute"
+   },
+   "shortDescription": {
+    "ar": "بديل زبدة الكاكاو لتطبيقات صناعية غذائية متعددة.",
+    "en": "Cocoa Butter Substitute for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الزيوت والدهون، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Oils & Fats, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "oils",
+   "image": "cocoa-butter-substitute.jpg",
+   "gallery": [
+    "cocoa-butter-substitute.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "biscuits"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "بديل زبدة الكاكاو",
+    "Cocoa Butter Substitute",
+    "oils"
+   ]
+  },
+  {
+   "id": "coconut-oil",
+   "slug": "coconut-oil",
+   "name": {
+    "ar": "زيت جوز الهند",
+    "en": "Coconut Oil"
+   },
+   "shortDescription": {
+    "ar": "زيت جوز الهند لتطبيقات صناعية غذائية متعددة.",
+    "en": "Coconut Oil for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة الزيوت والدهون، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Oils & Fats, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "oils",
+   "image": "coconut-oil.jpg",
+   "gallery": [
+    "coconut-oil.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "ice",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "زيت جوز الهند",
+    "Coconut Oil",
+    "oils"
+   ]
+  },
+  {
+   "id": "white-sugar",
+   "slug": "white-sugar",
+   "name": {
+    "ar": "سكر أبيض",
+    "en": "White Sugar"
+   },
+   "shortDescription": {
+    "ar": "سكر أبيض لتطبيقات صناعية غذائية متعددة.",
+    "en": "White Sugar for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة السكر والمحليات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Sugars & Sweeteners, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "sweeteners",
+   "image": "white-sugar.jpg",
+   "gallery": [
+    "white-sugar.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "cakes",
+    "ice",
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "سكر أبيض",
+    "White Sugar",
+    "sweeteners"
+   ]
+  },
+  {
+   "id": "glucose-syrup",
+   "slug": "glucose-syrup",
+   "name": {
+    "ar": "شراب الغلوكوز",
+    "en": "Glucose Syrup"
+   },
+   "shortDescription": {
+    "ar": "شراب الغلوكوز لتطبيقات صناعية غذائية متعددة.",
+    "en": "Glucose Syrup for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة السكر والمحليات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Sugars & Sweeteners, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "sweeteners",
+   "image": "glucose-syrup.jpg",
+   "gallery": [
+    "glucose-syrup.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "ice",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "شراب",
+      "en": "Syrup"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "شراب الغلوكوز",
+    "Glucose Syrup",
+    "sweeteners"
+   ]
+  },
+  {
+   "id": "dextrose",
+   "slug": "dextrose",
+   "name": {
+    "ar": "ديكستروز",
+    "en": "Dextrose"
+   },
+   "shortDescription": {
+    "ar": "ديكستروز لتطبيقات صناعية غذائية متعددة.",
+    "en": "Dextrose for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة السكر والمحليات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Sugars & Sweeteners, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "sweeteners",
+   "image": "dextrose.jpg",
+   "gallery": [
+    "dextrose.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "ice",
+    "beverages"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "ديكستروز",
+    "Dextrose",
+    "sweeteners"
+   ]
+  },
+  {
+   "id": "invert-sugar",
+   "slug": "invert-sugar",
+   "name": {
+    "ar": "سكر محوّل",
+    "en": "Invert Sugar Syrup"
+   },
+   "shortDescription": {
+    "ar": "سكر محوّل لتطبيقات صناعية غذائية متعددة.",
+    "en": "Invert Sugar Syrup for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة السكر والمحليات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Sugars & Sweeteners, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "sweeteners",
+   "image": "invert-sugar.jpg",
+   "gallery": [
+    "invert-sugar.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "cakes",
+    "ice"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "شراب",
+      "en": "Syrup"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "سكر محوّل",
+    "Invert Sugar Syrup",
+    "sweeteners"
+   ]
+  },
+  {
+   "id": "sorbitol",
+   "slug": "sorbitol",
+   "name": {
+    "ar": "سوربيتول",
+    "en": "Sorbitol"
+   },
+   "shortDescription": {
+    "ar": "سوربيتول لتطبيقات صناعية غذائية متعددة.",
+    "en": "Sorbitol for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة السكر والمحليات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Sugars & Sweeteners, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "sweeteners",
+   "image": "sorbitol.jpg",
+   "gallery": [
+    "sorbitol.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق أو شراب",
+      "en": "Powder or syrup"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "سوربيتول",
+    "Sorbitol",
+    "sweeteners"
+   ]
+  },
+  {
+   "id": "lecithin",
+   "slug": "lecithin",
+   "name": {
+    "ar": "ليسيثين",
+    "en": "Lecithin"
+   },
+   "shortDescription": {
+    "ar": "ليسيثين لتطبيقات صناعية غذائية متعددة.",
+    "en": "Lecithin for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المثبتات والمستحلبات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Stabilizers & Emulsifiers, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "stabilizers",
+   "image": "lecithin.jpg",
+   "gallery": [
+    "lecithin.jpg"
+   ],
+   "industryIds": [
+    "choc",
+    "bakeries",
+    "biscuits",
+    "ice",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الشوكولا والحلويات",
+     "en": "Chocolate & confectionery"
+    },
+    {
+     "ar": "البسكويت والويفر",
+     "en": "Biscuits & wafers"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "سائل أو مسحوق",
+      "en": "Liquid or powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "ليسيثين",
+    "Lecithin",
+    "stabilizers"
+   ]
+  },
+  {
+   "id": "mono-diglycerides",
+   "slug": "mono-diglycerides",
+   "name": {
+    "ar": "أحادي وثنائي الغليسيريد",
+    "en": "Mono & Diglycerides"
+   },
+   "shortDescription": {
+    "ar": "أحادي وثنائي الغليسيريد لتطبيقات صناعية غذائية متعددة.",
+    "en": "Mono & Diglycerides for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المثبتات والمستحلبات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Stabilizers & Emulsifiers, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "stabilizers",
+   "image": "mono-diglycerides.jpg",
+   "gallery": [
+    "mono-diglycerides.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "ice",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "حسب مواصفة المنتج",
+      "en": "Per product specification"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "أحادي وثنائي الغليسيريد",
+    "Mono & Diglycerides",
+    "stabilizers"
+   ]
+  },
+  {
+   "id": "xanthan-gum",
+   "slug": "xanthan-gum",
+   "name": {
+    "ar": "صمغ الزانثان",
+    "en": "Xanthan Gum"
+   },
+   "shortDescription": {
+    "ar": "صمغ الزانثان لتطبيقات صناعية غذائية متعددة.",
+    "en": "Xanthan Gum for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المثبتات والمستحلبات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Stabilizers & Emulsifiers, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "stabilizers",
+   "image": "xanthan-gum.jpg",
+   "gallery": [
+    "xanthan-gum.jpg"
+   ],
+   "industryIds": [
+    "ice",
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    },
+    {
+     "ar": "الألبان والحلويات المجمدة",
+     "en": "Dairy & frozen desserts"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "صمغ الزانثان",
+    "Xanthan Gum",
+    "stabilizers"
+   ]
+  },
+  {
+   "id": "guar-gum",
+   "slug": "guar-gum",
+   "name": {
+    "ar": "صمغ الغوار",
+    "en": "Guar Gum"
+   },
+   "shortDescription": {
+    "ar": "صمغ الغوار لتطبيقات صناعية غذائية متعددة.",
+    "en": "Guar Gum for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المثبتات والمستحلبات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Stabilizers & Emulsifiers, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "stabilizers",
+   "image": "guar-gum.jpg",
+   "gallery": [
+    "guar-gum.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "ice",
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "صمغ الغوار",
+    "Guar Gum",
+    "stabilizers"
+   ]
+  },
+  {
+   "id": "pectin",
+   "slug": "pectin",
+   "name": {
+    "ar": "بكتين",
+    "en": "Pectin"
+   },
+   "shortDescription": {
+    "ar": "بكتين لتطبيقات صناعية غذائية متعددة.",
+    "en": "Pectin for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المثبتات والمستحلبات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Stabilizers & Emulsifiers, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "stabilizers",
+   "image": "pectin.jpg",
+   "gallery": [
+    "pectin.jpg"
+   ],
+   "industryIds": [
+    "cakes",
+    "ice",
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "بكتين",
+    "Pectin",
+    "stabilizers"
+   ]
+  },
+  {
+   "id": "carrageenan",
+   "slug": "carrageenan",
+   "name": {
+    "ar": "كاراجينان",
+    "en": "Carrageenan"
+   },
+   "shortDescription": {
+    "ar": "كاراجينان لتطبيقات صناعية غذائية متعددة.",
+    "en": "Carrageenan for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المثبتات والمستحلبات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Stabilizers & Emulsifiers, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "stabilizers",
+   "image": "carrageenan.jpg",
+   "gallery": [
+    "carrageenan.jpg"
+   ],
+   "industryIds": [
+    "ice",
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    },
+    {
+     "ar": "الألبان والحلويات المجمدة",
+     "en": "Dairy & frozen desserts"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "كاراجينان",
+    "Carrageenan",
+    "stabilizers"
+   ]
+  },
+  {
+   "id": "cmc",
+   "slug": "cmc",
+   "name": {
+    "ar": "كربوكسي ميثيل سيليلوز",
+    "en": "CMC"
+   },
+   "shortDescription": {
+    "ar": "كربوكسي ميثيل سيليلوز لتطبيقات صناعية غذائية متعددة.",
+    "en": "CMC for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة المثبتات والمستحلبات، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in Stabilizers & Emulsifiers, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "stabilizers",
+   "image": "cmc.jpg",
+   "gallery": [
+    "cmc.jpg"
+   ],
+   "industryIds": [
+    "ice",
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    },
+    {
+     "ar": "الألبان والحلويات المجمدة",
+     "en": "Dairy & frozen desserts"
+    },
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "كربوكسي ميثيل سيليلوز",
+    "CMC",
+    "stabilizers"
+   ]
+  },
+  {
+   "id": "maltodextrin",
+   "slug": "maltodextrin",
+   "name": {
+    "ar": "مالتوديكسترين",
+    "en": "Maltodextrin"
+   },
+   "shortDescription": {
+    "ar": "مالتوديكسترين لتطبيقات صناعية غذائية متعددة.",
+    "en": "Maltodextrin for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة مكونات غذائية متنوعة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in General Food Ingredients, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "general",
+   "image": "maltodextrin.jpg",
+   "gallery": [
+    "maltodextrin.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "ice",
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "مالتوديكسترين",
+    "Maltodextrin",
+    "general"
+   ]
+  },
+  {
+   "id": "citric-acid",
+   "slug": "citric-acid",
+   "name": {
+    "ar": "حمض الستريك",
+    "en": "Citric Acid"
+   },
+   "shortDescription": {
+    "ar": "حمض الستريك لتطبيقات صناعية غذائية متعددة.",
+    "en": "Citric Acid for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة مكونات غذائية متنوعة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in General Food Ingredients, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "general",
+   "image": "citric-acid.jpg",
+   "gallery": [
+    "citric-acid.jpg"
+   ],
+   "industryIds": [
+    "cakes",
+    "ice",
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "بلورات أو مسحوق",
+      "en": "Crystals or powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "حمض الستريك",
+    "Citric Acid",
+    "general"
+   ]
+  },
+  {
+   "id": "sodium-bicarbonate",
+   "slug": "sodium-bicarbonate",
+   "name": {
+    "ar": "بيكربونات الصوديوم",
+    "en": "Sodium Bicarbonate"
+   },
+   "shortDescription": {
+    "ar": "بيكربونات الصوديوم لتطبيقات صناعية غذائية متعددة.",
+    "en": "Sodium Bicarbonate for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة مكونات غذائية متنوعة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in General Food Ingredients, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "general",
+   "image": "sodium-bicarbonate.jpg",
+   "gallery": [
+    "sodium-bicarbonate.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق",
+      "en": "Powder"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "بيكربونات الصوديوم",
+    "Sodium Bicarbonate",
+    "general"
+   ]
+  },
+  {
+   "id": "food-grade-salt",
+   "slug": "food-grade-salt",
+   "name": {
+    "ar": "ملح غذائي",
+    "en": "Food Grade Salt"
+   },
+   "shortDescription": {
+    "ar": "ملح غذائي لتطبيقات صناعية غذائية متعددة.",
+    "en": "Food Grade Salt for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة مكونات غذائية متنوعة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in General Food Ingredients, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "general",
+   "image": "food-grade-salt.jpg",
+   "gallery": [
+    "food-grade-salt.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "biscuits",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "بلورات",
+      "en": "Crystals"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "ملح غذائي",
+    "Food Grade Salt",
+    "general"
+   ]
+  },
+  {
+   "id": "potassium-sorbate",
+   "slug": "potassium-sorbate",
+   "name": {
+    "ar": "سوربات البوتاسيوم",
+    "en": "Potassium Sorbate"
+   },
+   "shortDescription": {
+    "ar": "سوربات البوتاسيوم لتطبيقات صناعية غذائية متعددة.",
+    "en": "Potassium Sorbate for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة مكونات غذائية متنوعة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in General Food Ingredients, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "general",
+   "image": "potassium-sorbate.jpg",
+   "gallery": [
+    "potassium-sorbate.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes",
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق أو حبيبات",
+      "en": "Powder or granules"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "سوربات البوتاسيوم",
+    "Potassium Sorbate",
+    "general"
+   ]
+  },
+  {
+   "id": "sodium-benzoate",
+   "slug": "sodium-benzoate",
+   "name": {
+    "ar": "بنزوات الصوديوم",
+    "en": "Sodium Benzoate"
+   },
+   "shortDescription": {
+    "ar": "بنزوات الصوديوم لتطبيقات صناعية غذائية متعددة.",
+    "en": "Sodium Benzoate for multiple food manufacturing applications."
+   },
+   "description": {
+    "ar": "مكوّن ضمن فئة مكونات غذائية متنوعة، متاح للمناقشة بحسب التطبيق والمواصفات والتعبئة المطلوبة.",
+    "en": "An ingredient in General Food Ingredients, available for discussion based on application, specification and packaging needs."
+   },
+   "categoryId": "general",
+   "image": "sodium-benzoate.jpg",
+   "gallery": [
+    "sodium-benzoate.jpg"
+   ],
+   "industryIds": [
+    "beverages",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "تصنيع الأغذية",
+     "en": "Food manufacturing"
+    },
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "مسحوق أو حبيبات",
+      "en": "Powder or granules"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "بنزوات الصوديوم",
+    "Sodium Benzoate",
+    "general"
+   ]
+  },
+  {
+   "id": "canned-tropical-fruits",
+   "slug": "canned-tropical-fruits",
+   "name": {
+    "ar": "فواكه معلبة استوائية",
+    "en": "Canned Tropical Fruits"
+   },
+   "shortDescription": {
+    "ar": "فواكه استوائية معلبة لتطبيقات الحلويات والمخبوزات والآيس كريم.",
+    "en": "Canned tropical fruits for desserts, bakery and ice cream applications."
+   },
+   "description": {
+    "ar": "فواكه استوائية معلبة لاستخدامها في الحلويات وتزيين الكيك والمخبوزات والآيس كريم. تُناقش تشكيلة الفواكه وحجم القطع ووسط الحفظ والتعبئة بحسب احتياجات التطبيق.",
+    "en": "Canned tropical fruits for desserts, cake decoration, baked goods and ice cream. Fruit selection, piece size, preserving medium and packaging are discussed according to application needs."
+   },
+   "categoryId": "general",
+   "image": "canned-tropical-fruits.jpg",
+   "gallery": [
+    "canned-tropical-fruits.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes",
+    "ice",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "الحلويات وتزيين الكيك",
+     "en": "Desserts & cake decoration"
+    },
+    {
+     "ar": "المخبوزات",
+     "en": "Baked goods"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "قطع فواكه معلبة",
+      "en": "Canned fruit pieces"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "فواكه معلبة استوائية",
+    "Canned Tropical Fruits",
+    "general",
+    "أناناس",
+    "مانجو",
+    "بابايا",
+    "معلبات",
+    "pineapple",
+    "mango",
+    "papaya",
+    "canned"
+   ]
+  },
+  {
+   "id": "syrups",
+   "slug": "syrups",
+   "name": {
+    "ar": "سيروبات",
+    "en": "Syrups"
+   },
+   "shortDescription": {
+    "ar": "سيروبات لتطبيقات المشروبات والحلويات والآيس كريم.",
+    "en": "Syrups for beverages, desserts and ice cream applications."
+   },
+   "description": {
+    "ar": "سيروبات للاستخدام في المشروبات والحلويات والآيس كريم، مع مناقشة النكهة والتركيز والقوام والتعبئة المناسبة لكل تطبيق عند الاستفسار.",
+    "en": "Syrups for beverages, desserts and ice cream. Flavor, concentration, consistency and suitable packaging are discussed for each application on inquiry."
+   },
+   "categoryId": "sweeteners",
+   "image": "syrups.jpg",
+   "gallery": [
+    "syrups.jpg"
+   ],
+   "industryIds": [
+    "beverages",
+    "cakes",
+    "ice",
+    "bakeries",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "المشروبات والخلطات",
+     "en": "Beverages & mixes"
+    },
+    {
+     "ar": "الحلويات",
+     "en": "Desserts"
+    },
+    {
+     "ar": "الآيس كريم",
+     "en": "Ice cream"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "سائل لزج",
+      "en": "Viscous liquid"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": false,
+   "keywords": [
+    "سيروبات",
+    "Syrups",
+    "sweeteners",
+    "سيروب",
+    "شراب",
+    "مشروبات",
+    "syrup",
+    "beverage"
+   ]
+  },
+  {
+   "id": "fruit-purees",
+   "slug": "fruit-purees",
+   "name": {
+    "ar": "فواكه مهروسة للحشوات",
+    "en": "Fruit Purees for Fillings"
+   },
+   "shortDescription": {
+    "ar": "هريس فواكه لتحضير حشوات المخبوزات والكيك والحلويات.",
+    "en": "Fruit purees for preparing bakery, cake and dessert fillings."
+   },
+   "description": {
+    "ar": "فواكه مهروسة تستخدم كأساس لتحضير حشوات الكيك والمعجنات والحلويات. يُناقش نوع الفاكهة والقوام والمعالجة المطلوبة ومدى ملاءمتها للخَبز بحسب المنتج والتطبيق.",
+    "en": "Fruit purees used as a base for cake, pastry and dessert fillings. Fruit type, texture, required processing and suitability for baking are discussed according to the product and application."
+   },
+   "categoryId": "bakery",
+   "image": "fruit-purees.jpg",
+   "gallery": [
+    "fruit-purees.jpg"
+   ],
+   "industryIds": [
+    "bakeries",
+    "cakes",
+    "biscuits",
+    "ice",
+    "food"
+   ],
+   "applications": [
+    {
+     "ar": "حشوات المعجنات",
+     "en": "Pastry fillings"
+    },
+    {
+     "ar": "حشوات الكيك والحلويات",
+     "en": "Cake & dessert fillings"
+    },
+    {
+     "ar": "حشوات البسكويت",
+     "en": "Biscuit fillings"
+    }
+   ],
+   "specifications": [
+    {
+     "label": {
+      "ar": "الشكل",
+      "en": "Form"
+     },
+     "value": {
+      "ar": "هريس فواكه",
+      "en": "Fruit puree"
+     }
+    },
+    {
+     "label": {
+      "ar": "درجة الاستخدام",
+      "en": "Application grade"
+     },
+     "value": {
+      "ar": "مخصص للتصنيع الغذائي",
+      "en": "Food manufacturing"
+     }
+    },
+    {
+     "label": {
+      "ar": "التخزين",
+      "en": "Storage"
+     },
+     "value": {
+      "ar": "وفق نشرة المنتج الفنية",
+      "en": "Per product technical sheet"
+     }
+    }
+   ],
+   "packaging": {
+    "ar": "خيارات تعبئة صناعية — التفاصيل عند الطلب",
+    "en": "Industrial packaging options — details on request"
+   },
+   "featured": true,
+   "keywords": [
+    "فواكه مهروسة للحشوات",
+    "Fruit Purees for Fillings",
+    "bakery",
+    "هريس",
+    "بيوريه",
+    "حشوات",
+    "puree",
+    "purée",
+    "fillings"
+   ]
+  }
+ ],
+ "industries": [
+  {
+   "id": "choc",
+   "slug": "chocolate-confectionery",
+   "name": {
+    "ar": "معامل الشوكولا والحلويات",
+    "en": "Chocolate & Confectionery"
+   },
+   "description": {
+    "ar": "كاكاو وشوكولا ومكسرات وحشوات لتطبيقات متنوعة.",
+    "en": "Cocoa, chocolate, nuts and fillings for varied applications."
+   },
+   "image": "cocoa.jpg",
+   "ingredientIds": [
+    "natural-cocoa",
+    "alkalized-cocoa",
+    "cocoa-butter",
+    "cocoa-mass",
+    "dark-couverture",
+    "milk-couverture",
+    "white-couverture",
+    "hazelnuts",
+    "pistachios",
+    "almonds",
+    "cashews",
+    "peanuts",
+    "nut-paste",
+    "dried-apricots",
+    "coconut-flakes",
+    "chocolate-filling",
+    "sprinkles",
+    "milk-powder",
+    "vanilla-flavor",
+    "caramel-flavor",
+    "food-colors",
+    "palm-oil",
+    "cocoa-butter-substitute",
+    "coconut-oil",
+    "white-sugar",
+    "glucose-syrup",
+    "dextrose",
+    "invert-sugar",
+    "sorbitol",
+    "lecithin"
+   ]
+  },
+  {
+   "id": "bakeries",
+   "slug": "bakeries-pastries",
+   "name": {
+    "ar": "المخابز والمعجنات",
+    "en": "Bakeries & Pastries"
+   },
+   "description": {
+    "ar": "خلطات ومحسنات وحشوات ودهون للمخبوزات.",
+    "en": "Mixes, improvers, fillings and fats for baked goods."
+   },
+   "image": "bakery.jpg",
+   "ingredientIds": [
+    "natural-cocoa",
+    "alkalized-cocoa",
+    "dark-couverture",
+    "milk-couverture",
+    "white-couverture",
+    "chocolate-chips",
+    "hazelnuts",
+    "pistachios",
+    "almonds",
+    "cashews",
+    "walnuts",
+    "peanuts",
+    "nut-paste",
+    "sesame",
+    "dried-apricots",
+    "raisins",
+    "dried-dates",
+    "dried-figs",
+    "dried-cranberries",
+    "coconut-flakes",
+    "bakery-base-mix",
+    "bread-improver",
+    "baking-powder",
+    "dry-yeast",
+    "corn-starch",
+    "chocolate-filling",
+    "fruit-filling",
+    "neutral-glaze",
+    "sprinkles",
+    "milk-powder",
+    "whey-powder",
+    "cream-powder",
+    "vanilla-flavor",
+    "caramel-flavor",
+    "food-colors",
+    "palm-oil",
+    "bakery-shortening",
+    "industrial-margarine",
+    "coconut-oil",
+    "white-sugar",
+    "glucose-syrup",
+    "dextrose",
+    "invert-sugar",
+    "sorbitol",
+    "lecithin",
+    "mono-diglycerides",
+    "guar-gum",
+    "maltodextrin",
+    "sodium-bicarbonate",
+    "food-grade-salt",
+    "potassium-sorbate",
+    "canned-tropical-fruits",
+    "syrups",
+    "fruit-purees"
+   ]
+  },
+  {
+   "id": "biscuits",
+   "slug": "biscuits-wafers",
+   "name": {
+    "ar": "معامل البسكويت والويفر",
+    "en": "Biscuits & Wafers"
+   },
+   "description": {
+    "ar": "مكونات للعجين والحشوات والتغطية والقوام.",
+    "en": "Ingredients for dough, fillings, coating and texture."
+   },
+   "image": "filling.jpg",
+   "ingredientIds": [
+    "natural-cocoa",
+    "alkalized-cocoa",
+    "dark-couverture",
+    "milk-couverture",
+    "chocolate-chips",
+    "hazelnuts",
+    "almonds",
+    "peanuts",
+    "raisins",
+    "bakery-base-mix",
+    "baking-powder",
+    "corn-starch",
+    "chocolate-filling",
+    "milk-powder",
+    "whey-powder",
+    "vanilla-flavor",
+    "palm-oil",
+    "bakery-shortening",
+    "industrial-margarine",
+    "cocoa-butter-substitute",
+    "white-sugar",
+    "lecithin",
+    "mono-diglycerides",
+    "sodium-bicarbonate",
+    "food-grade-salt",
+    "fruit-purees"
+   ]
+  },
+  {
+   "id": "ice",
+   "slug": "ice-cream",
+   "name": {
+    "ar": "معامل الآيس كريم والألبان",
+    "en": "Ice Cream & Dairy"
+   },
+   "description": {
+    "ar": "قواعد ومنكهات ومساحيق ومثبتات للمنتجات المجمدة.",
+    "en": "Bases, flavors, powders and stabilizers for frozen products."
+   },
+   "image": "icecream.jpg",
+   "ingredientIds": [
+    "alkalized-cocoa",
+    "cocoa-butter",
+    "dark-couverture",
+    "milk-couverture",
+    "white-couverture",
+    "hazelnuts",
+    "pistachios",
+    "nut-paste",
+    "coconut-flakes",
+    "chocolate-filling",
+    "fruit-filling",
+    "sprinkles",
+    "icecream-base",
+    "milk-powder",
+    "whey-powder",
+    "cream-powder",
+    "soft-serve-mix",
+    "vanilla-flavor",
+    "strawberry-flavor",
+    "caramel-flavor",
+    "food-colors",
+    "coconut-oil",
+    "white-sugar",
+    "glucose-syrup",
+    "dextrose",
+    "invert-sugar",
+    "lecithin",
+    "mono-diglycerides",
+    "xanthan-gum",
+    "guar-gum",
+    "pectin",
+    "carrageenan",
+    "cmc",
+    "maltodextrin",
+    "citric-acid",
+    "canned-tropical-fruits",
+    "syrups",
+    "fruit-purees"
+   ]
+  },
+  {
+   "id": "cakes",
+   "slug": "cakes-desserts",
+   "name": {
+    "ar": "مصانع الكيك والحلويات",
+    "en": "Cakes & Desserts"
+   },
+   "description": {
+    "ar": "مكونات للكيك والحشوات والتزيين والحلويات.",
+    "en": "Ingredients for cakes, fillings, decoration and desserts."
+   },
+   "image": "apricots.jpg",
+   "ingredientIds": [
+    "natural-cocoa",
+    "cocoa-butter",
+    "cocoa-mass",
+    "dark-couverture",
+    "milk-couverture",
+    "white-couverture",
+    "chocolate-chips",
+    "hazelnuts",
+    "pistachios",
+    "almonds",
+    "walnuts",
+    "nut-paste",
+    "dried-apricots",
+    "raisins",
+    "dried-dates",
+    "dried-figs",
+    "dried-cranberries",
+    "coconut-flakes",
+    "bakery-base-mix",
+    "baking-powder",
+    "corn-starch",
+    "chocolate-filling",
+    "fruit-filling",
+    "neutral-glaze",
+    "sprinkles",
+    "cream-powder",
+    "vanilla-flavor",
+    "strawberry-flavor",
+    "caramel-flavor",
+    "food-colors",
+    "bakery-shortening",
+    "industrial-margarine",
+    "white-sugar",
+    "glucose-syrup",
+    "invert-sugar",
+    "pectin",
+    "citric-acid",
+    "potassium-sorbate",
+    "canned-tropical-fruits",
+    "syrups",
+    "fruit-purees"
+   ]
+  },
+  {
+   "id": "beverages",
+   "slug": "beverages",
+   "name": {
+    "ar": "مصانع المشروبات والعصائر",
+    "en": "Beverages & Juices"
+   },
+   "description": {
+    "ar": "محليات ونكهات وألوان ومثبتات لتطبيقات المشروبات.",
+    "en": "Sweeteners, flavors, colors and stabilizers for beverages."
+   },
+   "image": "icecream.jpg",
+   "ingredientIds": [
+    "natural-cocoa",
+    "alkalized-cocoa",
+    "milk-powder",
+    "whey-powder",
+    "vanilla-flavor",
+    "strawberry-flavor",
+    "caramel-flavor",
+    "food-colors",
+    "white-sugar",
+    "glucose-syrup",
+    "dextrose",
+    "xanthan-gum",
+    "guar-gum",
+    "pectin",
+    "carrageenan",
+    "cmc",
+    "maltodextrin",
+    "citric-acid",
+    "potassium-sorbate",
+    "sodium-benzoate",
+    "syrups"
+   ]
+  },
+  {
+   "id": "food",
+   "slug": "food-manufacturing",
+   "name": {
+    "ar": "مصانع الأغذية العامة",
+    "en": "General Food Manufacturing"
+   },
+   "description": {
+    "ar": "مكونات وظيفية ومواد أولية لخطوط إنتاج متعددة.",
+    "en": "Functional ingredients and raw materials for varied production lines."
+   },
+   "image": "hazelnuts.jpg",
+   "ingredientIds": [
+    "cashews",
+    "walnuts",
+    "peanuts",
+    "sesame",
+    "dried-apricots",
+    "raisins",
+    "dried-dates",
+    "dried-figs",
+    "dried-cranberries",
+    "corn-starch",
+    "palm-oil",
+    "coconut-oil",
+    "white-sugar",
+    "sorbitol",
+    "lecithin",
+    "mono-diglycerides",
+    "xanthan-gum",
+    "guar-gum",
+    "pectin",
+    "carrageenan",
+    "cmc",
+    "maltodextrin",
+    "citric-acid",
+    "sodium-bicarbonate",
+    "food-grade-salt",
+    "potassium-sorbate",
+    "sodium-benzoate",
+    "canned-tropical-fruits",
+    "syrups",
+    "fruit-purees"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,29 @@
+# /etc/systemd/system/alas-api.service
+[Unit]
+Description=Alas Foodstuff API (Django + Gunicorn)
+After=network.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+Type=notify
+User=alasapi
+Group=alasapi
+WorkingDirectory=/opt/alas-api
+EnvironmentFile=/etc/alas-api/env
+ExecStart=/opt/alas-api/.venv/bin/gunicorn alas_api.wsgi:application -c /opt/alas-api/deploy/gunicorn.conf.py
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=5
+
+# Hardening: the service can only write to its media folder
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/alas-api
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

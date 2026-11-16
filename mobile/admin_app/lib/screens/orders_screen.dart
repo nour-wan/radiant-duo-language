@@ -1,0 +1,347 @@
+import 'package:alas_shared/alas_shared.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'statement_screen.dart';
+
+import '../services/admin_api.dart';
+import '../widgets/admin_widgets.dart';
+
+class OrdersScreen extends StatefulWidget {
+  const OrdersScreen({super.key, this.customerId, this.title});
+
+  /// When set, shows only this customer's orders.
+  final int? customerId;
+  final String? title;
+
+  @override
+  State<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  String? _status;
+  String _q = '';
+
+  @override
+  Widget build(BuildContext context) {
+    final api = context.read<AdminApi>();
+    final t = Theme.of(context);
+    final lang = context.lang;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.title ?? context.tr('nav.orders')),
+        actions: [
+          IconButton(
+            tooltip: context.tr('orders.export'),
+            icon: const Icon(Icons.file_download_outlined),
+            onPressed: () async {
+              try {
+                final bytes = await api.exportOrders(status: _status);
+                if (context.mounted) await shareCsv(context, bytes, 'alas-orders-${isoDate(DateTime.now())}.csv');
+              } catch (e) {
+                if (context.mounted) showSnack(context, context.trError(e), error: true);
+              }
+            },
+          ),
+        ],
+      ),
+      body: PagedList<OrderSummary>(
+        key: ValueKey('$_status|$_q'),
+        load: (page) => api.orders(page: page, status: _status, q: _q, customer: widget.customerId),
+        header: Column(children: [
+          if (widget.customerId == null) SearchBox(hint: context.tr('orders.search'), onChanged: (v) => setState(() => _q = v.trim())),
+          SizedBox(
+            height: 48,
+            child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6), children: [
+              ChoiceChip(label: Text(context.tr('app.all')), selected: _status == null, onSelected: (_) => setState(() => _status = null)),
+              for (final s in orderStatuses) ...[
+                const SizedBox(width: 6),
+                ChoiceChip(label: Text(context.tr(s == 'shipped' ? 'status.shipped_any' : 'status.$s')), selected: _status == s, onSelected: (_) => setState(() => _status = s)),
+              ],
+            ]),
+          ),
+        ]),
+        empty: EmptyView(icon: Icons.receipt_long_outlined, title: context.tr('orders.empty')),
+        itemBuilder: (context, o, reload) => Card(
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () async {
+              await Navigator.of(context).push(MaterialPageRoute(builder: (_) => AdminOrderScreen(orderId: o.id)));
+              reload();
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(children: [
+                Expanded(
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      Text(o.number, style: t.textTheme.titleSmall),
+                      const SizedBox(width: 8),
+                      StatusChip(o.status, pickup: o.isPickup),
+                    ]),
+                    const SizedBox(height: 4),
+                    Text(o.businessName.isNotEmpty ? '${o.businessName} · ${o.customerName}' : o.customerName, style: t.textTheme.bodyMedium),
+                    Text('${formatDateTime(o.createdAt, lang)} · ${o.itemCount} ×',
+                        style: t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant)),
+                  ]),
+                ),
+                Text(money(o.total), style: t.textTheme.titleMedium?.copyWith(fontFamily: 'packages/alas_shared/Manrope')),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AdminOrderScreen extends StatefulWidget {
+  const AdminOrderScreen({super.key, required this.orderId});
+
+  final int orderId;
+
+  @override
+  State<AdminOrderScreen> createState() => _AdminOrderScreenState();
+}
+
+class _AdminOrderScreenState extends State<AdminOrderScreen> {
+  OrderDetail? _order;
+  Object? _error;
+  final _note = TextEditingController();
+  bool _busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final o = await context.read<AdminApi>().order(widget.orderId);
+      if (!mounted) return;
+      setState(() {
+        _order = o;
+        _error = null;
+        _note.text = o.adminNote;
+      });
+    } catch (e) {
+      if (mounted) setState(() => _error = e);
+    }
+  }
+
+  Future<void> _changeStatus(String status) async {
+    final noteCtl = TextEditingController();
+    final paidCtl = TextEditingController();
+    final o = _order!;
+    final askPaid = status == 'delivered' && o.userId != null;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(ctx.tr('order.to', {'s': statusLabel(ctx, status, pickup: o.isPickup)})),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (status == 'cancelled') Text(ctx.tr('order.cancel_warning'), style: const TextStyle(color: AlasColors.destructive)),
+          TextField(controller: noteCtl, decoration: InputDecoration(labelText: ctx.tr('order.status_note'))),
+          if (askPaid) ...[
+            const SizedBox(height: 12),
+            TextField(
+              controller: paidCtl,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(
+                labelText: ctx.tr('pay.paid_now'),
+                helperText: ctx.tr('pay.paid_now_hint'),
+                helperMaxLines: 3,
+                suffix: TextButton(
+                  onPressed: () => paidCtl.text = (o.total - o.paidAmount).clamp(0, double.infinity).toStringAsFixed(2),
+                  child: Text(ctx.tr('pay.full')),
+                ),
+              ),
+            ),
+          ],
+        ]),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(ctx.tr('app.cancel'))),
+          FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(ctx.tr('app.confirm'))),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _busy = true);
+    try {
+      final paid = parseAmount(paidCtl.text);
+      final o = await context.read<AdminApi>().setStatus(widget.orderId, status, note: noteCtl.text.trim(), paidAmount: paid != null && paid > 0 ? paid : null);
+      if (!mounted) return;
+      setState(() => _order = o);
+      showSnack(context, context.tr('order.updated'));
+    } catch (e) {
+      if (mounted) showSnack(context, context.trError(e), error: true);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _recordPayment() async {
+    final o = _order!;
+    final r = await askAmount(context, title: context.tr('pay.record'), full: (o.remaining ?? o.total - o.paidAmount));
+    if (r == null || !mounted) return;
+    try {
+      final fresh = await context.read<AdminApi>().recordOrderPayment(o.id, r.amount, r.note);
+      if (!mounted) return;
+      setState(() => _order = fresh);
+      showSnack(context, context.tr('pay.done'));
+    } catch (e) {
+      if (mounted) showSnack(context, context.trError(e), error: true);
+    }
+  }
+
+  Future<void> _saveNote() async {
+    try {
+      await context.read<AdminApi>().setNote(widget.orderId, _note.text.trim());
+      if (mounted) showSnack(context, context.tr('app.saved'));
+    } catch (e) {
+      if (mounted) showSnack(context, context.trError(e), error: true);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final o = _order;
+    final t = Theme.of(context);
+    final lang = context.lang;
+    return Scaffold(
+      appBar: AppBar(title: Text(o == null ? '' : context.tr('order.title', {'n': o.number}))),
+      body: _error != null
+          ? ErrorView(error: _error!, onRetry: _load)
+          : o == null
+              ? const LoadingView()
+              : RefreshIndicator(
+                  onRefresh: _load,
+                  child: ListView(padding: const EdgeInsets.all(12), children: [
+                    Row(children: [
+                      StatusChip(o.status, pickup: o.isPickup),
+                      const Spacer(),
+                      Text(formatDateTime(o.createdAt, lang), style: t.textTheme.bodySmall),
+                    ]),
+                    const SizedBox(height: 12),
+                    if (o.allowedStatuses.isNotEmpty)
+                      FormCard(title: context.tr('order.change_status'), children: [
+                        Wrap(spacing: 8, runSpacing: 8, children: [
+                          for (final s in o.allowedStatuses)
+                            FilledButton.tonal(
+                              style: s == 'cancelled' ? FilledButton.styleFrom(foregroundColor: AlasColors.destructive) : null,
+                              onPressed: _busy ? null : () => _changeStatus(s),
+                              child: Text(statusLabel(context, s, pickup: o.isPickup)),
+                            ),
+                        ]),
+                      ]),
+                    FormCard(title: context.tr('order.customer'), children: [
+                      if (o.customerDeleted)
+                        Text(context.tr('order.deleted_customer'), style: const TextStyle(color: AlasColors.destructive))
+                      else ...[
+                        if (o.businessName.isNotEmpty) Text(o.businessName, style: t.textTheme.titleSmall),
+                        Text(o.customerName),
+                        Text(o.customerPhone, textDirection: TextDirection.ltr, textAlign: lang == 'ar' ? TextAlign.right : TextAlign.left),
+                        if (o.customerEmail.isNotEmpty) Text(o.customerEmail, style: t.textTheme.bodySmall),
+                        Row(children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => launchUrl(Uri.parse('tel:${o.customerPhone}')),
+                              icon: const Icon(Icons.call),
+                              label: Text(context.tr('order.call')),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () => launchUrl(Uri.parse('https://wa.me/${_waNumber(o.customerPhone)}'), mode: LaunchMode.externalApplication),
+                              icon: const Icon(Icons.chat),
+                              label: Text(context.tr('order.whatsapp')),
+                            ),
+                          ),
+                        ]),
+                      ],
+                    ]),
+                    FormCard(title: context.tr(o.isPickup ? 'delivery.pickup' : 'delivery.delivery'), children: [
+                      if (!o.isPickup) ...[
+                        Text(o.address),
+                        if (o.deliveryZone.isNotEmpty) Text('${context.tr('order.zone')}: ${o.deliveryZone}', style: t.textTheme.bodySmall),
+                        Text('${context.tr('order.delivery_fee')}: ${o.deliveryFee.toStringAsFixed(0)} ${o.deliveryCurrency}',
+                            style: t.textTheme.titleSmall?.copyWith(color: t.colorScheme.primary)),
+                      ],
+                      if (o.notes.isNotEmpty) Text('${context.tr('order.customer_note')}: ${o.notes}'),
+                    ]),
+                    FormCard(title: context.tr('order.items'), children: [
+                      for (final i in o.items)
+                        Row(children: [
+                          SizedBox.square(dimension: 44, child: NetImage(i.image, radius: 6)),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(i.productName(lang), style: t.textTheme.titleSmall),
+                              Text('${i.variantLabel(lang)} · ${money(i.unitPrice)} × ${i.quantity}', style: t.textTheme.bodySmall),
+                            ]),
+                          ),
+                          Text(money(i.lineTotal), style: const TextStyle(fontFamily: 'packages/alas_shared/Manrope')),
+                        ]),
+                      const Divider(),
+                      _row(context, context.tr('order.subtotal'), money(o.subtotal)),
+                      if (o.discount > 0) _row(context, '${context.tr('order.coupon')} (${o.couponCode})', '- ${money(o.discount)}'),
+                      if (o.appDiscount > 0) _row(context, '${context.tr('app_discount')} (${o.appDiscountPercent.toStringAsFixed(0)}%)', '- ${money(o.appDiscount)}'),
+                      _row(context, context.tr('order.total'), money(o.total), bold: true),
+                      if (!o.isPickup && o.deliveryFee > 0)
+                        _row(context, context.tr('order.delivery_fee'), '+ ${o.deliveryFee.toStringAsFixed(0)} ${o.deliveryCurrency}'),
+                      const SizedBox(height: 8),
+                      InvoiceButton(number: o.number, load: (lang) => context.read<AdminApi>().invoicePdf(o.id, lang)),
+                    ]),
+                    if (o.status != 'cancelled')
+                      FormCard(title: context.tr('pay.title'), children: [
+                        _row(context, context.tr('ledger.paid'), money(o.paidAmount)),
+                        if (o.remaining != null) _row(context, context.tr('ledger.remaining'), money(o.remaining), bold: true),
+                        if (o.userId == null)
+                          Text(context.tr('pay.no_customer'), style: t.textTheme.bodySmall)
+                        else
+                          Wrap(spacing: 8, runSpacing: 8, children: [
+                            FilledButton.tonalIcon(onPressed: _recordPayment, icon: const Icon(Icons.payments_outlined), label: Text(context.tr('pay.record'))),
+                            OutlinedButton.icon(
+                              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => CustomerStatementScreen(customerId: o.userId!))),
+                              icon: const Icon(Icons.account_balance_wallet_outlined),
+                              label: Text(context.tr('pay.statement')),
+                            ),
+                          ]),
+                      ]),
+                    FormCard(title: context.tr('order.note'), children: [
+                      TextField(controller: _note, maxLines: 3, decoration: InputDecoration(hintText: context.tr('order.note_hint'))),
+                      Align(alignment: AlignmentDirectional.centerEnd, child: TextButton(onPressed: _saveNote, child: Text(context.tr('app.save')))),
+                    ]),
+                    FormCard(title: context.tr('order.history'), children: [
+                      for (final e in o.events.reversed)
+                        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Icon(Icons.circle, size: 10, color: StatusChip.color(e.status)),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(statusLabel(context, e.status, pickup: o.isPickup), style: t.textTheme.titleSmall),
+                              Text(formatDateTime(e.createdAt, lang), style: t.textTheme.bodySmall),
+                              if (e.note.isNotEmpty) Text(e.note, style: t.textTheme.bodySmall),
+                            ]),
+                          ),
+                        ]),
+                    ]),
+                  ]),
+                ),
+    );
+  }
+
+  /// Syrian local numbers (09…) → 9639… for WhatsApp links.
+  static String _waNumber(String phone) {
+    var p = phone.replaceAll(RegExp(r'[^0-9]'), '');
+    if (p.startsWith('00')) p = p.substring(2);
+    if (p.startsWith('0')) p = '963${p.substring(1)}';
+    return p;
+  }
+
+  Widget _row(BuildContext context, String label, String value, {bool bold = false}) => Row(children: [
+        Expanded(child: Text(label, style: bold ? Theme.of(context).textTheme.titleSmall : null)),
+        Text(value, style: TextStyle(fontFamily: 'packages/alas_shared/Manrope', fontWeight: bold ? FontWeight.w700 : null)),
+      ]);
+}
