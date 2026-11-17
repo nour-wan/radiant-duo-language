@@ -37,9 +37,16 @@ class Command(BaseCommand):
         data = json.loads((SEED / "catalog.json").read_text(encoding="utf-8"))
         self._settings()
         self._legal(refresh_legal)
-        categories = self._categories(data["categories"], no_images)
-        created = self._products(data["products"], categories, no_images)
-        self._banners(no_images)
+        # The sample catalog is only for a fresh install: once the owner's categories are in place
+        # (restructure_catalog), deleted sample categories and products must never come back.
+        from .restructure_catalog import CATEGORIES
+
+        if Category.objects.filter(slug__in=[c[0] for c in CATEGORIES]).exists():
+            categories, created = {}, 0
+        else:
+            categories = self._categories(data["categories"], no_images)
+            created = self._products(data["products"], categories, no_images)
+            self._banners(no_images)
         self._coupons()
         self._delivery()
         self.stdout.write(self.style.SUCCESS(f"Seed complete: {len(categories)} categories, {created} new products"))

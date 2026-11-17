@@ -537,6 +537,21 @@ class RestructureCatalogTests(TestCase):
         # Running the seed again must not bring the old categories back
         call_command("seed_store", "--no-images", stdout=open(os.devnull, "w"))
         self.assertFalse(Category.objects.get(slug="nuts-seeds").is_active)
+        # Deleting the old sample catalog: only the owner's 5 categories remain, past orders keep their lines
+        from apps.orders.models import Order, OrderItem
+
+        old = Product.objects.filter(category__slug="nuts-seeds").first()
+        order = Order.objects.create(customer_name="x", customer_phone="1", city="d", subtotal=10, total=10)
+        OrderItem.objects.create(order=order, product=old, product_name_ar=old.name_ar, product_name_en=old.name_en,
+                                 variant_label_ar="a", variant_label_en="a", unit_price=10, quantity=1, line_total=10)
+        call_command("remove_old_catalog", stdout=open(os.devnull, "w"))
+        self.assertEqual(sorted(Category.objects.values_list("slug", flat=True)),
+                         sorted(["canned-fruits", "syrups", "fruit-purees", "raw-cocoa", "cocoa-butter"]))
+        self.assertFalse(Product.objects.filter(category__slug="nuts-seeds").exists())
+        self.assertEqual(Product.objects.get(slug="cocoa-butter").category.slug, "cocoa-butter")
+        self.assertEqual(order.items.get().product_name_en, old.name_en)
+        call_command("seed_store", "--no-images", stdout=open(os.devnull, "w"))
+        self.assertEqual(Category.objects.count(), 5)
 
 
 class InvoiceTests(Base):
