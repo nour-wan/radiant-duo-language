@@ -165,3 +165,45 @@ class OverpaymentTests(LedgerTests):
         r = self.client.post("/api/v1/cart/quote/", {"items": [{"variant_id": self.v1.id, "quantity": 10}]}, format="json")
         self.assertEqual(r.data["due_on_delivery"], "280.00")
         self.assertEqual(self.client.get(f"/api/v1/orders/{second}/invoice/").status_code, 200)
+
+
+class ExcelExportTests(LedgerTests):
+    """Downloads open in Excel with real date cells (CSV dates showed as ##### in narrow columns)."""
+
+    def _sheet(self, url):
+        from io import BytesIO
+
+        from openpyxl import load_workbook
+
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200, r.content[:200])
+        self.assertTrue(r["Content-Type"].startswith("application/vnd.openxmlformats"))
+        self.assertIn(".xlsx", r["Content-Disposition"])
+        return load_workbook(BytesIO(r.content)).active
+
+    def test_statement_and_orders_have_real_dates(self):
+        from datetime import datetime
+
+        self.deliver(self.place(), paid="80")
+        self.login(self.admin)
+        ws = self._sheet(f"/api/v1/admin/customers/{self.user.id}/statement/?format=xlsx")
+        self.assertTrue(ws.sheet_view.rightToLeft)
+        values = [[c.value for c in row] for row in ws.iter_rows()]
+        header = next(i for i, row in enumerate(values) if row[0] == "التاريخ")
+        first = values[header + 1]
+        self.assertIsInstance(first[0], datetime)
+        self.assertEqual(first[0].date(), datetime.now().date())
+        self.assertGreaterEqual(ws.column_dimensions["A"].width, 18)
+        self.assertEqual(values[-1][4], 200)  # balance in the totals row
+        ws = self._sheet("/api/v1/admin/orders/export/?format=xlsx&lang=en")
+        self.assertFalse(ws.sheet_view.rightToLeft)
+        self.assertEqual(ws["A1"].value, "Order")
+        self.assertIsInstance(ws["B2"].value, datetime)
+        self.assertEqual(ws["C2"].value, "Delivered")
+
+    def test_other_downloads(self):
+        self.deliver(self.place(), paid="80")
+        self.login(self.admin)
+        for url in ["/api/v1/admin/receivables/?format=xlsx", "/api/v1/admin/reports/?format=xlsx", "/api/v1/admin/audit/?format=xlsx"]:
+            ws = self._sheet(url)
+            self.assertGreater(ws.max_row, 1, url)

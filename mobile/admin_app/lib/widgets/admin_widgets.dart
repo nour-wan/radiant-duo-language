@@ -154,10 +154,13 @@ String? moneyField(BuildContext context, String? v, {bool optional = false}) {
 
 /// Saves CSV bytes to a temporary file and opens the share sheet (WhatsApp, email, Drive…).
 Future<void> shareCsv(BuildContext context, List<int> bytes, String filename) async {
+  // The server sends a real Excel file (dates as date cells, wide columns, right-to-left in Arabic)
+  final name = filename.replaceAll(RegExp(r'\.csv$'), '.xlsx');
   final dir = await getTemporaryDirectory();
-  final file = File('${dir.path}/$filename');
+  final file = File('${dir.path}/$name');
   await file.writeAsBytes(bytes);
-  await SharePlus.instance.share(ShareParams(files: [XFile(file.path, mimeType: 'text/csv')], subject: filename));
+  await SharePlus.instance.share(ShareParams(
+      files: [XFile(file.path, mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')], subject: name));
 }
 
 class SaveButton extends StatelessWidget {

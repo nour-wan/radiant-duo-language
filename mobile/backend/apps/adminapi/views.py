@@ -1,4 +1,3 @@
-import csv
 import json
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
@@ -7,7 +6,6 @@ from django.db import transaction
 from django.db.models import Count, DecimalField, Max, OuterRef, Q, Subquery, Sum, Value
 from django.db.models.functions import Coalesce
 from django.db.models.functions import TruncDay, TruncMonth, TruncWeek
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import mixins, status, viewsets
@@ -38,6 +36,7 @@ from apps.store import fx
 from apps.store.delivery import DeliveryZone
 from apps.store.models import LegalPage, StoreSettings
 
+from . import export as x
 from . import serializers as s
 
 SALE_STATUSES = [Order.PENDING, Order.CONFIRMED, Order.SHIPPED, Order.DELIVERED]
@@ -273,17 +272,22 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
 
     @action(detail=False, methods=["get"])
     def export(self, request):
-        response = HttpResponse(content_type="text/csv; charset=utf-8")
-        response["Content-Disposition"] = 'attachment; filename="orders.csv"'
-        response.write("﻿")  # BOM so Excel shows Arabic correctly
-        w = csv.writer(response)
-        w.writerow(["number", "date", "status", "customer", "business", "phone", "area", "delivery", "delivery_fee", "subtotal",
-                    "coupon_discount", "app_discount", "total_syp", "total_usd", "exchange_rate", "coupon"])
-        for o in self.get_queryset().order_by("-created_at")[:20000]:
-            w.writerow([o.number, timezone.localtime(o.created_at).strftime("%Y-%m-%d %H:%M"), o.status, o.customer_name,
-                        o.business_name, o.customer_phone, o.area, o.delivery_method, f"{o.delivery_fee} {o.delivery_currency}".strip(),
-                        o.subtotal, o.discount, o.app_discount, o.total, o.total_usd or "", o.exchange_rate or "", o.coupon_code])
-        return response
+        lang = x.lang_of(request)
+        columns = [
+            ("رقم الطلب", "Order", x.TEXT), ("التاريخ", "Date", x.DATETIME), ("الحالة", "Status", x.TEXT),
+            ("الزبون", "Customer", x.TEXT), ("المنشأة", "Business", x.TEXT), ("الهاتف", "Phone", x.TEXT),
+            ("المنطقة", "Area", x.TEXT), ("الاستلام", "Receiving", x.TEXT), ("أجرة التوصيل (ل.س)", "Delivery fee (SYP)", x.SYP),
+            ("المجموع (ل.س)", "Subtotal (SYP)", x.SYP), ("خصم الكوبون (ل.س)", "Coupon discount (SYP)", x.SYP),
+            ("خصم التطبيق (ل.س)", "App discount (SYP)", x.SYP), ("الإجمالي (ل.س)", "Total (SYP)", x.SYP),
+            ("الإجمالي ($)", "Total (USD)", x.USD), ("سعر الصرف", "Exchange rate", x.RATE), ("الكوبون", "Coupon", x.TEXT),
+        ]
+        rows = [
+            [o.number, o.created_at, x.label("status", o.status, lang), o.customer_name, o.business_name, o.customer_phone,
+             o.area, x.label("delivery", o.delivery_method, lang), o.delivery_fee, o.subtotal, o.discount, o.app_discount,
+             o.total, o.total_usd, o.exchange_rate, o.coupon_code]
+            for o in self.get_queryset().order_by("-created_at")[:20000]
+        ]
+        return x.table_response(request, f"alas-orders-{timezone.localdate()}", columns, rows)
 
 
 def _notify_payment(entry):
@@ -337,8 +341,8 @@ class CustomerViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMix
     @action(detail=True, methods=["get"])
     def statement(self, request, pk=None):
         customer = self.get_object()
-        if request.query_params.get("format") == "csv":
-            return _statement_csv(customer)
+        if x.wants_file(request):
+            return _statement_file(request, customer)
         return statement_response(request, self, customer, AdminLedgerEntrySerializer)
 
     @action(detail=True, methods=["post"])
@@ -366,21 +370,25 @@ class CustomerViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMix
         return Response(AdminLedgerEntrySerializer(entry).data, status=status.HTTP_201_CREATED)
 
 
-def _statement_csv(customer):
-    response = HttpResponse(content_type="text/csv; charset=utf-8")
-    response["Content-Disposition"] = f'attachment; filename="statement_{customer.pk}.csv"'
-    response.write("\ufeff")  # BOM so Excel shows Arabic correctly
-    w = csv.writer(response)
-    w.writerow([customer.business_name or customer.full_name, customer.phone, customer.email])
-    w.writerow(["date", "type", "order", "amount_syp", "balance_syp", "note", "by"])
-    for e in reversed(list(ledger.statement(customer).select_related("created_by"))):
-        w.writerow([timezone.localtime(e.created_at).strftime("%Y-%m-%d %H:%M"), e.kind, e.order.number if e.order else "",
-                    e.amount, f"{e.balance_after:.2f}", e.note, e.created_by.email if e.created_by else ""])
-    return response
+def _statement_file(request, customer):
+    lang = x.lang_of(request)
+    columns = [
+        ("التاريخ", "Date", x.DATETIME), ("الحركة", "Entry", x.TEXT), ("الطلب", "Order", x.TEXT),
+        ("المبلغ (ل.س)", "Amount (SYP)", x.SYP), ("الرصيد بعدها (ل.س)", "Balance after (SYP)", x.SYP),
+        ("ملاحظة", "Note", x.TEXT), ("بواسطة", "By", x.TEXT),
+    ]
+    rows = [
+        [e.created_at, x.label("kind", e.kind, lang), e.order.number if e.order else "", e.amount, e.balance_after, e.note,
+         e.created_by.display_name if e.created_by else ""]
+        for e in reversed(list(ledger.statement(customer).select_related("created_by", "order")))
+    ]
+    title = [customer.business_name or customer.full_name, customer.full_name if customer.business_name else "", customer.phone]
+    footer = ["المتبقي" if lang == "ar" else "Balance", "", "", None, ledger.balance(customer), "", ""]
+    return x.table_response(request, f"statement-{customer.pk}-{timezone.localdate()}", columns, rows, title=title, footer=footer)
 
 
 class ReceivablesView(AdminMixin, APIView):
-    """Customers with an open balance, largest first. ?format=csv to export."""
+    """Customers with an open balance, largest first. ?format=xlsx (or csv) to export."""
 
     def get(self, request):
         rows = ledger.receivables()
@@ -394,17 +402,16 @@ class ReceivablesView(AdminMixin, APIView):
             for uid, b in rows if uid in users
         ]
         total = sum((b for _, b in rows if b > 0), ledger.ZERO)
-        if request.query_params.get("format") == "csv":
-            response = HttpResponse(content_type="text/csv; charset=utf-8")
-            response["Content-Disposition"] = 'attachment; filename="receivables.csv"'
-            response.write("\ufeff")
-            w = csv.writer(response)
-            w.writerow(["customer", "business", "phone", "area", "balance_syp"])
-            for i in items:
-                w.writerow([i["full_name"], i["business_name"], i["phone"], i["area_name"], i["balance"]])
-            w.writerow([])
-            w.writerow(["total", "", "", "", total])
-            return response
+        if x.wants_file(request):
+            lang = x.lang_of(request)
+            columns = [
+                ("الزبون", "Customer", x.TEXT), ("المنشأة", "Business", x.TEXT), ("الهاتف", "Phone", x.TEXT),
+                ("المنطقة", "Area", x.TEXT), ("الرصيد (ل.س)", "Balance (SYP)", x.SYP), ("سقف الدين (ل.س)", "Credit limit (SYP)", x.SYP),
+            ]
+            rows = [[i["full_name"], i["business_name"], i["phone"], i["area_name"], Decimal(i["balance"]),
+                     Decimal(i["credit_limit"]) if i["credit_limit"] else None] for i in items]
+            footer = ["الإجمالي" if lang == "ar" else "Total", "", "", "", total, None]
+            return x.table_response(request, f"receivables-{timezone.localdate()}", columns, rows, footer=footer)
         return Response({"total": str(total), "count": len(items), "results": items})
 
 
@@ -523,7 +530,7 @@ class ZoneViewSet(AdminMixin, viewsets.ModelViewSet):
 
 
 class ReportView(AdminMixin, APIView):
-    """GET ?period=day|week|month&from=YYYY-MM-DD&to=YYYY-MM-DD[&format=csv]"""
+    """GET ?period=day|week|month&from=YYYY-MM-DD&to=YYYY-MM-DD[&format=xlsx|csv]"""
 
     TRUNC = {"day": TruncDay, "week": TruncWeek, "month": TruncMonth}
 
@@ -558,17 +565,16 @@ class ReportView(AdminMixin, APIView):
             .annotate(quantity=Sum("quantity"), revenue=Sum("line_total"))
             .order_by("-revenue")[:10]
         )
-        if p.get("format") == "csv":
-            response = HttpResponse(content_type="text/csv; charset=utf-8")
-            response["Content-Disposition"] = f'attachment; filename="sales_{period}_{date_from}_{date_to}.csv"'
-            response.write("﻿")
-            w = csv.writer(response)
-            w.writerow(["period", "orders", "sales_syp", "sales_usd", "discount_syp"])
-            for r in series:
-                w.writerow([r["period"], r["orders"], r["sales"], r["sales_usd"], r["discount"]])
-            w.writerow([])
-            w.writerow(["total", totals["orders"], totals["sales"] or 0, totals["sales_usd"] or 0, totals["discount"] or 0])
-            return response
+        if x.wants_file(request):
+            lang = x.lang_of(request)
+            columns = [
+                ("الفترة", "Period", x.DATE), ("الطلبات", "Orders", x.INT), ("المبيعات (ل.س)", "Sales (SYP)", x.SYP),
+                ("المبيعات ($)", "Sales (USD)", x.USD), ("الخصومات (ل.س)", "Discounts (SYP)", x.SYP),
+            ]
+            rows = [[r["bucket"].date(), r["orders"], r["sales"], r["sales_usd"] or 0, r["discount"]] for r in rows]
+            footer = ["الإجمالي" if lang == "ar" else "Total", totals["orders"], totals["sales"] or 0, totals["sales_usd"] or 0,
+                      totals["discount"] or 0]
+            return x.table_response(request, f"alas-sales-{period}-{date_from}_{date_to}", columns, rows, footer=footer)
         return Response(
             {
                 "period": period,
@@ -739,7 +745,7 @@ class CollectionsView(OwnerMixin, APIView):
 
 
 class AuditLogView(OwnerMixin, APIView):
-    """Everything done in the admin app. ?staff=<id>&from=&to= ; &format=csv downloads it."""
+    """Everything done in the admin app. ?staff=<id>&from=&to= ; &format=xlsx (or csv) downloads it."""
 
     def get(self, request):
         from .models import AuditLog
@@ -755,16 +761,18 @@ class AuditLogView(OwnerMixin, APIView):
                 qs = qs.filter(created_at__lt=_local_day_start(date.fromisoformat(p["to"]) + timedelta(days=1)))
         except ValueError:
             raise BusinessError("invalid_date")
-        if p.get("format") == "csv":
-            response = HttpResponse(content_type="text/csv; charset=utf-8")
-            response["Content-Disposition"] = 'attachment; filename="alas-activity-log.csv"'
-            response.write("\ufeff")  # BOM so Excel shows Arabic correctly
-            w = csv.writer(response)
-            w.writerow(["date", "employee", "action", "target", "details", "ip"])
-            for e in qs[:20000]:
-                w.writerow([timezone.localtime(e.created_at).strftime("%Y-%m-%d %H:%M:%S"), e.actor_name, e.action_ar, e.target,
-                            json.dumps(e.details, ensure_ascii=False) if e.details else "", e.ip or ""])
-            return response
+        if x.wants_file(request):
+            lang = x.lang_of(request)
+            columns = [
+                ("التاريخ", "Date", x.DATETIME), ("الموظف", "Employee", x.TEXT), ("العملية", "Action", x.TEXT),
+                ("على", "Target", x.TEXT), ("التفاصيل", "Details", x.TEXT), ("IP", "IP", x.TEXT),
+            ]
+            rows = [
+                [e.created_at, e.actor_name, e.action_ar if lang == "ar" else e.action_en, e.target,
+                 json.dumps(e.details, ensure_ascii=False) if e.details else "", e.ip or ""]
+                for e in qs[:20000]
+            ]
+            return x.table_response(request, f"alas-activity-log-{timezone.localdate()}", columns, rows)
         paginator = Pagination()
         page = paginator.paginate_queryset(qs, request, view=self)
         return paginator.get_paginated_response([

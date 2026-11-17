@@ -29,7 +29,7 @@ const adminStrings = <String, List<String>>{
 
   'orders.search': ['بحث برقم الطلب، الاسم، الهاتف، المنشأة', 'Search number, name, phone, business'],
   'orders.empty': ['لا توجد طلبات', 'No orders'],
-  'orders.export': ['تصدير CSV', 'Export CSV'],
+  'orders.export': ['تصدير Excel', 'Export to Excel'],
   'order.title': ['طلب {n}', 'Order {n}'],
   'order.customer': ['الزبون', 'Customer'],
   'order.deleted_customer': ['حذف الزبون حسابه', 'Customer deleted their account'],
@@ -235,7 +235,7 @@ const adminStrings = <String, List<String>>{
   'report.avg': ['متوسط الطلب', 'Average order'],
   'report.discounts': ['الخصومات', 'Discounts'],
   'report.top': ['أعلى المنتجات إيراداً', 'Top products by revenue'],
-  'report.export': ['تصدير CSV', 'Export CSV'],
+  'report.export': ['تصدير Excel', 'Export to Excel'],
   'report.empty': ['لا توجد مبيعات في هذه الفترة', 'No sales in this period'],
 
   'settings.store': ['بيانات المتجر', 'Store details'],

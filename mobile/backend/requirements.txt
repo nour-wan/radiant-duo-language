@@ -9,3 +9,4 @@ requests==2.34.2
 gunicorn==27.0.0
 fpdf2==2.9.0
 uharfbuzz==0.57.0
+openpyxl==3.1.5

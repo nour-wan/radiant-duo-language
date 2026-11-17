@@ -212,7 +212,7 @@ class AdminApi {
   Future<OrderDetail> recordOrderPayment(int id, double amount, String note) async => OrderDetail.fromJson(
       await client.post('/admin/orders/$id/payment/', data: {'amount': amount.toStringAsFixed(2), 'note': note}));
   Future<OrderDetail> setNote(int id, String note) async => OrderDetail.fromJson(await client.patch('/admin/orders/$id/note/', data: {'admin_note': note}));
-  Future<List<int>> exportOrders({String? status}) => client.getBytes('/admin/orders/export/', query: {if (status != null) 'status': status});
+  Future<List<int>> exportOrders({String? status}) => client.getBytes('/admin/orders/export/', query: {'format': 'xlsx', 'lang': moneyLang, if (status != null) 'status': status});
 
   // Products
   Future<PageResult<AdminProduct>> products({int page = 1, String? q, int? category, bool lowStock = false, bool? active}) async => PageResult.fromJson(
@@ -262,7 +262,7 @@ class AdminApi {
   // Customer accounts (receivables)
   Future<Statement> statement(int customerId) async =>
       Statement.fromJson(await client.get('/admin/customers/$customerId/statement/', query: {'page_size': 100}));
-  Future<List<int>> statementCsv(int customerId) => client.getBytes('/admin/customers/$customerId/statement/', query: {'format': 'csv'});
+  Future<List<int>> statementCsv(int customerId) => client.getBytes('/admin/customers/$customerId/statement/', query: {'format': 'xlsx', 'lang': moneyLang});
   Future<void> recordPayment(int customerId, double amount, String note) =>
       client.post('/admin/customers/$customerId/payments/', data: {'amount': amount.toStringAsFixed(2), 'note': note});
   Future<void> recordAdjustment(int customerId, double amount, String note) =>
@@ -271,7 +271,7 @@ class AdminApi {
     final j = await client.get<Map>('/admin/receivables/');
     return (total: toMoney(j['total']), rows: (j['results'] as List).cast<Map<String, dynamic>>());
   }
-  Future<List<int>> receivablesCsv() => client.getBytes('/admin/receivables/', query: {'format': 'csv'});
+  Future<List<int>> receivablesCsv() => client.getBytes('/admin/receivables/', query: {'format': 'xlsx', 'lang': moneyLang});
 
   // Coupons
   Future<PageResult<Coupon>> coupons({int page = 1}) async => PageResult.fromJson(await client.get('/admin/coupons/', query: {'page': page}), Coupon.fromJson);
@@ -332,7 +332,7 @@ class AdminApi {
       await client.get<Map<String, dynamic>>('/admin/audit/', query: {'page': page, if (staffId != null) 'staff': staffId}),
       (j) => j);
   Future<List<int>> auditCsv({int? staffId}) =>
-      client.getBytes('/admin/audit/', query: {'format': 'csv', if (staffId != null) 'staff': staffId});
+      client.getBytes('/admin/audit/', query: {'format': 'xlsx', 'lang': moneyLang, if (staffId != null) 'staff': staffId});
   Future<Map<String, dynamic>> whatsApp() async => Map<String, dynamic>.from(await client.get('/admin/whatsapp/') as Map);
   Future<Map<String, dynamic>> saveWhatsApp(Map<String, dynamic> data) async =>
       Map<String, dynamic>.from(await client.patch('/admin/whatsapp/', data: data) as Map);
@@ -349,7 +349,7 @@ class AdminApi {
   Future<Report> report(String period, DateTime from, DateTime to) async =>
       Report.fromJson(await client.get('/admin/reports/', query: {'period': period, 'from': isoDate(from), 'to': isoDate(to)}));
   Future<List<int>> reportCsv(String period, DateTime from, DateTime to) =>
-      client.getBytes('/admin/reports/', query: {'period': period, 'from': isoDate(from), 'to': isoDate(to), 'format': 'csv'});
+      client.getBytes('/admin/reports/', query: {'period': period, 'from': isoDate(from), 'to': isoDate(to), 'format': 'xlsx', 'lang': moneyLang});
 
   Future<void> registerDevice(String token, String lang) =>
       client.post('/devices/', data: {'token': token, 'app': 'admin', 'platform': 'android', 'language': lang});
