@@ -4,6 +4,9 @@ const adminStrings = <String, List<String>>{
   'login.title': ['دخول الإدارة', 'Admin sign in'],
   'login.sub': ['هذا التطبيق مخصص لإدارة المتجر فقط.', 'This app is for store management only.'],
   'login.button': ['دخول', 'Sign in'],
+  'auth.change_password': ['تغيير كلمة المرور', 'Change password'],
+  'auth.current_password': ['كلمة المرور الحالية', 'Current password'],
+  'auth.new_password': ['كلمة المرور الجديدة', 'New password'],
 
   'nav.dashboard': ['الرئيسية', 'Dashboard'],
   'nav.orders': ['الطلبات', 'Orders'],
