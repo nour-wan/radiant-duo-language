@@ -5,6 +5,8 @@ import logging
 from django.conf import settings
 from django.core.mail import send_mail
 
+from apps.store import fx
+
 from . import fcm
 from .models import AdminNotification, DeviceToken, Notification
 
@@ -97,19 +99,19 @@ def order_placed(order):
     who = order.business_name or order.customer_name
     _notify_admins(
         "طلب جديد 🛒", "New order 🛒",
-        f"{order.number} — {who} — ${order.total}",
-        f"{order.number} — {who} — ${order.total}",
+        f"{order.number} — {who} — {fx.fmt(order.total, 'ar')}",
+        f"{order.number} — {who} — {fx.fmt(order.total, 'en')}",
         data,
     )
     try:
-        lines = "\n".join(f"- {i.product_name_ar} / {i.variant_label_ar} × {i.quantity} = ${i.line_total}" for i in order.items.all())
+        lines = "\n".join(f"- {i.product_name_ar} / {i.variant_label_ar} × {i.quantity} = {fx.fmt(i.line_total)}" for i in order.items.all())
         send_mail(
-            f"طلب جديد {order.number} — ${order.total}",
+            f"طلب جديد {order.number} — {fx.fmt(order.total)}",
             f"العميل: {order.customer_name}\nالمنشأة: {order.business_name or '-'}\nالهاتف: {order.customer_phone}\n"
             f"الاستلام: {'توصيل' if order.delivery_method == 'delivery' else 'استلام من المحل'}"
             f" — {order.area} {order.street} {order.address_details}\nملاحظات: {order.notes or '-'}\n\n{lines}\n\n"
-            f"المجموع: ${order.subtotal}\nخصم الكوبون: ${order.discount}\nخصم التطبيق: ${order.app_discount}\n"
-            f"الإجمالي: ${order.total}\nالتوصيل: {order.delivery_fee} {order.delivery_currency}",
+            f"المجموع: {fx.fmt(order.subtotal)}\nخصم الكوبون: {fx.fmt(order.discount)}\nخصم التطبيق: {fx.fmt(order.app_discount)}\n"
+            f"الإجمالي: {fx.fmt(order.total)} (≈ ${order.total_usd or '-'} @ {order.exchange_rate or '-'})\nالتوصيل: {fx.fmt(order.delivery_fee)}",
             settings.DEFAULT_FROM_EMAIL,
             [settings.ADMIN_NOTIFY_EMAIL],
             fail_silently=True,
@@ -148,14 +150,14 @@ def payment_recorded(entry, balance):
         return
     paid = -entry.amount
     if balance > 0:
-        rest_ar, rest_en = f"المتبقي عليك: ${balance}", f"Remaining balance: ${balance}"
+        rest_ar, rest_en = f"المتبقي عليك: {fx.fmt(balance)}", f"Remaining balance: {fx.fmt(balance, 'en')}"
     elif balance < 0:
-        rest_ar, rest_en = f"رصيدك لدينا: ${-balance}", f"Your credit with us: ${-balance}"
+        rest_ar, rest_en = f"رصيدك لدينا: {fx.fmt(-balance)}", f"Your credit with us: {fx.fmt(-balance, 'en')}"
     else:
         rest_ar, rest_en = "حسابك مسدد بالكامل، شكراً لك", "Your account is fully paid. Thank you"
     notify_user(
         entry.user, "account", "تم استلام دفعة", "Payment received",
-        f"استلمنا منك ${paid}. {rest_ar}", f"We received ${paid}. {rest_en}",
+        f"استلمنا منك {fx.fmt(paid)}. {rest_ar}", f"We received {fx.fmt(paid, 'en')}. {rest_en}",
         {"screen": "statement"},
     )
 
@@ -165,7 +167,7 @@ def account_adjusted(entry, balance):
         return
     notify_user(
         entry.user, "account", "تحديث على كشف حسابك", "Account statement updated",
-        f"{entry.note} — الرصيد الحالي: ${balance}", f"{entry.note} — Current balance: ${balance}",
+        f"{entry.note} — الرصيد الحالي: {fx.fmt(balance)}", f"{entry.note} — Current balance: {fx.fmt(balance, 'en')}",
         {"screen": "statement"},
     )
 
@@ -186,3 +188,24 @@ def phone_code_for_admin(phone, code, purpose, whatsapp_link):
         f"{phone} — code: {code} — tap to send it on WhatsApp",
         {"kind": "phone_code", "phone": phone, "whatsapp_link": whatsapp_link},
     )
+
+
+def exchange_rate_problem(kind, last_ok=None, held=None):
+    """Tell the admins the dollar rate could not be updated, or moved too much to apply on its own."""
+    from django.utils import timezone
+
+    when = timezone.localtime(last_ok).strftime("%Y-%m-%d %H:%M") if last_ok else "-"
+    if kind == "jump" and held is not None:
+        _notify_admins(
+            "سعر الدولار تغيّر كثيراً", "Dollar rate moved a lot",
+            f"السعر الجديد من الليرة اليوم: {held.sell} مبيع / {held.buy} شراء. لم يُطبَّق حتى تؤكده من إعدادات المتجر ← سعر الدولار.",
+            f"New sp-today rate: {held.sell} sell / {held.buy} buy. Not applied until you confirm it in Store settings → Dollar rate.",
+            {"kind": "exchange_rate", "screen": "exchange_rate"},
+        )
+    else:
+        _notify_admins(
+            "تعذّر تحديث سعر الدولار", "Could not update the dollar rate",
+            f"آخر تحديث ناجح: {when}. الأسعار تُحسب على آخر سعر معروف. يمكنك وضع سعر يدوي من إعدادات المتجر ← سعر الدولار.",
+            f"Last successful update: {when}. Prices use the last known rate. You can set a manual rate in Store settings → Dollar rate.",
+            {"kind": "exchange_rate", "screen": "exchange_rate"},
+        )

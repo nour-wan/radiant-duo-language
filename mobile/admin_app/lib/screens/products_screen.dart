@@ -64,7 +64,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
         ]),
         empty: EmptyView(icon: Icons.inventory_2_outlined, title: context.tr('products.empty')),
         itemBuilder: (context, p, reload) {
-          final prices = p.variants.map((v) => v.effectivePrice).toList()..sort();
+          final cheapest = p.variants.isEmpty ? null : (p.variants.toList()..sort((a, b) => a.effectivePrice.compareTo(b.effectivePrice))).first;
           return Card(
             child: ListTile(
               contentPadding: const EdgeInsets.fromLTRB(10, 6, 12, 6),
@@ -79,7 +79,12 @@ class _ProductsScreenState extends State<ProductsScreen> {
                   if (p.isFeatured) _Badge(context.tr('products.featured'), AlasColors.warning),
                 ]),
               ]),
-              trailing: prices.isEmpty ? null : Text(money(prices.first), style: const TextStyle(fontFamily: 'packages/alas_shared/Manrope', fontWeight: FontWeight.w700)),
+              trailing: cheapest == null
+                  ? null
+                  : Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      Text(usd(cheapest.effectivePrice), style: const TextStyle(fontFamily: 'packages/alas_shared/Manrope', fontWeight: FontWeight.w700)),
+                      Text(money(cheapest.onSale ? cheapest.discountPriceSyp : cheapest.priceSyp), style: t.textTheme.bodySmall),
+                    ]),
               onTap: () => _open(p.id),
             ),
           );

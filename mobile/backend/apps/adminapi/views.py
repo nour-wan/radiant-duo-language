@@ -34,6 +34,7 @@ from apps.orders import pricing
 from apps.orders.invoice import invoice_response
 from apps.orders.models import Order, OrderItem
 from apps.promotions.models import Banner, Coupon
+from apps.store import fx
 from apps.store.delivery import DeliveryZone
 from apps.store.models import LegalPage, StoreSettings
 
@@ -75,8 +76,8 @@ class DashboardView(AdminMixin, APIView):
         sales = Order.objects.filter(status__in=SALE_STATUSES)
 
         def summary(since):
-            agg = sales.filter(created_at__gte=since).aggregate(total=Sum("total"), count=Count("id"))
-            return {"sales": str(agg["total"] or 0), "orders": agg["count"]}
+            agg = sales.filter(created_at__gte=since).aggregate(total=Sum("total"), usd=Sum("total_usd"), count=Count("id"))
+            return {"sales": str(agg["total"] or 0), "sales_usd": str(agg["usd"] or 0), "orders": agg["count"]}
 
         start = today - timedelta(days=13)
         daily = {
@@ -119,6 +120,7 @@ class DashboardView(AdminMixin, APIView):
                 "low_stock_threshold": threshold,
                 "unread_inbox": _unread_inbox(request.user).count(),
                 "receivables_total": str(sum((b for _, b in ledger.receivables() if b > 0), ledger.ZERO)),
+                "exchange_rate": fx.status(),
             }
         )
 
@@ -276,11 +278,11 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
         response.write("﻿")  # BOM so Excel shows Arabic correctly
         w = csv.writer(response)
         w.writerow(["number", "date", "status", "customer", "business", "phone", "area", "delivery", "delivery_fee", "subtotal",
-                    "coupon_discount", "app_discount", "total_usd", "coupon"])
+                    "coupon_discount", "app_discount", "total_syp", "total_usd", "exchange_rate", "coupon"])
         for o in self.get_queryset().order_by("-created_at")[:20000]:
             w.writerow([o.number, timezone.localtime(o.created_at).strftime("%Y-%m-%d %H:%M"), o.status, o.customer_name,
                         o.business_name, o.customer_phone, o.area, o.delivery_method, f"{o.delivery_fee} {o.delivery_currency}".strip(),
-                        o.subtotal, o.discount, o.app_discount, o.total, o.coupon_code])
+                        o.subtotal, o.discount, o.app_discount, o.total, o.total_usd or "", o.exchange_rate or "", o.coupon_code])
         return response
 
 
@@ -370,7 +372,7 @@ def _statement_csv(customer):
     response.write("\ufeff")  # BOM so Excel shows Arabic correctly
     w = csv.writer(response)
     w.writerow([customer.business_name or customer.full_name, customer.phone, customer.email])
-    w.writerow(["date", "type", "order", "amount_usd", "balance_usd", "note", "by"])
+    w.writerow(["date", "type", "order", "amount_syp", "balance_syp", "note", "by"])
     for e in reversed(list(ledger.statement(customer).select_related("created_by"))):
         w.writerow([timezone.localtime(e.created_at).strftime("%Y-%m-%d %H:%M"), e.kind, e.order.number if e.order else "",
                     e.amount, f"{e.balance_after:.2f}", e.note, e.created_by.email if e.created_by else ""])
@@ -397,7 +399,7 @@ class ReceivablesView(AdminMixin, APIView):
             response["Content-Disposition"] = 'attachment; filename="receivables.csv"'
             response.write("\ufeff")
             w = csv.writer(response)
-            w.writerow(["customer", "business", "phone", "area", "balance_usd"])
+            w.writerow(["customer", "business", "phone", "area", "balance_syp"])
             for i in items:
                 w.writerow([i["full_name"], i["business_name"], i["phone"], i["area_name"], i["balance"]])
             w.writerow([])
@@ -439,7 +441,34 @@ class SettingsView(OwnerMixin, APIView):
         ser = s.AdminSettingsSerializer(StoreSettings.load(), data=request.data, partial=True)
         ser.is_valid(raise_exception=True)
         ser.save()
+        fx.clear_cache()
         return Response(ser.data)
+
+
+class ExchangeRateView(AdminMixin, APIView):
+    """GET: the dollar rate in use and where it came from (all staff).
+    POST {"action": "refresh"} reads sp-today.com now; {"action": "accept", "id": n} applies a reading
+    that was held back because it moved a lot (owner only)."""
+
+    def get(self, request):
+        return Response(fx.status())
+
+    def post(self, request):
+        if not request.user.is_superuser:
+            raise PermissionDenied()
+        action_name = request.data.get("action")
+        if action_name == "refresh":
+            entry, problem = fx.update_from_source()
+            if entry is None:
+                raise BusinessError("rate_fetch_failed")
+        elif action_name == "accept":
+            from apps.store.models import ExchangeRate
+
+            entry = get_object_or_404(ExchangeRate, pk=request.data.get("id"), accepted=False)
+            fx.accept(entry)
+        else:
+            raise BusinessError("invalid_action")
+        return Response(fx.status())
 
 
 class LegalViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
@@ -514,14 +543,15 @@ class ReportView(AdminMixin, APIView):
         rows = (
             orders.annotate(bucket=self.TRUNC[period]("created_at"))
             .values("bucket")
-            .annotate(sales=Sum("total"), discount=Sum("discount"), orders=Count("id"))
+            .annotate(sales=Sum("total"), sales_usd=Sum("total_usd"), discount=Sum("discount"), orders=Count("id"))
             .order_by("bucket")
         )
         series = [
-            {"period": r["bucket"].date().isoformat(), "sales": str(r["sales"]), "discount": str(r["discount"]), "orders": r["orders"]}
+            {"period": r["bucket"].date().isoformat(), "sales": str(r["sales"]), "sales_usd": str(r["sales_usd"] or 0),
+             "discount": str(r["discount"]), "orders": r["orders"]}
             for r in rows
         ]
-        totals = orders.aggregate(sales=Sum("total"), orders=Count("id"), discount=Sum("discount"))
+        totals = orders.aggregate(sales=Sum("total"), sales_usd=Sum("total_usd"), orders=Count("id"), discount=Sum("discount"))
         top = (
             OrderItem.objects.filter(order__in=orders)
             .values("product_name_ar", "product_name_en")
@@ -533,11 +563,11 @@ class ReportView(AdminMixin, APIView):
             response["Content-Disposition"] = f'attachment; filename="sales_{period}_{date_from}_{date_to}.csv"'
             response.write("﻿")
             w = csv.writer(response)
-            w.writerow(["period", "orders", "sales_usd", "discount_usd"])
+            w.writerow(["period", "orders", "sales_syp", "sales_usd", "discount_syp"])
             for r in series:
-                w.writerow([r["period"], r["orders"], r["sales"], r["discount"]])
+                w.writerow([r["period"], r["orders"], r["sales"], r["sales_usd"], r["discount"]])
             w.writerow([])
-            w.writerow(["total", totals["orders"], totals["sales"] or 0, totals["discount"] or 0])
+            w.writerow(["total", totals["orders"], totals["sales"] or 0, totals["sales_usd"] or 0, totals["discount"] or 0])
             return response
         return Response(
             {
@@ -547,6 +577,7 @@ class ReportView(AdminMixin, APIView):
                 "series": series,
                 "totals": {
                     "sales": str(totals["sales"] or 0),
+                    "sales_usd": str(totals["sales_usd"] or 0),
                     "orders": totals["orders"],
                     "discount": str(totals["discount"] or 0),
                     "average_order": str(round((totals["sales"] or 0) / totals["orders"], 2)) if totals["orders"] else "0",

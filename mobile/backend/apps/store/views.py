@@ -22,7 +22,11 @@ from .models import LegalPage, StoreSettings
 class PublicSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = StoreSettings
-        exclude = ["id", "low_stock_threshold"]
+        # Nothing about dollars or the exchange rate is shown to customers
+        exclude = [
+            "id", "low_stock_threshold", "usd_rate_mode", "usd_rate_side", "usd_rate_manual", "syp_rounding",
+            "usd_rate_error", "usd_rate_alerted_at", "syp_converted_rate",
+        ]
 
 
 class LegalPageSerializer(serializers.ModelSerializer):

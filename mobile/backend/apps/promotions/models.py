@@ -55,7 +55,8 @@ class Coupon(models.Model):
             amount = self.value
         if self.max_discount is not None:
             amount = min(amount, self.max_discount)
-        return min(amount, subtotal).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+        # Syrian pounds: whole numbers
+        return min(amount, subtotal).quantize(Decimal("1"), rounding=ROUND_HALF_UP).quantize(Decimal("0.01"))
 
 
 class CouponRedemption(models.Model):

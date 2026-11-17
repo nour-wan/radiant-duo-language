@@ -9,9 +9,10 @@ from apps.catalog.serializers import ImageSerializer
 from apps.core.images import absolute_media_url
 from apps.notifications.models import AdminNotification, Notification
 from apps.orders.models import Order
-from apps.orders.serializers import OrderDetailSerializer
+from apps.orders.serializers import OrderDetailSerializer, OrderItemSerializer
 from apps.promotions.models import Banner, Coupon
 from apps.store.delivery import DeliveryArea, DeliveryZone
+from apps.store import fx
 from apps.store.models import LegalPage, StoreSettings
 
 
@@ -32,14 +33,28 @@ class AdminCategorySerializer(serializers.ModelSerializer):
 
 
 class AdminVariantSerializer(serializers.ModelSerializer):
+    """price / discount_price are in USD (entered by the admin); *_syp is what customers see now."""
+
     id = serializers.IntegerField(required=False)
+    price_syp = serializers.SerializerMethodField()
+    discount_price_syp = serializers.SerializerMethodField()
 
     class Meta:
         model = Variant
         fields = [
             "id", "label_ar", "label_en", "unit", "unit_quantity", "sku", "price", "discount_price", "stock",
-            "min_order_qty", "is_active", "sort_order",
+            "min_order_qty", "is_active", "sort_order", "price_syp", "discount_price_syp",
         ]
+
+    def _syp(self, usd):
+        rate = fx.rate_or_none()
+        return str(fx.to_syp(usd, rate)) if usd is not None and rate else None
+
+    def get_price_syp(self, obj):
+        return self._syp(obj.price)
+
+    def get_discount_price_syp(self, obj):
+        return self._syp(obj.discount_price)
 
     def validate(self, data):
         price, discount = data.get("price"), data.get("discount_price")
@@ -114,7 +129,7 @@ class AdminOrderListSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             "id", "number", "status", "delivery_method", "customer_name", "business_name", "customer_phone", "city", "total",
-            "item_count", "created_at",
+            "total_usd", "exchange_rate", "item_count", "created_at",
         ]
 
 
@@ -128,7 +143,15 @@ class AdminOrderEventSerializer(serializers.Serializer):
         return obj.by.display_name if obj.by_id else None
 
 
+class AdminOrderItemSerializer(OrderItemSerializer):
+    class Meta(OrderItemSerializer.Meta):
+        fields = OrderItemSerializer.Meta.fields + ["unit_price_usd"]
+
+
 class AdminOrderDetailSerializer(OrderDetailSerializer):
+    """Amounts in SYP like the customer sees them, plus the rate and the USD total for the store."""
+
+    items = AdminOrderItemSerializer(many=True, read_only=True)
     user_id = serializers.IntegerField(read_only=True)
     allowed_statuses = serializers.SerializerMethodField()
     events = AdminOrderEventSerializer(many=True, read_only=True)
@@ -137,6 +160,7 @@ class AdminOrderDetailSerializer(OrderDetailSerializer):
     class Meta(OrderDetailSerializer.Meta):
         fields = OrderDetailSerializer.Meta.fields + [
             "customer_email", "user_id", "admin_note", "customer_deleted", "allowed_statuses", "payments",
+            "exchange_rate", "total_usd",
         ]
 
     def get_payments(self, obj):
@@ -261,7 +285,17 @@ class AdminBannerSerializer(serializers.ModelSerializer):
 class AdminSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = StoreSettings
-        exclude = ["id"]
+        exclude = ["id", "usd_rate_alerted_at"]
+        read_only_fields = ["usd_rate_error", "syp_converted_rate"]
+
+    def validate(self, data):
+        mode = data.get("usd_rate_mode", getattr(self.instance, "usd_rate_mode", "auto"))
+        manual = data.get("usd_rate_manual", getattr(self.instance, "usd_rate_manual", None))
+        if mode == "manual" and not manual:
+            raise serializers.ValidationError({"usd_rate_manual": "required"})
+        if manual is not None and not (fx.MIN_RATE <= manual <= fx.MAX_RATE):
+            raise serializers.ValidationError({"usd_rate_manual": "rate_out_of_range"})
+        return data
 
 
 class AdminLegalSerializer(serializers.ModelSerializer):

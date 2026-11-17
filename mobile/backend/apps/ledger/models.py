@@ -3,7 +3,7 @@ from django.db import models
 
 
 class LedgerEntry(models.Model):
-    """One line of a customer's account statement (USD, products only; delivery fees are not included).
+    """One line of a customer's account statement (Syrian pounds, products only; delivery fees are not included).
 
     Positive amounts increase what the customer owes (a delivered order), negative amounts reduce it
     (a payment). Entries are never edited or deleted: mistakes are corrected with an adjustment entry.
@@ -16,6 +16,8 @@ class LedgerEntry(models.Model):
     kind = models.CharField(max_length=12, choices=KINDS)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     order = models.ForeignKey("orders.Order", on_delete=models.SET_NULL, null=True, blank=True, related_name="ledger_entries")
+    # Set on entries written in USD before the switch to SYP: the original dollar amount
+    original_usd = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     note = models.CharField(max_length=300, blank=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)

@@ -183,7 +183,7 @@ class SaveButton extends StatelessWidget {
 
 double? parseAmount(String text) => double.tryParse(text.trim().replaceAll(',', '.').replaceAll('٫', '.'));
 
-/// Ask for an amount (USD) and a note. [signed] allows negative amounts; [noteRequired] for adjustments.
+/// Ask for an amount (Syrian pounds) and a note. [signed] allows negative amounts; [noteRequired] for adjustments.
 Future<({double amount, String note})?> askAmount(BuildContext context,
     {required String title, double? full, bool signed = false, bool noteRequired = false, String? hint}) async {
   final amount = TextEditingController();

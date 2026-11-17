@@ -78,6 +78,8 @@ class Variant {
         sku = j['sku'] as String? ?? '',
         price = toMoney(j['price']),
         discountPrice = toMoneyOrNull(j['discount_price']),
+        priceSyp = toMoneyOrNull(j['price_syp']),
+        discountPriceSyp = toMoneyOrNull(j['discount_price_syp']),
         stock = j['stock'] as int? ?? 0,
         minOrderQty = j['min_order_qty'] as int? ?? 1,
         isActive = j['is_active'] as bool? ?? true,
@@ -92,6 +94,8 @@ class Variant {
     this.sku = '',
     required this.price,
     this.discountPrice,
+    this.priceSyp,
+    this.discountPriceSyp,
     this.stock = 0,
     this.minOrderQty = 1,
     this.isActive = true,
@@ -102,6 +106,8 @@ class Variant {
   final String labelAr, labelEn, unit, sku;
   final double unitQuantity, price;
   final double? discountPrice;
+  /// Admin app only: what customers pay now in Syrian pounds (price is USD there).
+  final double? priceSyp, discountPriceSyp;
   final int stock, minOrderQty, sortOrder;
   final bool isActive;
 
@@ -406,6 +412,7 @@ class OrderSummary {
         status = j['status'] as String? ?? 'pending',
         deliveryMethod = j['delivery_method'] as String? ?? 'delivery',
         total = toMoney(j['total']),
+        totalUsd = toMoneyOrNull(j['total_usd']),
         itemCount = j['item_count'] as int? ?? 0,
         customerName = j['customer_name'] as String? ?? '',
         businessName = j['business_name'] as String? ?? '',
@@ -416,6 +423,8 @@ class OrderSummary {
   final int id;
   final String number, status, deliveryMethod, customerName, businessName, customerPhone, city;
   final double total;
+  /// Admin app only (never sent to customers).
+  final double? totalUsd;
   final int itemCount;
   final DateTime createdAt;
 
@@ -447,6 +456,8 @@ class OrderDetail {
         subtotal = toMoney(j['subtotal']),
         discount = toMoney(j['discount']),
         total = toMoney(j['total']),
+        totalUsd = toMoneyOrNull(j['total_usd']),
+        exchangeRate = toMoneyOrNull(j['exchange_rate']),
         items = (j['items'] as List? ?? []).map((e) => OrderItem.fromJson(e as Map<String, dynamic>)).toList(),
         events = (j['events'] as List? ?? []).map((e) => OrderEvent.fromJson(e as Map<String, dynamic>)).toList(),
         payments = (j['payments'] as List? ?? []).map((e) => OrderPayment.fromJson(e as Map<String, dynamic>)).toList(),
@@ -465,6 +476,9 @@ class OrderDetail {
   final String city, area, street, addressDetails, notes, adminNote, couponCode;
   final String deliveryMethod, deliveryZone, deliveryCurrency;
   final double subtotal, discount, total, deliveryFee, appDiscount, appDiscountPercent;
+
+  /// Admin app only: the dollar rate the order was priced with and its total in USD.
+  final double? totalUsd, exchangeRate;
 
   /// Payments recorded against this order; [remaining] is set once the order is delivered.
   final double paidAmount;

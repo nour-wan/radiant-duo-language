@@ -38,7 +38,6 @@ class _AreaSheetState extends State<_AreaSheet> {
   Widget build(BuildContext context) {
     final t = Theme.of(context);
     final lang = context.lang;
-    final currency = widget.info.currency(lang);
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: SizedBox(
@@ -56,7 +55,7 @@ class _AreaSheetState extends State<_AreaSheet> {
               for (final z in widget.info.zones) ...[
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                  child: Text('${z.name(lang)} · ${z.fee.toStringAsFixed(0)} $currency',
+                  child: Text('${z.name(lang)} · ${money(z.fee)}',
                       style: t.textTheme.labelLarge?.copyWith(color: t.colorScheme.primary)),
                 ),
                 for (final a in z.areas.where((a) => _q.isEmpty || a.nameAr.contains(_q) || a.nameEn.toLowerCase().contains(_q.toLowerCase())))

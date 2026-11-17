@@ -160,7 +160,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                 helperText: ctx.tr('pay.paid_now_hint'),
                 helperMaxLines: 3,
                 suffix: TextButton(
-                  onPressed: () => paidCtl.text = (o.toCollect ?? (o.total - o.paidAmount)).clamp(0, double.infinity).toStringAsFixed(2),
+                  onPressed: () => paidCtl.text = (o.toCollect ?? (o.total - o.paidAmount)).clamp(0, double.infinity).toStringAsFixed(0),
                   child: Text(ctx.tr('pay.full')),
                 ),
               ),
@@ -296,8 +296,14 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                       if (o.discount > 0) _row(context, '${context.tr('order.coupon')} (${o.couponCode})', '- ${money(o.discount)}'),
                       if (o.appDiscount > 0) _row(context, '${context.tr('app_discount')} (${o.appDiscountPercent.toStringAsFixed(0)}%)', '- ${money(o.appDiscount)}'),
                       _row(context, context.tr('order.total'), money(o.total), bold: true),
+                      if (o.totalUsd != null && o.exchangeRate != null)
+                        Align(
+                          alignment: AlignmentDirectional.centerEnd,
+                          child: Text(context.tr('rate.usd_total', {'usd': usd(o.totalUsd), 'rate': money(o.exchangeRate)}),
+                              style: Theme.of(context).textTheme.bodySmall),
+                        ),
                       if (!o.isPickup && o.deliveryFee > 0)
-                        _row(context, context.tr('order.delivery_fee'), '+ ${o.deliveryFee.toStringAsFixed(0)} ${o.deliveryCurrency}'),
+                        _row(context, context.tr('order.delivery_fee'), '+ ${money(o.deliveryFee)}'),
                       const SizedBox(height: 8),
                       InvoiceButton(number: o.number, load: (lang) => context.read<AdminApi>().invoicePdf(o.id, lang)),
                     ]),

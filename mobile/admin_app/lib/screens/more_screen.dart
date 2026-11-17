@@ -10,6 +10,7 @@ import 'manage_screens.dart';
 import 'notify_screen.dart';
 import 'reports_screen.dart';
 import 'staff_screens.dart';
+import 'exchange_rate_screen.dart';
 import 'whatsapp_screen.dart';
 
 class MoreScreen extends StatelessWidget {
@@ -58,6 +59,7 @@ class MoreScreen extends StatelessWidget {
         const SizedBox(height: 12),
         Card(
           child: Column(children: [
+            tile(Icons.currency_exchange, 'rate.title', const ExchangeRateScreen()),
             if (owner) tile(Icons.storefront_outlined, 'more.settings', const StoreSettingsScreen()),
             tile(Icons.gavel_outlined, 'more.legal', const LegalPagesScreen()),
           ]),

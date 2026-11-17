@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'api/api_client.dart';
+import 'format.dart';
 
 /// Simple two-language string table. Each app registers its own keys on startup.
 class L10n {
@@ -43,7 +44,9 @@ extension L10nContext on BuildContext {
 class AppSettings extends ChangeNotifier {
   AppSettings(this._prefs)
       : _lang = _prefs.getString('lang') ?? 'ar',
-        _theme = ThemeMode.values[_prefs.getInt('theme') ?? ThemeMode.system.index];
+        _theme = ThemeMode.values[_prefs.getInt('theme') ?? ThemeMode.system.index] {
+    moneyLang = _lang;
+  }
 
   final SharedPreferences _prefs;
   String _lang;
@@ -57,6 +60,7 @@ class AppSettings extends ChangeNotifier {
   Future<void> setLang(String lang) async {
     if (lang == _lang) return;
     _lang = lang;
+    moneyLang = lang;
     await _prefs.setString('lang', lang);
     notifyListeners();
   }
@@ -101,7 +105,7 @@ const sharedStrings = <String, List<String>>{
   'app.logout': ['تسجيل الخروج', 'Log out'],
   'app.version': ['الإصدار', 'Version'],
   'app.all': ['الكل', 'All'],
-  'app.currency_note': ['جميع الأسعار بالدولار الأمريكي', 'All prices in US dollars'],
+  'app.currency_note': ['جميع الأسعار بالليرة السورية', 'All prices in Syrian pounds'],
   'status.pending': ['قيد المراجعة', 'Pending'],
   'status.confirmed': ['مؤكد', 'Confirmed'],
   'status.shipped': ['قيد التوصيل', 'Shipped'],
@@ -141,7 +145,7 @@ const sharedStrings = <String, List<String>>{
   'ledger.kind.payment': ['دفعة', 'Payment'],
   'ledger.kind.adjustment': ['تصحيح', 'Adjustment'],
   'ledger.balance_after': ['الرصيد', 'Balance'],
-  'ledger.note_usd': ['المبالغ بالدولار ولا تشمل أجرة التوصيل.', 'Amounts are in USD and exclude delivery fees.'],
+  'ledger.note_usd': ['المبالغ بالليرة السورية ولا تشمل أجرة التوصيل.', 'Amounts are in Syrian pounds and exclude delivery fees.'],
   'ledger.paid': ['المدفوع', 'Paid'],
   'ledger.credit_used': ['مخصوم من رصيدك لدينا', 'Paid from your credit'],
   'ledger.credit_used_admin': ['مخصوم من رصيد الزبون', 'Paid from customer credit'],
@@ -180,6 +184,10 @@ const sharedStrings = <String, List<String>>{
   'err.google_token_invalid': ['تعذّر التحقق من حساب Google.', 'Could not verify your Google account.'],
   'err.google_email_unverified': ['بريد Google غير موثّق.', 'Your Google email is not verified.'],
   'err.cart_empty': ['السلة فارغة.', 'Your cart is empty.'],
+  'err.prices_changed': ['تغيّر سعر الصرف وتم تحديث الأسعار. راجع المجموع الجديد ثم أكّد الطلب.', 'The exchange rate changed and prices were updated. Check the new total, then place the order.'],
+  'err.prices_unavailable': ['الأسعار غير متوفرة حالياً، حاول بعد قليل.', 'Prices are not available right now. Please try again shortly.'],
+  'err.rate_fetch_failed': ['تعذّر قراءة سعر الدولار من موقع الليرة اليوم الآن.', 'Could not read the dollar rate from sp-today.com right now.'],
+  'err.rate_out_of_range': ['السعر غير منطقي. اكتب سعر الدولار بالليرة الجديدة (مثلاً 149.5).', 'That rate looks wrong. Enter the dollar rate in new Syrian pounds (e.g. 149.5).'],
   'err.cart_invalid': ['بيانات السلة غير صحيحة.', 'Invalid cart.'],
   'err.item_unavailable': ['أحد المنتجات لم يعد متوفراً.', 'An item is no longer available.'],
   'err.below_min_qty': ['الكمية أقل من الحد الأدنى للطلب.', 'Quantity is below the minimum order.'],

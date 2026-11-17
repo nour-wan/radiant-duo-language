@@ -12,6 +12,7 @@ from apps.core.errors import BusinessError
 from apps.core.images import absolute_media_url
 from apps.ledger import services as ledger
 from apps.promotions.models import Coupon, CouponRedemption
+from apps.store import fx
 from apps.store.delivery import fee_for_area
 from apps.store.models import StoreSettings
 
@@ -23,13 +24,25 @@ MAX_QTY = 100_000
 
 @dataclass
 class Line:
+    """Prices in Syrian pounds: the variant's dollar price × the rate, rounded to the store's step."""
+
     variant: Variant
     quantity: int
+    rate: Decimal
+    step: int
     problem: str | None = None
 
     @property
-    def unit_price(self):
+    def unit_price_usd(self):
         return self.variant.effective_price
+
+    @property
+    def unit_price(self):
+        return fx.to_syp(self.variant.effective_price, self.rate, self.step)
+
+    @property
+    def regular_price(self):
+        return fx.to_syp(self.variant.price, self.rate, self.step)
 
     @property
     def line_total(self):
@@ -53,6 +66,8 @@ class Quote:
     delivery_fee: Decimal = Decimal("0")
     credit: dict | None = None
     account_credit: Decimal = Decimal("0")
+    rate: Decimal = Decimal("0")
+    subtotal_usd: Decimal = Decimal("0")
 
     @property
     def ok(self):
@@ -77,7 +92,8 @@ def _parse_items(items):
 
 
 def _money(value):
-    return value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    """Syrian pounds: whole numbers."""
+    return value.quantize(Decimal("1"), rounding=ROUND_HALF_UP).quantize(Decimal("0.01"))
 
 
 def build_quote(items, coupon_code, user, lock=False, delivery_method=None, area_id=None):
@@ -86,12 +102,17 @@ def build_quote(items, coupon_code, user, lock=False, delivery_method=None, area
     if lock:
         variants = variants.select_for_update(of=("self",))
     by_id = {v.id: v for v in variants}
-    quote = Quote()
+    store = StoreSettings.load()
+    try:
+        rate = fx.current_rate()
+    except fx.RateUnavailable:
+        raise BusinessError("prices_unavailable")
+    quote = Quote(rate=rate)
     for vid, qty in wanted.items():
         v = by_id.get(vid)
         if v is None:
             raise BusinessError("item_unavailable", variant_id=vid)
-        line = Line(v, qty)
+        line = Line(v, qty, rate, store.syp_rounding)
         if not (v.is_active and v.product.is_active and v.product.category.is_active):
             line.problem = "item_unavailable"
         elif qty < v.min_order_qty:
@@ -101,8 +122,8 @@ def build_quote(items, coupon_code, user, lock=False, delivery_method=None, area
         quote.lines.append(line)
         if not line.problem:
             quote.subtotal += line.line_total
+            quote.subtotal_usd += line.unit_price_usd * qty
 
-    store = StoreSettings.load()
     if not store.orders_enabled:
         quote.order_problem = "orders_disabled"
     elif quote.subtotal < store.min_order_total:
@@ -155,7 +176,7 @@ def quote_payload(quote):
                 "product_id": line.variant.product_id,
                 "quantity": line.quantity,
                 "unit_price": str(line.unit_price),
-                "regular_price": str(line.variant.price),
+                "regular_price": str(line.regular_price),
                 "line_total": str(line.line_total),
                 "stock": line.variant.stock,
                 "min_order_qty": line.variant.min_order_qty,
@@ -179,7 +200,7 @@ def quote_payload(quote):
         "coupon_problem": quote.coupon_problem,
         "order_problem": quote.order_problem,
         "min_order_total": str(store.min_order_total),
-        "currency": "USD",
+        "currency": "SYP",
         "credit_limit": str(quote.credit["credit_limit"]) if quote.credit and quote.credit["credit_limit"] is not None else None,
         "credit_available": str(quote.credit["available"]) if quote.credit and quote.credit["available"] is not None else None,
         "account_credit": str(quote.account_credit),
@@ -189,8 +210,15 @@ def quote_payload(quote):
     }
 
 
+def _total_usd(quote):
+    """The order total in dollars, for the store's reports (discounts applied proportionally)."""
+    if not quote.subtotal:
+        return Decimal("0.00")
+    return (quote.subtotal_usd * quote.total / quote.subtotal).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+
 @transaction.atomic
-def place_order(user, items, coupon_code, contact, client_ref="", delivery_method=None, area_id=None):
+def place_order(user, items, coupon_code, contact, client_ref="", delivery_method=None, area_id=None, expected_total=None):
     if client_ref:
         existing = Order.objects.filter(user=user, client_ref=client_ref).first()
         if existing:
@@ -205,6 +233,9 @@ def place_order(user, items, coupon_code, contact, client_ref="", delivery_metho
             raise BusinessError(line.problem, variant_id=line.variant.id)
     if quote.coupon_problem:
         raise BusinessError(quote.coupon_problem)
+    # The rate moved since the customer saw the total: show them the new one before ordering
+    if expected_total is not None and Decimal(expected_total) != quote.total:
+        raise BusinessError("prices_changed")
 
     order = Order.objects.create(
         user=user,
@@ -215,6 +246,9 @@ def place_order(user, items, coupon_code, contact, client_ref="", delivery_metho
         app_discount_percent=quote.app_discount_percent,
         app_discount=quote.app_discount,
         total=quote.total,
+        currency="SYP",
+        exchange_rate=quote.rate,
+        total_usd=_total_usd(quote),
         coupon_code=quote.coupon.code if quote.coupon else "",
         delivery_method=quote.delivery_method,
         delivery_zone=quote.delivery_zone.name_ar if quote.delivery_zone else "",
@@ -235,6 +269,7 @@ def place_order(user, items, coupon_code, contact, client_ref="", delivery_metho
             variant_label_en=v.label_en,
             image=absolute_media_url(first_image.thumbnail or first_image.image) if first_image else "",
             unit_price=line.unit_price,
+            unit_price_usd=line.unit_price_usd,
             quantity=line.quantity,
             line_total=line.line_total,
         )

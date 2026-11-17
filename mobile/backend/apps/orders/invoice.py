@@ -71,14 +71,16 @@ TEXT = {
     "delivery_fee": ("أجرة التوصيل", "Delivery fee"),
     "fee_note": ("تدفع عند الاستلام ولا تدخل في الفاتورة", "Paid on receipt, not part of this invoice"),
     "notes": ("ملاحظات", "Notes"),
-    "usd": ("جميع المبالغ بالدولار الأمريكي", "All amounts in US dollars"),
+    "usd": ("جميع المبالغ بالليرة السورية (ل.س)", "All amounts in Syrian pounds (SYP)"),
     "thanks": ("نشكركم على تعاملكم معنا", "Thank you for your business"),
     "page": ("صفحة", "Page"),
 }
 
 
 def _money(value):
-    return f"${Decimal(value):,.2f}"
+    """Syrian pounds; the currency is stated once at the bottom of the invoice."""
+    value = Decimal(value)
+    return f"{value:,.0f}" if value == value.to_integral_value() else f"{value:,.2f}"
 
 
 class InvoicePDF(FPDF):

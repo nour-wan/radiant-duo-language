@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from apps.core.images import absolute_media_url
+from apps.store import fx
 
 from .models import Category, Product, ProductImage, Variant
 
@@ -32,8 +33,18 @@ class ImageSerializer(serializers.ModelSerializer):
         return absolute_media_url(obj.thumbnail or obj.image)
 
 
+def _syp(usd):
+    """Customer price in Syrian pounds (product prices are stored in USD and never sent to customers)."""
+    rate = fx.rate_or_none()
+    if usd is None or rate is None:
+        return None
+    return str(fx.to_syp(usd, rate))
+
+
 class VariantSerializer(serializers.ModelSerializer):
     in_stock = serializers.SerializerMethodField()
+    price = serializers.SerializerMethodField()
+    discount_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Variant
@@ -44,6 +55,12 @@ class VariantSerializer(serializers.ModelSerializer):
 
     def get_in_stock(self, obj):
         return obj.stock >= obj.min_order_qty
+
+    def get_price(self, obj):
+        return _syp(obj.price)
+
+    def get_discount_price(self, obj):
+        return _syp(obj.discount_price) if obj.discount_price and obj.discount_price < obj.price else None
 
 
 def _active_variants(product):
@@ -76,11 +93,11 @@ class ProductListSerializer(serializers.ModelSerializer):
 
     def get_price(self, obj):
         v = self._cheapest(obj)
-        return str(v.price) if v else None
+        return _syp(v.price) if v else None
 
     def get_discount_price(self, obj):
         v = self._cheapest(obj)
-        return str(v.discount_price) if v and v.discount_price and v.discount_price < v.price else None
+        return _syp(v.discount_price) if v and v.discount_price and v.discount_price < v.price else None
 
     def get_in_stock(self, obj):
         return any(v.stock >= v.min_order_qty for v in _active_variants(obj))

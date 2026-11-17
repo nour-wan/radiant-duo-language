@@ -32,7 +32,12 @@ class Base(TestCase):
         # Most tests check product pricing only: the app discount is switched off unless a test enables it
         s = StoreSettings.load()
         s.app_discount_enabled = False
+        # A fixed rate of 1 keeps the numbers in these tests readable (prices become whole pounds)
+        s.usd_rate_mode, s.usd_rate_manual, s.syp_rounding = "manual", Decimal("1"), 1
         s.save()
+        from apps.store import fx
+
+        fx.clear_cache()
         self.near = DeliveryZone.objects.create(name_ar="قريبة", name_en="Near", fee=250)
         self.far = DeliveryZone.objects.create(name_ar="بعيدة", name_en="Far", fee=500, is_default_for_unlisted=True)
         self.shaalan = DeliveryArea.objects.create(zone=self.near, name_ar="الشعلان", name_en="Shaalan")
@@ -402,7 +407,7 @@ class DeliveryAndAppDiscountTests(Base):
         self.enable_app_discount()
         Coupon.objects.create(code="TEN", kind="fixed", value=10)
         q = self.quote(coupon_code="TEN")
-        self.assertEqual((q["subtotal"], q["discount"], q["app_discount"], q["total"]), ("140.00", "10.00", "2.60", "127.40"))
+        self.assertEqual((q["subtotal"], q["discount"], q["app_discount"], q["total"]), ("140.00", "10.00", "3.00", "127.00"))  # whole Syrian pounds
         self.enable_app_discount(False)
         self.assertEqual(self.quote()["total"], "140.00")
 
@@ -412,7 +417,7 @@ class DeliveryAndAppDiscountTests(Base):
         r = self.order([{"variant_id": self.v1.id, "quantity": 5}], delivery_area_id=self.qudsaya.id)
         self.assertEqual(r.status_code, 201, r.data)
         self.assertEqual((r.data["delivery_fee"], r.data["delivery_zone"], r.data["app_discount"], r.data["total"]),
-                         ("500.00", "بعيدة", "2.80", "137.20"))
+                         ("500.00", "بعيدة", "3.00", "137.00"))
         self.assertEqual(r.data["area"], "قدسيا")
 
     def test_pickup_order_needs_no_address(self):

@@ -66,7 +66,7 @@ class User(AbstractUser):
     google_sub = models.CharField(max_length=64, unique=True, null=True, blank=True)
     notifications_seen_at = models.DateTimeField(null=True, blank=True)
     admin_inbox_seen_at = models.DateTimeField(null=True, blank=True)
-    # Max unpaid amount (USD) for this customer; empty = use the store default
+    # Max unpaid amount (SYP) for this customer; empty = use the store default
     credit_limit = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(Decimal("0"))])
     # Buying on credit is off until an admin turns it on for this customer; until then the
     # customer sees nothing about debt or limits.

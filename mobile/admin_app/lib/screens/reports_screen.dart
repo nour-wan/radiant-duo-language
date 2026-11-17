@@ -82,6 +82,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               crossAxisSpacing: 8,
               children: [
                 _Kpi(context.tr('report.sales'), money(r.totalSales)),
+                _Kpi(context.tr('report.sales_usd'), usd(r.totalSalesUsd)),
                 _Kpi(context.tr('report.orders'), '${r.totalOrders}'),
                 _Kpi(context.tr('report.avg'), money(r.averageOrder)),
                 _Kpi(context.tr('report.discounts'), money(r.totalDiscount)),

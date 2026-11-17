@@ -87,7 +87,7 @@ class OrderListCreateView(generics.ListAPIView):
             raise BusinessError("contact_required")
         order, created = pricing.place_order(
             user, data["items"], data.get("coupon_code"), contact, data.get("client_ref", ""),
-            delivery_method=method, area_id=area_id,
+            delivery_method=method, area_id=area_id, expected_total=data.get("expected_total"),
         )
         if created:
             transaction.on_commit(lambda: events.order_placed(order))

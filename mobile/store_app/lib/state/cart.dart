@@ -67,9 +67,31 @@ class Cart extends ChangeNotifier {
       } catch (_) {}
     }
     coupon = _prefs.getString('$_key.coupon');
+    _migrateDollarCart();
   }
 
-  static const _key = 'cart.v1';
+  /// Carts saved by older versions held dollar prices: keep the items, drop the old prices
+  /// (the next quote fills in Syrian-pound prices).
+  void _migrateDollarCart() {
+    final old = _prefs.getString('cart.v1');
+    if (old == null) return;
+    if (lines.isEmpty) {
+      try {
+        for (final e in jsonDecode(old) as List) {
+          final line = CartLine.fromJson(e as Map<String, dynamic>)
+            ..unitPrice = 0
+            ..regularPrice = 0;
+          lines.add(line);
+        }
+      } catch (_) {}
+      coupon = _prefs.getString('cart.v1.coupon');
+      _persist();
+    }
+    _prefs.remove('cart.v1');
+    _prefs.remove('cart.v1.coupon');
+  }
+
+  static const _key = 'cart.v2';
   final SharedPreferences _prefs;
   final StoreApi _api;
   final List<CartLine> lines = [];

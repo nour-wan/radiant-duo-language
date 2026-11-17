@@ -79,6 +79,8 @@ class QuoteRequestSerializer(serializers.Serializer):
 
 class PlaceOrderSerializer(QuoteRequestSerializer):
     client_ref = serializers.CharField(required=False, allow_blank=True, max_length=64)
+    # Total (SYP) the customer was shown; if the rate moved since, the order is refused with prices_changed
+    expected_total = serializers.DecimalField(max_digits=14, decimal_places=2, required=False, allow_null=True)
     address_id = serializers.IntegerField(required=False)
     customer_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
     customer_phone = serializers.CharField(max_length=32, required=False, allow_blank=True)

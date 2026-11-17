@@ -81,6 +81,20 @@ echo "==> Backups"
 install -m 755 "$APP/deploy/backup.sh" /usr/local/sbin/alas-api-backup
 echo "30 3 * * * root /usr/local/sbin/alas-api-backup" > /etc/cron.d/alas-api-backup
 
+echo "==> Dollar rate (sp-today.com) every 15 minutes"
+install -m 755 "$APP/deploy/update_rate.sh" /usr/local/sbin/alas-api-rate
+echo "*/15 * * * * root /usr/local/sbin/alas-api-rate" > /etc/cron.d/alas-api-rate
+cat > /etc/logrotate.d/alas-api-rate <<'ROT'
+/var/log/alas-api-rate.log {
+  weekly
+  rotate 4
+  compress
+  missingok
+  notifempty
+}
+ROT
+run_manage update_exchange_rate || true
+
 sleep 2
 curl -fsS -H "Host: $DOMAIN" http://127.0.0.1/health/ && echo "  <- API health OK"
 if [ ! -d /etc/letsencrypt/live/$DOMAIN ]; then

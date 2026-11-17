@@ -6,6 +6,8 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from apps.store import fx
+
 from .models import Category, Favorite, Product, ProductImage, Variant
 from .serializers import CategorySerializer, ProductDetailSerializer, ProductListSerializer
 
@@ -57,10 +59,12 @@ def filter_products(qs, params):
         )
     if params.get("category"):
         qs = qs.filter(category_id=params["category"]) if str(params["category"]).isdigit() else qs.filter(category__slug=params["category"])
-    if (low := _decimal(params.get("min_price"))) is not None:
-        qs = qs.filter(min_price__gte=low)
-    if (high := _decimal(params.get("max_price"))) is not None:
-        qs = qs.filter(min_price__lte=high)
+    # The customer filters in Syrian pounds; prices are stored in USD
+    rate = fx.rate_or_none()
+    if rate and (low := _decimal(params.get("min_price"))) is not None:
+        qs = qs.filter(min_price__gte=low / rate)
+    if rate and (high := _decimal(params.get("max_price"))) is not None:
+        qs = qs.filter(min_price__lte=high / rate)
     if params.get("featured") in ("1", "true"):
         qs = qs.filter(is_featured=True)
     if params.get("on_sale") in ("1", "true"):

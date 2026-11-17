@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'exchange_rate_screen.dart';
 import 'inbox_screen.dart';
 import 'statement_screen.dart';
 
@@ -38,10 +39,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
         builder: (context, d, reload) => RefreshIndicator(
           onRefresh: reload,
           child: ListView(padding: const EdgeInsets.all(12), children: [
+            if (d.rate != null)
+              Card(
+                color: d.rate!.stale || d.rate!.held != null ? AlasColors.warning.withValues(alpha: .12) : null,
+                child: ListTile(
+                  dense: true,
+                  leading: Icon(Icons.currency_exchange, color: d.rate!.stale || d.rate!.held != null ? AlasColors.warning : AlasColors.primary),
+                  title: Text(context.tr('dash.rate', {'r': d.rate!.rate == null ? '—' : money(d.rate!.rate)}), style: const TextStyle(fontWeight: FontWeight.w700)),
+                  subtitle: d.rate!.held != null
+                      ? Text(context.tr('rate.held_title'))
+                      : d.rate!.stale
+                          ? Text(context.tr('rate.stale'))
+                          : d.rate!.fetchedAt == null || d.rate!.mode == 'manual'
+                              ? Text(context.tr('rate.from_manual'))
+                              : Text(context.tr('rate.updated', {'t': formatDateTime(d.rate!.fetchedAt!, context.lang)})),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ExchangeRateScreen())).then((_) => reload()),
+                ),
+              ),
             Row(children: [
-              Expanded(child: _Stat(label: context.tr('dash.today'), value: money(d.todaySales), sub: context.tr('dash.orders_n', {'n': d.todayOrders}))),
+              Expanded(
+                  child: _Stat(
+                      label: context.tr('dash.today'),
+                      value: money(d.todaySales),
+                      sub: '${context.tr('dash.orders_n', {'n': d.todayOrders})} · ≈ ${usd(d.todaySalesUsd)}')),
               const SizedBox(width: 10),
-              Expanded(child: _Stat(label: context.tr('dash.month'), value: moneyCompact(d.monthSales), sub: context.tr('dash.orders_n', {'n': d.monthOrders}))),
+              Expanded(
+                  child: _Stat(
+                      label: context.tr('dash.month'),
+                      value: moneyCompact(d.monthSales),
+                      sub: '${context.tr('dash.orders_n', {'n': d.monthOrders})} · ≈ ${usd(d.monthSalesUsd)}')),
             ]),
             const SizedBox(height: 10),
             if (d.pendingOrders > 0)

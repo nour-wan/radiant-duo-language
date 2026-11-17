@@ -51,7 +51,12 @@ class Order(models.Model):
     discount = models.DecimalField(max_digits=12, decimal_places=2, default=0)  # coupon discount
     app_discount_percent = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     app_discount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    total = models.DecimalField(max_digits=12, decimal_places=2)  # USD, products only
+    total = models.DecimalField(max_digits=12, decimal_places=2)  # SYP, products only (delivery fee separate)
+    # Amounts above are in Syrian pounds. The USD → SYP rate the order was priced with, and the
+    # same total in dollars (for the store's own reports; never shown to customers).
+    currency = models.CharField(max_length=3, default="SYP")
+    exchange_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    total_usd = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
     admin_note = models.CharField(max_length=500, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
@@ -87,7 +92,8 @@ class OrderItem(models.Model):
     variant_label_ar = models.CharField(max_length=80)
     variant_label_en = models.CharField(max_length=80)
     image = models.CharField(max_length=300, blank=True)
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2)  # SYP
+    unit_price_usd = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     quantity = models.PositiveIntegerField()
     line_total = models.DecimalField(max_digits=12, decimal_places=2)
 

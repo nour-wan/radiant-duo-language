@@ -114,6 +114,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           'address_details': _details.text.trim(),
         },
         'notes': _notes.text.trim(),
+        // The total the customer saw; if the dollar rate moved since, the server asks to confirm again
+        if (cart.quote != null) 'expected_total': cart.quote!.total.toStringAsFixed(2),
       });
       cart.clear();
       if (!mounted) return;
@@ -237,7 +239,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget _addressSection(BuildContext context, DeliveryInfo info) {
-    final lang = context.lang;
     final q = context.watch<Cart>().quote;
     const newAddress = -1;
     return _Section(title: context.tr('co.address'), children: [
@@ -290,13 +291,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           const Icon(Icons.local_shipping_outlined, size: 20),
           const SizedBox(width: 8),
           Expanded(child: Text(context.tr('co.delivery_fee'))),
-          Text('${q.deliveryFee.toStringAsFixed(0)} ${q.currency(lang)}', style: Theme.of(context).textTheme.titleSmall),
+          Text(money(q.deliveryFee), style: Theme.of(context).textTheme.titleSmall),
         ]),
         if (!q.deliveryAreaListed && (_addressId != null || _newArea != null))
           Padding(
             padding: const EdgeInsets.only(top: 6),
             child: Text(
-              context.tr('co.fee_estimate', {'fee': '${q.deliveryFee.toStringAsFixed(0)} ${q.currency(lang)}'}),
+              context.tr('co.fee_estimate', {'fee': money(q.deliveryFee)}),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AlasColors.warning),
             ),
           ),
@@ -305,7 +306,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 }
 
-/// Subtotal, coupon, app discount and total (USD) plus the delivery fee in its own currency.
+/// Subtotal, coupon, app discount and total plus the delivery fee (all in Syrian pounds).
 class OrderTotals extends StatelessWidget {
   const OrderTotals({super.key, required this.quote, required this.fallbackSubtotal});
 
@@ -315,7 +316,6 @@ class OrderTotals extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final q = quote;
-    final lang = context.lang;
     return Column(children: [
       SummaryRow(context.tr('cart.subtotal'), money(q?.subtotal ?? fallbackSubtotal)),
       if ((q?.discount ?? 0) > 0) SummaryRow('${context.tr('cart.discount')} (${q!.couponCode})', '- ${money(q.discount)}', color: AlasColors.sale),
@@ -335,12 +335,14 @@ class OrderTotals extends StatelessWidget {
         ),
       ],
       if (q != null && q.deliveryMethod == 'delivery' && q.deliveryFee > 0) ...[
-        SummaryRow(context.tr('co.delivery_fee'), '+ ${q.deliveryFee.toStringAsFixed(0)} ${q.currency(lang)}'),
+        SummaryRow(context.tr('co.delivery_fee'), '+ ${money(q.deliveryFee)}'),
         Align(
           alignment: AlignmentDirectional.centerStart,
           child: Text(context.tr('co.delivery_fee_note'),
               style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
         ),
+        const Divider(height: 18),
+        SummaryRow(context.tr('co.pay_on_receipt'), money((q.dueOnDelivery ?? q.total) + q.deliveryFee), bold: true),
       ],
     ]);
   }
@@ -465,7 +467,7 @@ class _SuccessScreen extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: t.textTheme.headlineSmall?.copyWith(color: t.colorScheme.primary, fontFamily: 'packages/alas_shared/Manrope')),
             if (!order.isPickup && order.deliveryFee > 0)
-              Text('+ ${order.deliveryFee.toStringAsFixed(0)} ${order.deliveryCurrency}', textAlign: TextAlign.center, style: t.textTheme.titleSmall),
+              Text('+ ${money(order.deliveryFee)} ${context.tr('co.delivery_fee')}', textAlign: TextAlign.center, style: t.textTheme.titleSmall),
             const SizedBox(height: 32),
             FilledButton(
               onPressed: () => Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => OrderDetailScreen(orderId: order.id))),

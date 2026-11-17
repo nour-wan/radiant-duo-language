@@ -99,9 +99,45 @@ class Coupon {
   bool get expired => expiresAt != null && expiresAt!.isBefore(DateTime.now());
 }
 
+/// The dollar rate used to turn USD product prices into the Syrian-pound prices customers see.
+class RateStatus {
+  RateStatus.fromJson(Map<String, dynamic> j)
+      : rate = toMoneyOrNull(j['rate']),
+        mode = j['mode'] as String? ?? 'auto',
+        side = j['side'] as String? ?? 'sell',
+        manual = toMoneyOrNull(j['manual']),
+        rounding = j['rounding'] as int? ?? 10,
+        autoBuy = toMoneyOrNull(j['auto_buy']),
+        autoSell = toMoneyOrNull(j['auto_sell']),
+        fetchedAt = j['fetched_at'] == null ? null : DateTime.tryParse(j['fetched_at'] as String)?.toLocal(),
+        stale = j['stale'] as bool? ?? false,
+        error = j['error'] as String? ?? '',
+        held = j['held'] == null ? null : Map<String, dynamic>.from(j['held'] as Map);
+
+  final double? rate, manual, autoBuy, autoSell;
+  final String mode, side, error;
+  final int rounding;
+  final DateTime? fetchedAt;
+  final bool stale;
+  final Map<String, dynamic>? held;
+
+  /// Last status seen anywhere in the app (the product form uses it for its live preview).
+  static RateStatus? last;
+
+  /// Customer price in Syrian pounds for a dollar price, the same way the server rounds it.
+  double? toSyp(double? usdPrice) {
+    if (usdPrice == null || rate == null) return null;
+    final step = rounding < 1 ? 1 : rounding;
+    return ((usdPrice * rate!) / step).round() * step.toDouble();
+  }
+}
+
 class Dashboard {
   Dashboard.fromJson(Map<String, dynamic> j)
       : todaySales = toMoney(j['today']['sales']),
+        todaySalesUsd = toMoney(j['today']['sales_usd']),
+        monthSalesUsd = toMoney(j['month']['sales_usd']),
+        rate = j['exchange_rate'] == null ? null : RateStatus.fromJson(Map<String, dynamic>.from(j['exchange_rate'] as Map)),
         todayOrders = j['today']['orders'] as int,
         monthSales = toMoney(j['month']['sales']),
         monthOrders = j['month']['orders'] as int,
@@ -115,7 +151,8 @@ class Dashboard {
         receivablesTotal = toMoney(j['receivables_total']),
         unreadInbox = j['unread_inbox'] as int? ?? 0;
 
-  final double todaySales, monthSales, receivablesTotal;
+  final double todaySales, monthSales, receivablesTotal, todaySalesUsd, monthSalesUsd;
+  final RateStatus? rate;
   final int todayOrders, monthOrders, pendingOrders, customers, products, lowStockThreshold, unreadInbox;
   final List<({DateTime date, double sales, int orders})> chart;
   final List<Map<String, dynamic>> bestSellers, lowStock;
@@ -130,6 +167,7 @@ class Report {
             .map((e) => (period: DateTime.parse(e['period'] as String), sales: toMoney(e['sales']), discount: toMoney(e['discount']), orders: e['orders'] as int))
             .toList(),
         totalSales = toMoney(j['totals']['sales']),
+        totalSalesUsd = toMoney(j['totals']['sales_usd']),
         totalOrders = j['totals']['orders'] as int,
         totalDiscount = toMoney(j['totals']['discount']),
         averageOrder = toMoney(j['totals']['average_order']),
@@ -138,7 +176,7 @@ class Report {
   final String period;
   final DateTime from, to;
   final List<({DateTime period, double sales, double discount, int orders})> series;
-  final double totalSales, totalDiscount, averageOrder;
+  final double totalSales, totalSalesUsd, totalDiscount, averageOrder;
   final int totalOrders;
   final List<Map<String, dynamic>> topProducts;
 }
@@ -151,7 +189,11 @@ class AdminApi {
 
   final ApiClient client;
 
-  Future<Dashboard> dashboard() async => Dashboard.fromJson(await client.get('/admin/dashboard/'));
+  Future<Dashboard> dashboard() async {
+    final d = Dashboard.fromJson(await client.get('/admin/dashboard/'));
+    if (d.rate != null) RateStatus.last = d.rate;
+    return d;
+  }
 
   // Orders
   Future<PageResult<OrderSummary>> orders({int page = 1, String? status, String? q, int? customer}) async => PageResult.fromJson(
@@ -272,6 +314,11 @@ class AdminApi {
   Future<void> markInboxSeen() => client.post('/admin/inbox/seen/');
 
   // Settings & policies
+  Future<RateStatus> exchangeRate() async =>
+      RateStatus.last = RateStatus.fromJson(Map<String, dynamic>.from(await client.get('/admin/exchange-rate/') as Map));
+  Future<RateStatus> exchangeRateAction(String action, {int? id}) async => RateStatus.last = RateStatus.fromJson(
+      Map<String, dynamic>.from(await client.post('/admin/exchange-rate/', data: {'action': action, if (id != null) 'id': id}) as Map));
+  Future<void> saveRateSettings(Map<String, dynamic> data) => client.patch('/admin/settings/', data: data);
   Future<StoreInfo> settings() async => StoreInfo.fromJson(await client.get('/admin/settings/'));
   Future<StoreInfo> saveSettings(Map<String, dynamic> data) async => StoreInfo.fromJson(await client.patch('/admin/settings/', data: data));
   Future<List<Map<String, dynamic>>> staff() async =>

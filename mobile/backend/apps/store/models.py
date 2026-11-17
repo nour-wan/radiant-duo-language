@@ -38,8 +38,17 @@ class StoreSettings(models.Model):
     delivery_enabled = models.BooleanField(default=True)
     delivery_currency_ar = models.CharField(max_length=20, default="ل.س")
     delivery_currency_en = models.CharField(max_length=20, default="SYP")
-    # Max unpaid amount (USD) per customer; empty = no limit
+    # Max unpaid amount (SYP) per customer; empty = no limit
     default_credit_limit = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(Decimal("0"))])
+    # Product prices are entered in USD; customers see SYP = USD × rate (see fx.py)
+    usd_rate_mode = models.CharField(max_length=10, choices=[("auto", "Automatic (sp-today.com)"), ("manual", "Manual")], default="auto")
+    usd_rate_side = models.CharField(max_length=4, choices=[("sell", "Sell"), ("buy", "Buy")], default="sell")
+    usd_rate_manual = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, validators=[MinValueValidator(Decimal("1"))])
+    syp_rounding = models.PositiveIntegerField(default=10, validators=[MinValueValidator(1)])
+    usd_rate_error = models.CharField(max_length=200, blank=True)
+    usd_rate_alerted_at = models.DateTimeField(null=True, blank=True)
+    # Set once, when existing USD orders, balances and limits were converted to SYP
+    syp_converted_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
@@ -53,6 +62,20 @@ class StoreSettings(models.Model):
     def load(cls):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
+
+
+class ExchangeRate(models.Model):
+    """One reading of the USD rate in Damascus (new Syrian pounds). A reading that moved too much
+    from the previous one is kept with accepted=False until the owner confirms it."""
+
+    buy = models.DecimalField(max_digits=10, decimal_places=2)
+    sell = models.DecimalField(max_digits=10, decimal_places=2)
+    source_updated_at = models.CharField(max_length=40, blank=True)
+    accepted = models.BooleanField(default=True)
+    fetched_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["-fetched_at", "-id"]
 
 
 class LegalPage(models.Model):

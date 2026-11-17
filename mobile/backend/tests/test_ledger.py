@@ -45,7 +45,7 @@ class LedgerTests(Base):
         self.assertEqual([e["kind"] for e in data["results"]], ["payment", "order"])
         self.assertEqual([e["balance_after"] for e in data["results"]], ["180.00", "280.00"])
         inbox = self.client.get("/api/v1/notifications/").data["results"]
-        self.assertIn("180.00", inbox[0]["body_ar"])
+        self.assertIn("180 ل.س", inbox[0]["body_ar"])
 
     def test_general_payment_and_overpayment_credit(self):
         self.deliver(self.place())

@@ -76,6 +76,17 @@ class _ProductFormScreenState extends State<ProductFormScreen> {
     super.initState();
     _id = widget.productId;
     _load();
+    // Today's dollar rate for the "customers see" preview under each price
+    _loadRate();
+  }
+
+  Future<void> _loadRate() async {
+    try {
+      await context.read<AdminApi>().exchangeRate();
+      if (mounted) setState(() {});
+    } catch (_) {
+      // The preview is optional; the server prices orders anyway
+    }
   }
 
   Future<void> _load() async {
@@ -308,6 +319,12 @@ class _VariantEditor extends StatefulWidget {
 }
 
 class _VariantEditorState extends State<_VariantEditor> {
+  /// "Customers see: 4,190 ل.س" for a dollar price typed in the form.
+  String? _preview(BuildContext context, String text) {
+    final syp = RateStatus.last?.toSyp(parseAmount(text));
+    return syp == null ? null : context.tr('variant.syp_preview', {'p': money(syp)});
+  }
+
   @override
   Widget build(BuildContext context) {
     final v = widget.row;
@@ -347,14 +364,23 @@ class _VariantEditorState extends State<_VariantEditor> {
           ),
         ]),
         const SizedBox(height: 8),
-        Row(children: [
-          num(v.price, context.tr('variant.price')),
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(
+            child: TextFormField(
+              controller: v.price,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(labelText: context.tr('variant.price'), isDense: true, helperText: _preview(context, v.price.text)),
+              validator: (s) => moneyField(context, s),
+            ),
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: TextFormField(
               controller: v.discount,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(labelText: context.tr('variant.discount'), isDense: true),
+              onChanged: (_) => setState(() {}),
+              decoration: InputDecoration(labelText: context.tr('variant.discount'), isDense: true, helperText: _preview(context, v.discount.text)),
               validator: (s) {
                 if (s == null || s.trim().isEmpty) return null;
                 final d = double.tryParse(s.trim()), p = double.tryParse(v.price.text.trim());
