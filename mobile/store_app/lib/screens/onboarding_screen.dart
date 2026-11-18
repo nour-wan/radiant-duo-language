@@ -2,6 +2,7 @@ import 'package:alas_shared/alas_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/onboarding_art.dart';
 import 'shell.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -14,8 +15,6 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final _pages = PageController();
   int _index = 0;
-
-  static const _icons = [Icons.inventory_2_outlined, Icons.sell_outlined, Icons.local_shipping_outlined];
 
   Future<void> _finish() async {
     await context.read<AppSettings>().prefs.setBool('onboarded', true);
@@ -48,12 +47,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               itemBuilder: (_, i) => Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Container(
-                    width: 170,
-                    height: 170,
-                    decoration: BoxDecoration(color: t.colorScheme.primaryContainer, shape: BoxShape.circle),
-                    child: Icon(_icons[i], size: 76, color: t.colorScheme.primary),
-                  ),
+                  switch (i) {
+                    0 => IngredientsArt(active: _index == 0),
+                    1 => DeliveryArt(active: _index == 1, cashLabel: context.tr('ob.cash')),
+                    _ => OffersArt(active: _index == 2, couponLabel: context.tr('ob.coupon'), offerLabel: context.tr('ob.offer')),
+                  },
                   const SizedBox(height: 36),
                   Text(context.tr('ob.${i + 1}.title'), style: t.textTheme.headlineSmall, textAlign: TextAlign.center),
                   const SizedBox(height: 12),

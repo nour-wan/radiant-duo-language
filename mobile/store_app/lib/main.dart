@@ -7,11 +7,10 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'screens/account/statement_screen.dart';
-import 'screens/onboarding_screen.dart';
 import 'screens/orders/order_detail_screen.dart';
 import 'screens/product/product_detail_screen.dart';
 import 'screens/product/product_list_screen.dart';
-import 'screens/shell.dart';
+import 'screens/splash_screen.dart';
 import 'services/store_api.dart';
 import 'state/cart.dart';
 import 'state/favorites.dart';
@@ -85,7 +84,6 @@ class StoreApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<AppSettings>();
-    final onboarded = settings.prefs.getBool('onboarded') ?? false;
     return MaterialApp(
       navigatorKey: navigatorKey,
       builder: keepAboveSystemBar,
@@ -101,7 +99,7 @@ class StoreApp extends StatelessWidget {
       themeMode: settings.themeMode,
       theme: buildAlasTheme(brightness: Brightness.light, languageCode: settings.lang),
       darkTheme: buildAlasTheme(brightness: Brightness.dark, languageCode: settings.lang),
-      home: onboarded ? const Shell() : const OnboardingScreen(),
+      home: const SplashScreen(),
     );
   }
 }
