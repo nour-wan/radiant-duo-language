@@ -183,6 +183,7 @@ const sharedStrings = <String, List<String>>{
   'err.google_not_configured': ['الدخول عبر Google غير مفعّل حالياً.', 'Google sign-in is not available yet.'],
   'err.google_token_invalid': ['تعذّر التحقق من حساب Google.', 'Could not verify your Google account.'],
   'err.google_email_unverified': ['بريد Google غير موثّق.', 'Your Google email is not verified.'],
+  'order.grand_total': ['الإجمالي مع التوصيل', 'Total incl. delivery'],
   'err.cart_empty': ['السلة فارغة.', 'Your cart is empty.'],
   'err.prices_changed': ['تغيّر سعر الصرف وتم تحديث الأسعار. راجع المجموع الجديد ثم أكّد الطلب.', 'The exchange rate changed and prices were updated. Check the new total, then place the order.'],
   'err.prices_unavailable': ['الأسعار غير متوفرة حالياً، حاول بعد قليل.', 'Prices are not available right now. Please try again shortly.'],

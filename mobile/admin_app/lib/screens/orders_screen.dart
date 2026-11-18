@@ -304,6 +304,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                         ),
                       if (!o.isPickup && o.deliveryFee > 0)
                         _row(context, context.tr('order.delivery_fee'), '+ ${money(o.deliveryFee)}'),
+                      if (!o.isPickup && o.deliveryFee > 0) _row(context, context.tr('order.grand_total'), money(o.total + o.deliveryFee), bold: true),
                       const SizedBox(height: 8),
                       InvoiceButton(number: o.number, load: (lang) => context.read<AdminApi>().invoicePdf(o.id, lang)),
                     ]),

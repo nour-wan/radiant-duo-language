@@ -69,7 +69,8 @@ TEXT = {
     "delivery": ("توصيل", "Delivery"),
     "pickup": ("استلام من المحل", "Store pickup"),
     "delivery_fee": ("أجرة التوصيل", "Delivery fee"),
-    "fee_note": ("تدفع عند الاستلام ولا تدخل في الفاتورة", "Paid on receipt, not part of this invoice"),
+    "products_total": ("إجمالي المنتجات", "Products total"),
+    "delivery_zone": ("منطقة التوصيل", "Delivery zone"),
     "notes": ("ملاحظات", "Notes"),
     "usd": ("جميع المبالغ بالليرة السورية (ل.س)", "All amounts in Syrian pounds (SYP)"),
     "thanks": ("نشكركم على تعاملكم معنا", "Thank you for your business"),
@@ -247,10 +248,16 @@ def build_invoice(order, lang="ar"):
         rows.append((f"{pdf.t('coupon')} ({order.coupon_code})", f"- {_money(order.discount)}", RED))
     if order.app_discount > 0:
         rows.append((f"{pdf.t('app_discount')} ({order.app_discount_percent.normalize():f}%)", f"- {_money(order.app_discount)}", GREEN))
+    # Delivery fee is part of the invoice: products total + delivery fee = amount of the invoice
+    fee = order.delivery_fee if order.delivery_method == Order.DELIVERY and order.delivery_fee else 0
+    if fee:
+        rows.append((pdf.t("products_total"), _money(order.total), INK))
+        rows.append((pdf.t("delivery_fee"), f"+ {_money(fee)}", INK))
     paid = remaining = None
     credit = ledger.credit_for_order(order) if order.status == Order.DELIVERED else ledger.ZERO
     if order.status == Order.DELIVERED:
-        paid = ledger.order_paid(order)
+        # The delivery fee is always taken in cash on delivery, so a delivered order has it paid
+        paid = ledger.order_paid(order) + fee
         remaining = ledger.to_collect(order)
     needed = 12 + len(rows) * 7 + 12 + (16 if paid is not None else 0) + (7 if credit else 0)
     if y + needed > pdf.h - 24:
@@ -265,7 +272,7 @@ def build_invoice(order, lang="ar"):
         y += 7
     pdf.box(tx, y + 1, tw, 11, GREEN, radius=2.5)
     pdf.text(tx + 4, y + 2.5, tw - 40, 8, pdf.t("total"), size=11, bold=True, color=WHITE)
-    pdf.text(tx + tw - 40, y + 2.5, 36, 8, _money(order.total), size=12, bold=True, color=WHITE, align="end")
+    pdf.text(tx + tw - 40, y + 2.5, 36, 8, _money(order.total + fee), size=12, bold=True, color=WHITE, align="end")
     y += 14
     if credit:
         pdf.text(tx, y, tw - 34, 7, pdf.t("credit_used"), size=9.5, color=MUTED)
@@ -285,9 +292,8 @@ def build_invoice(order, lang="ar"):
         (pdf.t("payment"), pdf.t("cod")),
         (pdf.t("receiving"), pdf.t("delivery") if order.delivery_method == Order.DELIVERY else pdf.t("pickup")),
     ]
-    if order.delivery_method == Order.DELIVERY and order.delivery_fee:
-        currency = pick(s.delivery_currency_ar, s.delivery_currency_en)
-        info.append((pdf.t("delivery_fee"), f"{order.delivery_fee:,.0f} {currency} — {pdf.t('fee_note')}"))
+    if fee and order.delivery_zone:
+        info.append((pdf.t("delivery_zone"), order.delivery_zone))
     if order.notes:
         info.append((pdf.t("notes"), order.notes))
     top = y - (14 + len(rows) * 7 + (14 if paid is not None else 0) + (7 if credit else 0))
