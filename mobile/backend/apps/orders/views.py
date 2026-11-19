@@ -84,7 +84,8 @@ class OrderListCreateView(generics.ListAPIView):
             if area_id and not contact["area"]:
                 listed = DeliveryArea.objects.filter(pk=area_id).first()
                 contact["area"] = listed.name_ar if listed else ""
-            if not contact["area"] or (not contact["address_details"] and not contact["street"]):
+            pinned = contact.get("latitude") is not None and contact.get("longitude") is not None
+            if not contact["area"] or (not contact["address_details"] and not contact["street"] and not pinned):
                 raise BusinessError("address_required")
         else:
             contact.update(city="", area="", street="", address_details="", latitude=None, longitude=None)

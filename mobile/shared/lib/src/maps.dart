@@ -255,3 +255,82 @@ class _DeliveryMapState extends State<DeliveryMap> {
     );
   }
 }
+
+/// One marker on [MultiPointMap].
+class MapPoint {
+  const MapPoint(this.position, this.marker, {this.size = 40, this.alignment = Alignment.center, this.onTap});
+
+  final LatLng position;
+  final Widget marker;
+  final double size;
+  final Alignment alignment;
+  final VoidCallback? onTap;
+}
+
+/// A map showing several points at once (e.g. every driver on the road), zoomed to fit them all.
+class MultiPointMap extends StatefulWidget {
+  const MultiPointMap({super.key, required this.points, this.height});
+
+  final List<MapPoint> points;
+
+  /// null = fill the space it is given.
+  final double? height;
+
+  @override
+  State<MultiPointMap> createState() => _MultiPointMapState();
+}
+
+class _MultiPointMapState extends State<MultiPointMap> {
+  final _map = MapController();
+  bool _fitted = false;
+
+  CameraFit? get _fit {
+    final p = widget.points.map((e) => e.position).toList();
+    if (p.length < 2) return null;
+    return CameraFit.coordinates(coordinates: p, padding: const EdgeInsets.all(56), maxZoom: 16);
+  }
+
+  @override
+  void didUpdateWidget(MultiPointMap old) {
+    super.didUpdateWidget(old);
+    // Fit once when the first positions arrive; after that the user's own zoom/pan is kept
+    if (!_fitted && widget.points.isNotEmpty) {
+      final fit = _fit;
+      if (fit != null) {
+        _map.fitCamera(fit);
+      } else {
+        _map.move(widget.points.first.position, 15);
+      }
+      _fitted = true;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final first = widget.points.isEmpty ? damascus : widget.points.first.position;
+    _fitted = _fitted || widget.points.isNotEmpty;
+    final map = FlutterMap(
+      mapController: _map,
+      options: MapOptions(
+        initialCenter: first,
+        initialZoom: widget.points.isEmpty ? 12 : 15,
+        initialCameraFit: _fit,
+        interactionOptions: const InteractionOptions(flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
+      ),
+      children: [
+        ...mapBaseLayers(),
+        MarkerLayer(markers: [
+          for (final p in widget.points)
+            Marker(
+              point: p.position,
+              width: p.size,
+              height: p.size,
+              alignment: p.alignment,
+              child: GestureDetector(onTap: p.onTap, child: p.marker),
+            ),
+        ]),
+      ],
+    );
+    return widget.height == null ? map : SizedBox(height: widget.height, child: map);
+  }
+}

@@ -221,6 +221,10 @@ class AdminApi {
         if (driverId != null) 'driver_id': driverId,
       }));
 
+  /// Orders out for delivery right now with each driver's last position (this account's side only).
+  Future<List<Map<String, dynamic>>> liveDeliveries() async =>
+      ((await client.get('/admin/orders/live/')) as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+
   /// Who an order can be handed to for delivery: [{id, name, is_driver, is_me}].
   Future<List<Map<String, dynamic>>> orderDrivers(int id) async =>
       ((await client.get('/admin/orders/$id/drivers/')) as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();

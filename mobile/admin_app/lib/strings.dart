@@ -33,6 +33,8 @@ const adminStrings = <String, List<String>>{
   'drv.me': ['أنا ({n})', 'Me ({n})'],
   'drv.handed': ['صار الطلب مع {n}', 'Handed to {n}'],
   'drv.my_deliveries': ['توصيلاتي', 'My deliveries'],
+  'live.title': ['التوصيلات الحالية', 'Deliveries now'],
+  'live.empty': ['ما في طلبات بالطريق هلق', 'No orders on the road right now'],
   'drv.driver': ['السائق: {n}', 'Driver: {n}'],
   'drv.no_driver': ['ما حدا استلم توصيله لسا', 'Nobody is delivering it yet'],
   'drv.take': ['أنا رح وصّله', 'I will deliver it'],

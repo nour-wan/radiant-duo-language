@@ -148,14 +148,18 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
             const SizedBox(height: 12),
             AreaField(info: _info, initialValue: _area, onChanged: (v) => _area = v, validator: (v) => v == null ? context.tr('app.required') : null),
             const SizedBox(height: 12),
+            // The map pin is enough; the written address is only needed without one
+            PinField(value: _pin, onChanged: (p) => setState(() => _pin = p)),
+            const SizedBox(height: 12),
             TextFormField(
               controller: _details,
               maxLines: 2,
-              decoration: InputDecoration(labelText: context.tr('profile.address'), hintText: context.tr('profile.address_hint')),
-              validator: _req,
+              decoration: InputDecoration(
+                labelText: context.tr(_pin == null ? 'profile.address' : 'addr.details_optional'),
+                hintText: context.tr('profile.address_hint'),
+              ),
+              validator: (v) => _pin == null ? _req(v) : null,
             ),
-            const SizedBox(height: 12),
-            PinField(value: _pin, onChanged: (p) => setState(() => _pin = p)),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(context.tr('addr.default')),

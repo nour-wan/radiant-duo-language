@@ -312,6 +312,27 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
         tracking.assign_driver(order, request.user)
         return Response(s.AdminOrderDetailSerializer(self.get_queryset().get(pk=order.pk)).data)
 
+    @action(detail=False, methods=["get"])
+    def live(self, request):
+        """Orders out for delivery right now (this account's side only) with each driver's last position."""
+        orders = (
+            self.get_queryset()
+            .filter(status=Order.SHIPPED, delivery_method=Order.DELIVERY)
+            .select_related("driver", "distributor")
+            .order_by("created_at")
+        )
+        return Response([
+            {
+                "id": o.id, "number": o.number, "customer": o.business_name or o.customer_name, "area": o.area,
+                "driver_name": o.driver.display_name if o.driver_id else None,
+                "distributor_name": o.distributor.display_name if o.distributor_id else None,
+                "latitude": float(o.latitude) if o.latitude is not None else None,
+                "longitude": float(o.longitude) if o.longitude is not None else None,
+                "tracking": tracking.tracking(o),
+            }
+            for o in orders
+        ])
+
     @action(detail=True, methods=["get"])
     def drivers(self, request, pk=None):
         """Who this order can be handed to for delivery."""

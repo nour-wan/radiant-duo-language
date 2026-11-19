@@ -10,6 +10,7 @@ const storeStrings = <String, List<String>>{
   'profile.distributor_code': ['كود الموزّع (اختياري)', 'Distributor code (optional)'],
   'profile.distributor_code_hint': ['إذا عطاك موزّع كود، اكتبه هون حتى توصلك طلباتك عن طريقه', 'If a distributor gave you a code, enter it so your orders go through them'],
   'profile.distributor': ['موزّعك', 'Your distributor'],
+  'addr.details_optional': ['تفاصيل إضافية (اختياري)', 'Extra details (optional)'],
   'ob.skip': ['تخطي', 'Skip'],
   'ob.next': ['التالي', 'Next'],
   'ob.start': ['ابدأ التسوق', 'Start shopping'],

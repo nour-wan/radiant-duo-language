@@ -221,10 +221,28 @@ class AddressViewSet(viewsets.ModelViewSet):
             address.save(update_fields=["is_default"])
 
     def perform_create(self, serializer):
-        self._sync_default(serializer.save(user=self.request.user))
+        address = serializer.save(user=self.request.user)
+        self._sync_default(address)
+        pin_open_orders(address)
 
     def perform_update(self, serializer):
-        self._sync_default(serializer.save())
+        address = serializer.save()
+        self._sync_default(address)
+        pin_open_orders(address)
+
+
+def pin_open_orders(address):
+    """Orders still on their way to this address (placed before it was pinned) get its map pin too,
+    so the driver and the delivery estimate work for them."""
+    if address.latitude is None or address.longitude is None:
+        return
+    from apps.orders.models import Order
+
+    Order.objects.filter(
+        user=address.user, delivery_method=Order.DELIVERY, latitude__isnull=True,
+        status__in=[Order.PENDING, Order.CONFIRMED, Order.SHIPPED],
+        area=address.area, address_details=address.details,
+    ).update(latitude=address.latitude, longitude=address.longitude)
 
 
 class RefreshView(TokenRefreshView):

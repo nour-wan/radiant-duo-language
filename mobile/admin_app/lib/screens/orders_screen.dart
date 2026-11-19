@@ -4,6 +4,7 @@ import 'package:alas_shared/alas_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'live_deliveries_screen.dart';
 import 'statement_screen.dart';
 
 import '../services/admin_api.dart';
@@ -35,6 +36,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
       appBar: AppBar(
         title: Text(widget.title ?? context.tr('nav.orders')),
         actions: [
+          if (!context.watch<AdminSession>().isDriver) ...[
+          // Every driver on the road right now, on one map
+          IconButton(
+            tooltip: context.tr('live.title'),
+            icon: const Icon(Icons.map_outlined),
+            onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LiveDeliveriesScreen())),
+          ),
           IconButton(
             tooltip: context.tr('orders.export'),
             icon: const Icon(Icons.file_download_outlined),
@@ -47,6 +55,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               }
             },
           ),
+          ],
         ],
       ),
       body: PagedList<OrderSummary>(
@@ -321,17 +330,29 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
     final mine = o.driverId != null && o.driverId == _me;
     final shipped = o.status == 'shipped';
     final driverAt = mine ? (tracker.lastPosition ?? o.tracking?.position) : o.tracking?.position;
+    final eta = o.tracking?.etaMinutes;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      // Out for delivery: where the driver is now (and the estimated arrival when the customer pinned their place)
+      if (shipped && !mine) ...[
+        if (driverAt == null)
+          Text(context.tr('track.waiting'), style: t.textTheme.bodyMedium?.copyWith(color: t.colorScheme.onSurfaceVariant))
+        else if (eta != null)
+          Text(context.tr('track.eta', {'n': eta}), style: t.textTheme.titleMedium?.copyWith(color: AlasColors.primary)),
+        const SizedBox(height: 6),
+      ],
+      if (o.pin != null || (shipped && driverAt != null))
+        DeliveryMap(destination: o.pin, driver: shipped ? driverAt : null, height: 220),
       if (o.pin != null) ...[
-        DeliveryMap(destination: o.pin, driver: shipped ? driverAt : null, height: 200),
         const SizedBox(height: 8),
         FilledButton.icon(
           onPressed: () => openDirections(o.pin!),
           icon: const Icon(Icons.directions),
           label: Text(context.tr('map.directions')),
         ),
-      ] else
+      ] else ...[
+        const SizedBox(height: 6),
         Text(context.tr('map.no_pin'), style: t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant)),
+      ],
       if (shipped) ...[
         const Divider(height: 20),
         Row(children: [

@@ -1028,3 +1028,40 @@ class DistributorContactTests(DistributorTests):
         self.assertEqual(theirs["distributor_name"], "Mleiha Dist")
         self.login(self.user)
         self.assertEqual(self.client.get("/api/v1/settings/").data["whatsapp"], store["whatsapp"])
+
+
+class LiveDeliveriesTests(DriverTests):
+    def test_live_map_is_scoped(self):
+        driver = self.add_driver(self.dist)
+        self.login(self.dist)
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "confirmed"}, format="json")
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "shipped", "driver_id": driver.id}, format="json")
+        self.login(driver)
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/location/", {"latitude": "33.5", "longitude": "36.3"}, format="json")
+        self.assertEqual(self.client.get("/api/v1/admin/orders/live/").status_code, 403)  # not for drivers
+        for who, expected in [(self.dist, {self.their_order}), (self.admin, {self.their_order}), (self.employee, set())]:
+            self.login(who)
+            rows = self.client.get("/api/v1/admin/orders/live/").data
+            self.assertEqual({r["id"] for r in rows}, expected)
+        self.login(self.dist)
+        row = self.client.get("/api/v1/admin/orders/live/").data[0]
+        self.assertEqual((row["driver_name"], row["tracking"]["latitude"]), ("Samer", 33.5))
+
+
+class PinLaterTests(Base):
+    def test_pinning_an_address_updates_its_open_orders(self):
+        self.login(self.user)
+        addr = self.client.post("/api/v1/addresses/", {"recipient_name": "B", "phone": "1", "area": "x", "details": "y"}, format="json").data
+        open_order = self.order([{"variant_id": self.v1.id, "quantity": 5}], address_id=addr["id"]).data["id"]
+        other = self.order([{"variant_id": self.v1.id, "quantity": 5}], address_details="Elsewhere").data["id"]
+        self.assertIsNone(Order.objects.get(pk=open_order).latitude)
+        self.client.patch(f"/api/v1/addresses/{addr['id']}/", {"latitude": "33.5", "longitude": "36.3"}, format="json")
+        self.assertEqual(float(Order.objects.get(pk=open_order).latitude), 33.5)
+        self.assertIsNone(Order.objects.get(pk=other).latitude)  # a different address is left alone
+
+    def test_a_map_pin_is_enough_without_written_address(self):
+        self.login(self.user)
+        r = self.order([{"variant_id": self.v1.id, "quantity": 5}], address_details="", latitude="33.5", longitude="36.3")
+        self.assertEqual(r.status_code, 201, r.data)
+        r = self.order([{"variant_id": self.v1.id, "quantity": 5}], address_details="")
+        self.assertEqual(r.data["code"], "address_required")

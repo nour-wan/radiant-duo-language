@@ -297,14 +297,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           validator: (v) => v == null ? context.tr('app.required') : null,
         ),
         const SizedBox(height: 12),
+        // The map pin is enough; the written address is only needed without one
+        PinField(value: _newPin, onChanged: (p) => setState(() => _newPin = p)),
+        const SizedBox(height: 12),
         TextFormField(
           controller: _details,
           maxLines: 2,
-          decoration: InputDecoration(labelText: context.tr('profile.address'), hintText: context.tr('profile.address_hint')),
-          validator: _required,
+          decoration: InputDecoration(
+            labelText: context.tr(_newPin == null ? 'profile.address' : 'addr.details_optional'),
+            hintText: context.tr('profile.address_hint'),
+          ),
+          validator: (v) => _newPin == null ? _required(v) : null,
         ),
-        const SizedBox(height: 12),
-        PinField(value: _newPin, onChanged: (p) => setState(() => _newPin = p)),
         CheckboxListTile(
           contentPadding: EdgeInsets.zero,
           value: _saveAddress,
