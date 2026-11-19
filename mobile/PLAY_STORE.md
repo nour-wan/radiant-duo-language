@@ -8,7 +8,7 @@
 | Category | Shopping |
 | Version | 1.0.0 (1) |
 | Contact email | info@alasfoodstuff.com |
-| Phone | +963965747889 |
+| Phone | +963980387705 |
 | Website | https://alasfoodstuff.com |
 | Privacy policy | https://api.alasfoodstuff.com/legal/privacy/ |
 | Account deletion URL | https://api.alasfoodstuff.com/legal/account-deletion/ |
@@ -32,7 +32,7 @@
 • إشعارات فورية بحالة طلبك وبالعروض.
 • واجهة عربية وإنجليزية مع وضع ليلي.
 
-للاستفسار: واتساب 963965747889+ أو info@alasfoodstuff.com
+للاستفسار: واتساب 963980387705+ أو info@alasfoodstuff.com
 
 ## Full description — English
 Alas for Foodstuff Trading — your partner for food ingredients and raw materials for factories, bakeries, restaurants, cafés and sweet shops — now in one app.
@@ -49,7 +49,7 @@ What you can do:
 • Instant notifications for order updates and offers.
 • Arabic and English interface with dark mode.
 
-Questions? WhatsApp +963965747889 or info@alasfoodstuff.com
+Questions? WhatsApp +963980387705 or info@alasfoodstuff.com
 
 ## الصور المطلوبة
 | العنصر | المواصفات | ملاحظة |

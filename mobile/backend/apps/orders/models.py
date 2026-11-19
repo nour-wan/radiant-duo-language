@@ -37,6 +37,10 @@ class Order(models.Model):
     # Map pin of the delivery address (copied from the address when the order is placed)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    # Distributor whose customer placed the order (copied from the customer); null = the store's own
+    distributor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="distributor_orders"
+    )
     # Staff member delivering the order and their last reported position (live tracking while shipped)
     driver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="deliveries")
     driver_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)

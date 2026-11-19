@@ -25,6 +25,7 @@ class PhoneField(serializers.CharField):
 
 CODE = r"^\d{6}$"
 
+
 PROFILE_FIELDS = ["full_name", "phone", "business_name", "business_type", "area_name", "address"]
 
 
@@ -35,12 +36,26 @@ class ProfileFieldsMixin(serializers.Serializer):
         queryset=DeliveryArea.objects.filter(is_active=True), required=False, allow_null=True
     )
     interests = serializers.PrimaryKeyRelatedField(queryset=Category.objects.filter(is_active=True), many=True, required=False)
+    # Optional: the code of the distributor the customer buys through (blank = the store itself)
+    distributor_code = serializers.CharField(max_length=12, required=False, allow_blank=True, write_only=True)
 
     def validate(self, data):
         data = super().validate(data)
         area = data.get("delivery_area")
         if area is not None:
             data["area_name"] = area.name_ar
+        code = data.pop("distributor_code", "").strip().upper()
+        if code:
+            distributor = User.objects.filter(
+                distributor_code=code, is_distributor=True, is_staff=True, is_active=True
+            ).first()
+            if distributor is None:
+                raise serializers.ValidationError({"distributor_code": "invalid_distributor_code"})
+            current = getattr(self, "instance", None)
+            if current is not None and current.distributor_id and current.distributor_id != distributor.pk:
+                # Moving to another distributor is the store owner's decision
+                raise serializers.ValidationError({"distributor_code": "distributor_locked"})
+            data["distributor"] = distributor
         return data
 
 
@@ -49,19 +64,29 @@ class UserSerializer(ProfileFieldsMixin, serializers.ModelSerializer):
     profile_complete = serializers.SerializerMethodField()
     show_statement = serializers.SerializerMethodField()
     is_owner = serializers.BooleanField(source="is_superuser", read_only=True)
+    # Customers: the distributor they buy through. Distributor accounts: their own code to share.
+    distributor_name = serializers.SerializerMethodField()
+    own_distributor_code = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
             "id", "email", "full_name", "phone", "phone_verified", "business_name", "business_type", "delivery_area",
             "area_name", "address", "interests", "language", "is_staff", "has_password", "profile_complete",
-            "credit_enabled", "show_statement", "is_owner", "date_joined",
+            "credit_enabled", "show_statement", "is_owner", "is_distributor", "distributor_name", "own_distributor_code",
+            "distributor_code", "date_joined",
         ]
         # The phone changes only through a WhatsApp code (me/phone/)
         read_only_fields = [
             "id", "email", "phone", "phone_verified", "is_staff", "has_password", "profile_complete", "credit_enabled",
-            "date_joined",
+            "is_distributor", "date_joined",
         ]
+
+    def get_distributor_name(self, obj):
+        return obj.distributor.display_name if obj.distributor_id else None
+
+    def get_own_distributor_code(self, obj):
+        return obj.distributor_code if obj.is_distributor else None
 
     def get_show_statement(self, obj):
         """Every customer sees their statement (fully paid / credit with us / amount due).

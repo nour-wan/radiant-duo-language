@@ -120,7 +120,7 @@ We may update these terms; continued use of the app means you accept the updated
 - بعد التحقق من الطلب نوفر لك أحد الخيارات: استبدال المنتج، أو رصيداً لطلبك القادم، أو استرداد المبلغ نقداً خلال 14 يوماً.
 - الطلبات الملغاة قبل الشحن لا يترتب عليها أي التزام، لأن الدفع يتم عند الاستلام.
 ## التواصل
-للإبلاغ عن مشكلة: من صفحة «تواصل معنا» في التطبيق، أو واتساب +963965747889، أو info@alasfoodstuff.com""",
+للإبلاغ عن مشكلة: من صفحة «تواصل معنا» في التطبيق، أو واتساب +963980387705، أو info@alasfoodstuff.com""",
         "body_en": """We want your order to arrive intact and correct. Because these are food products, returns are subject to the following conditions.
 ## Inspection on delivery
 - Please inspect goods in the presence of the courier. You may refuse any damaged, opened or incorrect package at no cost.
@@ -136,7 +136,7 @@ We may update these terms; continued use of the app means you accept the updated
 - After verification we offer one of: a replacement, credit toward your next order, or a cash refund within 14 days.
 - Orders cancelled before shipping carry no obligation, since payment is made on delivery.
 ## Contact
-To report an issue: the Contact page in the app, WhatsApp +963965747889, or info@alasfoodstuff.com""",
+To report an issue: the Contact page in the app, WhatsApp +963980387705, or info@alasfoodstuff.com""",
     },
     "account-deletion": {
         "title_ar": "حذف الحساب",
@@ -147,7 +147,7 @@ To report an issue: the Contact page in the app, WhatsApp +963965747889, or info
 - اذهب إلى: الملف الشخصي ← حذف الحساب.
 - أكّد الحذف (وأدخل كلمة المرور إن طُلبت).
 ## دون التطبيق
-أرسل طلب حذف من رقمك المسجّل على واتساب +963965747889، أو إلى info@alasfoodstuff.com، بعنوان «حذف الحساب»، وسننفذ الطلب خلال 7 أيام.
+أرسل طلب حذف من رقمك المسجّل على واتساب +963980387705، أو إلى info@alasfoodstuff.com، بعنوان «حذف الحساب»، وسننفذ الطلب خلال 7 أيام.
 ## ما الذي يُحذف
 - الاسم، البريد الإلكتروني، الهاتف، اسم المنشأة وطبيعتها، المنطقة، العناوين، الأصناف المفضلة، المفضلة، الإشعارات، ورموز الأجهزة: تُحذف نهائياً وفوراً.
 - سجلات الطلبات السابقة وحركات كشف الحساب تبقى لأغراض محاسبية وقانونية بعد إزالة كل ما يعرّف بك.
@@ -158,7 +158,7 @@ To report an issue: the Contact page in the app, WhatsApp +963965747889, or info
 - Go to: Profile → Delete account.
 - Confirm (and enter your password if asked).
 ## Without the app
-Send "Delete account" on WhatsApp from your registered number to +963965747889, or email info@alasfoodstuff.com; we will complete the request within 7 days.
+Send "Delete account" on WhatsApp from your registered number to +963980387705, or email info@alasfoodstuff.com; we will complete the request within 7 days.
 ## What is deleted
 - Name, email, phone, business name and type, area, addresses, preferred categories, favorites, notifications and device tokens are permanently deleted immediately.
 - Past order records and account statement entries are kept for accounting and legal purposes with all identifying details removed.

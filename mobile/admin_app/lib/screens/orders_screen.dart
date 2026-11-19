@@ -87,6 +87,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     Text(o.businessName.isNotEmpty ? '${o.businessName} · ${o.customerName}' : o.customerName, style: t.textTheme.bodyMedium),
                     Text('${formatDateTime(o.createdAt, lang)} · ${o.itemCount} ×',
                         style: t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant)),
+                    if (o.distributorName != null && context.read<AdminSession>().isOwner)
+                      Text(context.tr('dist.via', {'n': o.distributorName}), style: t.textTheme.bodySmall?.copyWith(color: AlasColors.warning)),
                   ]),
                 ),
                 Text(money(o.total), style: t.textTheme.titleMedium?.copyWith(fontFamily: 'packages/alas_shared/Manrope')),
@@ -315,6 +317,11 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                       const Spacer(),
                       Text(formatDateTime(o.createdAt, lang), style: t.textTheme.bodySmall),
                     ]),
+                    if (o.distributorName != null && context.read<AdminSession>().isOwner)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6),
+                        child: Text(context.tr('dist.via', {'n': o.distributorName}), style: t.textTheme.bodyMedium?.copyWith(color: AlasColors.warning)),
+                      ),
                     const SizedBox(height: 12),
                     if (o.allowedStatuses.isNotEmpty)
                       FormCard(title: context.tr('order.change_status'), children: [
@@ -382,7 +389,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                       if (o.discount > 0) _row(context, '${context.tr('order.coupon')} (${o.couponCode})', '- ${money(o.discount)}'),
                       if (o.appDiscount > 0) _row(context, '${context.tr('app_discount')} (${o.appDiscountPercent.toStringAsFixed(0)}%)', '- ${money(o.appDiscount)}'),
                       _row(context, context.tr('order.total'), money(o.total), bold: true),
-                      if (o.totalUsd != null && o.exchangeRate != null)
+                      if (o.totalUsd != null && o.exchangeRate != null && !context.read<AdminSession>().isDistributor)
                         Align(
                           alignment: AlignmentDirectional.centerEnd,
                           child: Text(context.tr('rate.usd_total', {'usd': usd(o.totalUsd), 'rate': money(o.exchangeRate)}),

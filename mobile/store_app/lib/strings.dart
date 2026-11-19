@@ -7,6 +7,9 @@ const storeStrings = <String, List<String>>{
   // Onboarding
   'app.sounds': ['صوت فتح التطبيق', 'Opening sound'],
   'app.sounds_hint': ['ما بيطلع إذا الموبايل على الصامت', 'Silent when the phone is on silent'],
+  'profile.distributor_code': ['كود الموزّع (اختياري)', 'Distributor code (optional)'],
+  'profile.distributor_code_hint': ['إذا عطاك موزّع كود، اكتبه هون حتى توصلك طلباتك عن طريقه', 'If a distributor gave you a code, enter it so your orders go through them'],
+  'profile.distributor': ['موزّعك', 'Your distributor'],
   'ob.skip': ['تخطي', 'Skip'],
   'ob.next': ['التالي', 'Next'],
   'ob.start': ['ابدأ التسوق', 'Start shopping'],

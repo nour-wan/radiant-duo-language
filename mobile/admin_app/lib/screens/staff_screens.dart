@@ -56,13 +56,33 @@ class _StaffScreenState extends State<StaffScreen> {
     final name = TextEditingController(text: who?['full_name'] as String? ?? '');
     final phone = TextEditingController(text: who?['phone'] as String? ?? '');
     final password = TextEditingController();
+    final code = TextEditingController(text: who?['distributor_code'] as String? ?? '');
     final isNew = who == null;
+    var distributor = who?['is_distributor'] == true;
     return showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) => AlertDialog(
         title: Text(ctx.tr(isNew ? 'staff.add' : 'app.edit')),
         content: SingleChildScrollView(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
+            // Employee: the store's team. Distributor: a partner who sees only their own customers.
+            if (isNew) ...[
+              SegmentedButton<bool>(
+                segments: [
+                  ButtonSegment(value: false, label: Text(ctx.tr('staff.role_employee')), icon: const Icon(Icons.badge_outlined)),
+                  ButtonSegment(value: true, label: Text(ctx.tr('staff.role_distributor')), icon: const Icon(Icons.handshake_outlined)),
+                ],
+                selected: {distributor},
+                onSelectionChanged: (s) => setState(() => distributor = s.first),
+              ),
+              if (distributor)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(ctx.tr('dist.explain'), style: Theme.of(ctx).textTheme.bodySmall),
+                ),
+              const SizedBox(height: 8),
+            ],
             TextField(controller: name, decoration: InputDecoration(labelText: ctx.tr('staff.name'))),
             const SizedBox(height: 8),
             TextField(
@@ -81,6 +101,15 @@ class _StaffScreenState extends State<StaffScreen> {
                 helperMaxLines: 2,
               ),
             ),
+            if (distributor) ...[
+              const SizedBox(height: 8),
+              TextField(
+                controller: code,
+                textCapitalization: TextCapitalization.characters,
+                textDirection: TextDirection.ltr,
+                decoration: InputDecoration(labelText: ctx.tr('dist.code'), helperText: ctx.tr('dist.code_auto'), helperMaxLines: 2),
+              ),
+            ],
           ]),
         ),
         actions: [
@@ -90,10 +119,13 @@ class _StaffScreenState extends State<StaffScreen> {
               'full_name': name.text.trim(),
               'phone': phone.text.trim(),
               if (password.text.isNotEmpty) 'password': password.text,
+              if (isNew) 'is_distributor': distributor,
+              if (distributor && code.text.trim().isNotEmpty) 'distributor_code': code.text.trim().toUpperCase(),
             }),
             child: Text(ctx.tr('app.save')),
           ),
         ],
+      ),
       ),
     );
   }
@@ -141,7 +173,9 @@ class _StaffScreenState extends State<StaffScreen> {
                         child: ListTile(
                           leading: CircleAvatar(
                             backgroundColor: w['is_active'] == true ? t.colorScheme.primaryContainer : t.colorScheme.surfaceContainerHighest,
-                            child: Icon(w['is_owner'] == true ? Icons.workspace_premium_outlined : Icons.badge_outlined),
+                            child: Icon(w['is_owner'] == true
+                                ? Icons.workspace_premium_outlined
+                                : (w['is_distributor'] == true ? Icons.handshake_outlined : Icons.badge_outlined)),
                           ),
                           title: Text(
                             [
@@ -155,6 +189,12 @@ class _StaffScreenState extends State<StaffScreen> {
                             ),
                           ),
                           subtitle: Text([
+                            if (w['is_distributor'] == true)
+                              context.tr('dist.summary', {
+                                'c': w['distributor_code'] ?? '',
+                                'n': w['customer_count'] ?? 0,
+                                's': money(toMoney(w['month_sales'])),
+                              }),
                             if ((w['phone'] as String?)?.isNotEmpty == true) '‎${w['phone']}',
                             w['last_login'] == null
                                 ? context.tr('staff.never')

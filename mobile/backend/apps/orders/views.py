@@ -59,6 +59,7 @@ class OrderListCreateView(generics.ListAPIView):
             "street": data.get("street", ""),
             "address_details": data.get("address_details", ""),
             "notes": data.get("notes", ""),
+            "distributor": user.distributor if user.distributor_id else None,
             "latitude": data.get("latitude") if data.get("longitude") is not None else None,
             "longitude": data.get("longitude") if data.get("latitude") is not None else None,
         }

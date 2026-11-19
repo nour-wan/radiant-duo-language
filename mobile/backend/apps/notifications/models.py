@@ -43,6 +43,8 @@ class AdminNotification(models.Model):
     body_ar = models.CharField(max_length=500, blank=True)
     body_en = models.CharField(max_length=500, blank=True)
     data = models.JSONField(default=dict, blank=True)
+    # Alerts about a distributor's customers go to that distributor (and the owner); null = the store's team
+    distributor = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)
 
     class Meta:

@@ -28,6 +28,8 @@ class L10n {
     if (code == 'invalid' && error is ApiException) {
       final field = _table[lang]?['err.${error.message}'];
       if (field != null) return field;
+      // A sentence the server already wrote in the app's language (e.g. Django's password rules)
+      if (error.message.contains(' ')) return error.message;
     }
     return _table[lang]?['err.$code'] ?? get(lang, 'err.unknown');
   }
@@ -159,6 +161,14 @@ const sharedStrings = <String, List<String>>{
   'err.invalid_amount': ['أدخل مبلغاً صحيحاً.', 'Enter a valid amount.'],
   'err.note_required': ['اكتب سبب التصحيح.', 'Enter the reason for the adjustment.'],
   'err.invalid_order': ['لا يمكن تسجيل دفعة على هذا الطلب.', 'A payment cannot be recorded on this order.'],
+  'err.password_too_short': ['كلمة المرور قصيرة: لازم تكون 8 أحرف أو أكثر.', 'The password is too short: at least 8 characters.'],
+  'err.password_too_common': ['كلمة المرور سهلة ومعروفة كتير (متل 12345678). اختار وحدة أصعب.', 'This password is too common (like 12345678). Choose a harder one.'],
+  'err.password_entirely_numeric': ['كلمة المرور ما لازم تكون أرقام بس. ضيف أحرف (مثلاً Alas2026).', 'The password can\'t be only numbers. Add letters (e.g. Alas2026).'],
+  'err.password_too_similar': ['كلمة المرور شبه كتير لاسم الحساب أو رقمه.', 'The password is too similar to the account name or number.'],
+  'err.invalid_distributor_code': ['كود الموزّع غير صحيح.', 'Distributor code not found.'],
+  'err.distributor_code_taken': ['هذا الكود مستخدم لموزّع آخر.', 'This code is already used by another distributor.'],
+  'err.distributor_locked': ['حسابك مرتبط بموزّع. لتغييره تواصل معنا.', 'Your account is linked to a distributor. Contact us to change it.'],
+  'err.not_allowed': ['هذا القسم غير متاح لحسابك.', 'This section is not available for your account.'],
   'err.invalid_location': ['الموقع غير صحيح.', 'Invalid location.'],
   'err.not_out_for_delivery': ['الطلب مو بالتوصيل حالياً.', 'This order is not out for delivery.'],
   'map.pick_title': ['حدد موقعك على الخريطة', 'Pin your location'],

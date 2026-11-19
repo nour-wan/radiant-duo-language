@@ -71,6 +71,14 @@ class User(AbstractUser):
     # Buying on credit is off until an admin turns it on for this customer; until then the
     # customer sees nothing about debt or limits.
     credit_enabled = models.BooleanField(default=False)
+    # Distributors: partner accounts in the admin app that see only their own customers. A customer
+    # belongs to a distributor when they enter the distributor's code, or when the distributor adds them.
+    is_distributor = models.BooleanField(default=False)
+    distributor_code = models.CharField(max_length=12, unique=True, null=True, blank=True)
+    distributor = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, null=True, blank=True, related_name="distributor_customers",
+        limit_choices_to={"is_distributor": True},
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

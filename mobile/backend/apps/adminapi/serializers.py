@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import transaction
 from rest_framework import serializers
 
-from apps.accounts.models import User
+from apps.accounts.models import BUSINESS_TYPES, User
 from apps.catalog.models import Category, Product, Variant
 from apps.catalog.serializers import ImageSerializer
 from apps.core.images import absolute_media_url
@@ -129,8 +129,13 @@ class AdminOrderListSerializer(serializers.ModelSerializer):
         model = Order
         fields = [
             "id", "number", "status", "delivery_method", "customer_name", "business_name", "customer_phone", "city", "total",
-            "total_usd", "exchange_rate", "item_count", "created_at",
+            "total_usd", "exchange_rate", "item_count", "distributor_name", "created_at",
         ]
+
+    distributor_name = serializers.SerializerMethodField()
+
+    def get_distributor_name(self, obj):
+        return obj.distributor.display_name if obj.distributor_id else None
 
 
 class AdminOrderEventSerializer(serializers.Serializer):
@@ -162,8 +167,13 @@ class AdminOrderDetailSerializer(OrderDetailSerializer):
     class Meta(OrderDetailSerializer.Meta):
         fields = OrderDetailSerializer.Meta.fields + [
             "customer_email", "user_id", "admin_note", "customer_deleted", "allowed_statuses", "payments",
-            "exchange_rate", "total_usd", "driver_id", "driver_name",
+            "exchange_rate", "total_usd", "driver_id", "driver_name", "distributor_name",
         ]
+
+    distributor_name = serializers.SerializerMethodField()
+
+    def get_distributor_name(self, obj):
+        return obj.distributor.display_name if obj.distributor_id else None
 
     def get_driver_name(self, obj):
         return obj.driver.display_name if obj.driver_id else None
@@ -195,13 +205,21 @@ class AdminCustomerSerializer(serializers.ModelSerializer):
     last_order_at = serializers.DateTimeField(read_only=True, default=None)
     balance = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True, default=0)
     interests = serializers.SerializerMethodField()
+    # Owner only (checked in the view): move the customer to a distributor, or back to the store (null)
+    distributor = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(is_distributor=True, is_staff=True), required=False, allow_null=True
+    )
+    distributor_name = serializers.SerializerMethodField()
+
+    def get_distributor_name(self, obj):
+        return obj.distributor.display_name if obj.distributor_id else None
 
     class Meta:
         model = User
         fields = [
             "id", "email", "full_name", "phone", "phone_verified", "business_name", "business_type", "area_name",
             "address", "interests", "language", "is_active", "date_joined", "last_login", "order_count", "total_spent",
-            "last_order_at", "balance", "credit_enabled", "credit_limit",
+            "last_order_at", "balance", "credit_enabled", "credit_limit", "distributor", "distributor_name",
         ]
         read_only_fields = [
             "email", "full_name", "phone", "phone_verified", "business_name", "business_type", "area_name", "address",
@@ -210,6 +228,55 @@ class AdminCustomerSerializer(serializers.ModelSerializer):
 
     def get_interests(self, obj):
         return [{"id": c.id, "name_ar": c.name_ar, "name_en": c.name_en} for c in obj.interests.all()]
+
+
+class AdminCustomerCreateSerializer(serializers.Serializer):
+    """An employee or distributor adds a customer. The customer signs in later with
+    "Forgot password" (a WhatsApp code to their number) and sets their own password."""
+
+    full_name = serializers.CharField(max_length=150)
+    phone = serializers.CharField(max_length=32)
+    business_name = serializers.CharField(max_length=150)
+    business_type = serializers.ChoiceField(choices=[c for c, _ in BUSINESS_TYPES], required=False, allow_blank=True)
+    delivery_area = serializers.PrimaryKeyRelatedField(queryset=DeliveryArea.objects.filter(is_active=True), required=False, allow_null=True)
+    area_name = serializers.CharField(max_length=100, required=False, allow_blank=True)
+    address = serializers.CharField(max_length=300, required=False, allow_blank=True)
+    # Owner only: add straight to a distributor
+    distributor = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(is_distributor=True, is_staff=True), required=False, allow_null=True
+    )
+
+    def validate_phone(self, value):
+        from apps.accounts.phone import normalize_phone
+
+        phone = normalize_phone(value)
+        if not phone:
+            raise serializers.ValidationError("invalid_phone")
+        if User.objects.filter(phone=phone).exists():
+            raise serializers.ValidationError("phone_taken")
+        return phone
+
+    def validate(self, data):
+        area = data.get("delivery_area")
+        if area is not None:
+            data["area_name"] = area.name_ar
+        if not data.get("area_name", "").strip():
+            raise serializers.ValidationError({"area_name": "required"})
+        return data
+
+    @transaction.atomic
+    def create(self, data):
+        from apps.accounts.serializers import create_default_address
+        from apps.core.permissions import is_distributor
+
+        by = self.context["request"].user
+        if is_distributor(by):
+            data["distributor"] = by  # a distributor's customers are always their own
+        elif not by.is_superuser:
+            data.pop("distributor", None)  # employees add the store's own customers
+        user = User.objects.create_user(**data)  # no password yet
+        create_default_address(user)
+        return user
 
 
 class AdminAreaSerializer(serializers.ModelSerializer):
@@ -370,11 +437,49 @@ class StaffSerializer(serializers.ModelSerializer):
     is_owner = serializers.BooleanField(source="is_superuser", read_only=True)
     phone = serializers.CharField(max_length=32, required=False, allow_blank=True)
     password = serializers.CharField(write_only=True, required=False)
+    # A distributor is a partner: sees only their own customers (fixed when the account is created)
+    is_distributor = serializers.BooleanField(required=False)
+    distributor_code = serializers.CharField(max_length=12, required=False, allow_blank=True, allow_null=True)
+    customer_count = serializers.SerializerMethodField()
+    month_sales = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ["id", "full_name", "phone", "email", "is_owner", "is_active", "last_login", "date_joined", "password"]
+        fields = [
+            "id", "full_name", "phone", "email", "is_owner", "is_active", "last_login", "date_joined", "password",
+            "is_distributor", "distributor_code", "customer_count", "month_sales",
+        ]
         read_only_fields = ["id", "email", "is_owner", "last_login", "date_joined"]
+
+    def get_customer_count(self, obj):
+        return obj.distributor_customers.count() if obj.is_distributor else None
+
+    def get_month_sales(self, obj):
+        if not obj.is_distributor:
+            return None
+        from django.db.models import Sum
+        from django.utils import timezone
+
+        start = timezone.localtime().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        total = Order.objects.filter(
+            distributor=obj, created_at__gte=start, status__in=[Order.PENDING, Order.CONFIRMED, Order.SHIPPED, Order.DELIVERED]
+        ).aggregate(t=Sum("total"))["t"]
+        return str(total or 0)
+
+    def validate_distributor_code(self, value):
+        import re
+
+        code = (value or "").strip().upper()
+        if not code:
+            return None
+        if not re.fullmatch(r"[A-Z0-9]{3,12}", code):
+            raise serializers.ValidationError("invalid_distributor_code")
+        others = User.objects.filter(distributor_code=code)
+        if self.instance is not None:
+            others = others.exclude(pk=self.instance.pk)
+        if others.exists():
+            raise serializers.ValidationError("distributor_code_taken")
+        return code
 
     def validate_phone(self, value):
         from apps.accounts.phone import normalize_phone
@@ -407,15 +512,26 @@ class StaffSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"password": "required"})
         elif self.instance.is_superuser and data.get("is_active") is False:
             raise serializers.ValidationError({"is_active": "owner_cannot_be_disabled"})
+        if self.instance is not None:
+            data.pop("is_distributor", None)  # an employee can't become a distributor or the other way round
+            if not self.instance.is_distributor:
+                data.pop("distributor_code", None)
         return data
 
     def create(self, data):
-        return User.objects.create_user(
+        distributor = bool(data.get("is_distributor"))
+        user = User.objects.create_user(
             phone=data["phone"], password=data["password"], full_name=data["full_name"].strip(),
-            is_staff=True, phone_verified=True,
+            is_staff=True, phone_verified=True, is_distributor=distributor,
         )
+        if distributor:
+            user.distributor_code = data.get("distributor_code") or _new_distributor_code()
+            user.save(update_fields=["distributor_code"])
+        return user
 
     def update(self, user, data):
+        if user.is_distributor and "distributor_code" in data and not data["distributor_code"]:
+            data.pop("distributor_code")  # a distributor always keeps a code
         password = data.pop("password", None)
         for k, v in data.items():
             setattr(user, k, v)
@@ -423,3 +539,14 @@ class StaffSerializer(serializers.ModelSerializer):
             user.set_password(password)
         user.save()
         return user
+
+
+def _new_distributor_code():
+    """A short code customers type to buy through this distributor, e.g. D4K7Q."""
+    import secrets
+
+    alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"  # no 0/O or 1/I to avoid typos
+    while True:
+        code = "D" + "".join(secrets.choice(alphabet) for _ in range(4))
+        if not User.objects.filter(distributor_code=code).exists():
+            return code

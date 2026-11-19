@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../services/admin_api.dart';
+import '../state/admin_session.dart';
 import '../widgets/admin_widgets.dart';
 import 'dashboard_screen.dart';
 
@@ -82,7 +83,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               crossAxisSpacing: 8,
               children: [
                 _Kpi(context.tr('report.sales'), money(r.totalSales)),
-                _Kpi(context.tr('report.sales_usd'), usd(r.totalSalesUsd)),
+                if (!context.read<AdminSession>().isDistributor) _Kpi(context.tr('report.sales_usd'), usd(r.totalSalesUsd)),
                 _Kpi(context.tr('report.orders'), '${r.totalOrders}'),
                 _Kpi(context.tr('report.avg'), money(r.averageOrder)),
                 _Kpi(context.tr('report.discounts'), money(r.totalDiscount)),

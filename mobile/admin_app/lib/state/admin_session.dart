@@ -11,6 +11,9 @@ class AdminSession extends ChangeNotifier {
   bool get loggedIn => user != null;
   bool get isOwner => user?.isOwner ?? false;
 
+  /// Partner account: only its own customers, their orders and its own sales.
+  bool get isDistributor => !isOwner && (user?.isDistributor ?? false);
+
   Future<void> restore() async {
     await client.tokens.load();
     if (!client.tokens.hasSession) return;

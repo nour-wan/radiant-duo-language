@@ -77,11 +77,22 @@ def broadcast(title_ar, title_en, body_ar="", body_en="", kind="offer", data=Non
     return campaign
 
 
-def _notify_admins(title_ar, title_en, body_ar, body_en, data):
-    # Kept in the admin inbox too, so a dismissed push can still be found in the app.
+def _notify_admins(title_ar, title_en, body_ar, body_en, data, distributor=None):
+    """Kept in the admin inbox too, so a dismissed push can still be found in the app. Alerts about a
+    distributor's customer go to that distributor and the owner; everything else to the store's team
+    (never to distributors)."""
+    from django.db.models import Q
+
     data = {"kind": "admin_order", **data}
-    n = AdminNotification.objects.create(title_ar=title_ar, title_en=title_en, body_ar=body_ar, body_en=body_en, data=data)
-    tokens = list(DeviceToken.objects.filter(app=DeviceToken.ADMIN, user__is_staff=True, user__is_active=True))
+    n = AdminNotification.objects.create(
+        title_ar=title_ar, title_en=title_en, body_ar=body_ar, body_en=body_en, data=data, distributor=distributor
+    )
+    staff = DeviceToken.objects.filter(app=DeviceToken.ADMIN, user__is_staff=True, user__is_active=True)
+    if distributor is not None:
+        staff = staff.filter(Q(user=distributor) | Q(user__is_superuser=True))
+    else:
+        staff = staff.filter(Q(user__is_distributor=False) | Q(user__is_superuser=True))
+    tokens = list(staff)
     fcm.send_localized_async(
         tokens, {"ar": (title_ar, body_ar), "en": (title_en, body_en)}, {**data, "admin_notification_id": n.id}
     )
@@ -102,6 +113,7 @@ def order_placed(order):
         f"{order.number} — {who} — {fx.fmt(order.total, 'ar')}",
         f"{order.number} — {who} — {fx.fmt(order.total, 'en')}",
         data,
+        distributor=order.distributor,
     )
     try:
         lines = "\n".join(f"- {i.product_name_ar} / {i.variant_label_ar} × {i.quantity} = {fx.fmt(i.line_total)}" for i in order.items.all())
@@ -141,6 +153,7 @@ def order_cancelled_by_customer(order):
     _notify_admins(
         "ألغى عميل طلبه", "Customer cancelled an order",
         order.number, order.number, {"order_id": order.id, "number": order.number},
+        distributor=order.distributor,
     )
 
 

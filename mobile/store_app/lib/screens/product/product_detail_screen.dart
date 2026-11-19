@@ -65,7 +65,7 @@ class _ProductBodyState extends State<_ProductBody> {
   }
 
   Future<void> _whatsapp() async {
-    final settings = await context.read<StoreApi>().settings().catchError((_) => StoreInfo.fromJson({'whatsapp': '+963965747889'}));
+    final settings = await context.read<StoreApi>().settings().catchError((_) => StoreInfo.fromJson({'whatsapp': '+963980387705'}));
     final number = settings.whatsapp.replaceAll(RegExp(r'[^0-9]'), '');
     if (!mounted) return;
     final text = Uri.encodeComponent('${widget.product.name(context.lang)} — ${_variant?.label(context.lang) ?? ''}');

@@ -1,6 +1,7 @@
 import 'package:alas_shared/alas_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'statement_screen.dart';
 
 import '../services/admin_api.dart';
@@ -21,6 +22,7 @@ class MoreScreen extends StatelessWidget {
     final settings = context.watch<AppSettings>();
     final session = context.watch<AdminSession>();
     final owner = session.isOwner;
+    final distributor = session.isDistributor;
     void open(Widget w) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
     Widget tile(IconData i, String key, Widget page) =>
         ListTile(leading: Icon(i), title: Text(context.tr(key)), trailing: const Icon(Icons.chevron_right), onTap: () => open(page));
@@ -29,11 +31,16 @@ class MoreScreen extends StatelessWidget {
       body: ListView(padding: const EdgeInsets.all(12), children: [
         Card(
           child: ListTile(
-            leading: CircleAvatar(child: Icon(owner ? Icons.workspace_premium_outlined : Icons.badge_outlined)),
+            leading: CircleAvatar(
+                child: Icon(owner ? Icons.workspace_premium_outlined : (distributor ? Icons.handshake_outlined : Icons.badge_outlined))),
             title: Text(session.user?.displayName ?? ''),
-            subtitle: Text(context.tr(owner ? 'staff.role_owner' : 'staff.role_employee')),
+            subtitle: Text(context.tr(owner ? 'staff.role_owner' : (distributor ? 'staff.role_distributor' : 'staff.role_employee'))),
           ),
         ),
+        if (distributor && (session.user?.ownDistributorCode ?? '').isNotEmpty) ...[
+          const SizedBox(height: 8),
+          _DistributorCodeCard(code: session.user!.ownDistributorCode!),
+        ],
         const SizedBox(height: 12),
         if (owner) ...[
           Card(
@@ -45,6 +52,15 @@ class MoreScreen extends StatelessWidget {
           ),
           const SizedBox(height: 12),
         ],
+        if (distributor) ...[
+          Card(
+            child: Column(children: [
+              tile(Icons.bar_chart, 'more.reports', const ReportsScreen()),
+              tile(Icons.account_balance_wallet_outlined, 'more.receivables', const ReceivablesScreen()),
+            ]),
+          ),
+          const SizedBox(height: 12),
+        ] else ...[
         Card(
           child: Column(children: [
             tile(Icons.category_outlined, 'more.categories', const CategoriesScreen()),
@@ -65,6 +81,7 @@ class MoreScreen extends StatelessWidget {
           ]),
         ),
         const SizedBox(height: 12),
+        ],
         Card(
           child: Column(children: [
             ListTile(
@@ -353,4 +370,37 @@ class _LegalEditorState extends State<_LegalEditor> {
           ),
         ]),
       );
+}
+
+
+/// A distributor's code, to give to customers they find: entered in the store app, it links the
+/// customer to this distributor so their orders come here.
+class _DistributorCodeCard extends StatelessWidget {
+  const _DistributorCodeCard({required this.code});
+
+  final String code;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context);
+    return Card(
+      color: t.colorScheme.primaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(children: [
+          Text(context.tr('dist.my_code'), style: t.textTheme.titleSmall),
+          const SizedBox(height: 6),
+          SelectableText(code, style: t.textTheme.headlineMedium?.copyWith(fontFamily: 'packages/alas_shared/Manrope', letterSpacing: 4, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 4),
+          Text(context.tr('dist.code_hint'), textAlign: TextAlign.center, style: t.textTheme.bodySmall),
+          const SizedBox(height: 10),
+          FilledButton.icon(
+            onPressed: () => SharePlus.instance.share(ShareParams(text: context.tr('dist.share_text', {'c': code}))),
+            icon: const Icon(Icons.share),
+            label: Text(context.tr('dist.share')),
+          ),
+        ]),
+      ),
+    );
+  }
 }

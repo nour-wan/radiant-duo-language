@@ -828,3 +828,124 @@ class DeliveryTrackingTests(Base):
         self.ship(self.driver)
         self.assertEqual(self.report(self.driver, lat="abc").status_code, 400)
         self.assertEqual(self.report(self.driver, lat="91").status_code, 400)
+
+
+class DistributorTests(Base):
+    """A distributor (partner) sees only their own customers, orders and sales; employees don't see theirs."""
+
+    def setUp(self):
+        super().setUp()
+        self.login(self.admin)
+        r = self.client.post("/api/v1/admin/staff/", {
+            "full_name": "Mleiha Dist", "phone": "0933777888", "password": "D1str-pass!", "is_distributor": True,
+        }, format="json")
+        self.assertEqual(r.status_code, 201, r.data)
+        self.dist = User.objects.get(pk=r.data["id"])
+        self.code = r.data["distributor_code"]
+        self.assertTrue(self.code)
+        self.employee = User.objects.create_user("emp@alasfoodstuff.com", "Empl0yee-pass!", full_name="Emp", is_staff=True)
+        # One of the store's own orders, and one from a customer who uses the distributor's code
+        self.login(self.user)
+        self.own_order = self.order([{"variant_id": self.v1.id, "quantity": 5}]).data["id"]
+        self.theirs = User.objects.create_user("c2@example.com", "Str0ng-pass!", full_name="Dist Customer", phone="0955111222")
+        self.login(self.theirs)
+        r = self.client.patch("/api/v1/me/", {"distributor_code": self.code.lower()}, format="json")
+        self.assertEqual(r.status_code, 200, r.data)
+        self.assertEqual(r.data["distributor_name"], "Mleiha Dist")
+        with self.captureOnCommitCallbacks(execute=True):  # runs the new-order alerts
+            self.their_order = self.order([{"variant_id": self.v1.id, "quantity": 6}]).data["id"]
+
+    def ids(self, path, user):
+        self.login(user)
+        r = self.client.get(path)
+        self.assertEqual(r.status_code, 200, r.data)
+        return {row["id"] for row in r.data["results"]}
+
+    def test_each_side_sees_only_its_own(self):
+        self.assertEqual(Order.objects.get(pk=self.their_order).distributor, self.dist)
+        self.assertEqual(self.ids("/api/v1/admin/orders/", self.dist), {self.their_order})
+        self.assertEqual(self.ids("/api/v1/admin/orders/", self.employee), {self.own_order})
+        self.assertEqual(self.ids("/api/v1/admin/orders/", self.admin), {self.own_order, self.their_order})
+        self.assertEqual(self.ids("/api/v1/admin/customers/", self.dist), {self.theirs.id})
+        self.assertEqual(self.ids("/api/v1/admin/customers/", self.employee), {self.user.id})
+        self.login(self.dist)
+        self.assertEqual(self.client.get(f"/api/v1/admin/orders/{self.own_order}/").status_code, 404)
+        self.assertEqual(self.client.get(f"/api/v1/admin/customers/{self.user.id}/statement/").status_code, 404)
+        self.assertEqual(self.client.post(f"/api/v1/admin/orders/{self.own_order}/status/", {"status": "confirmed"}, format="json").status_code, 404)
+        self.login(self.employee)
+        self.assertEqual(self.client.get(f"/api/v1/admin/orders/{self.their_order}/").status_code, 404)
+
+    def test_dashboard_and_reports_are_scoped(self):
+        self.login(self.dist)
+        d = self.client.get("/api/v1/admin/dashboard/").data
+        theirs = Order.objects.get(pk=self.their_order).total
+        self.assertEqual((d["customers"], d["pending_orders"]), (1, 1))
+        self.assertEqual(Decimal(d["today"]["sales"]), theirs)
+        r = self.client.get("/api/v1/admin/reports/").data
+        self.assertEqual(Decimal(r["totals"]["sales"]), theirs)
+        self.login(self.employee)
+        d = self.client.get("/api/v1/admin/dashboard/").data
+        self.assertEqual(Decimal(d["today"]["sales"]), Order.objects.get(pk=self.own_order).total)
+
+    def test_distributor_is_shut_out_of_everything_else(self):
+        self.login(self.dist)
+        for path in ["/api/v1/admin/coupons/", "/api/v1/admin/banners/", "/api/v1/admin/notifications/", "/api/v1/admin/staff/",
+                     "/api/v1/admin/settings/", "/api/v1/admin/collections/", "/api/v1/admin/audit/", "/api/v1/admin/whatsapp/",
+                     "/api/v1/admin/legal/"]:
+            self.assertEqual(self.client.get(path).status_code, 403, path)
+        # Products, categories and areas: read only
+        self.assertEqual(self.client.get("/api/v1/admin/products/").status_code, 200)
+        self.assertEqual(self.client.patch(f"/api/v1/admin/products/{self.product.id}/", {"name_ar": "x"}, format="json").status_code, 403)
+        self.assertEqual(self.client.post("/api/v1/admin/categories/", {"name_ar": "x", "name_en": "x"}, format="json").status_code, 403)
+        self.assertEqual(self.client.get("/api/v1/admin/zones/").status_code, 200)
+
+    def test_distributor_adds_customers_but_cannot_disable_or_move_them(self):
+        self.login(self.dist)
+        r = self.client.post("/api/v1/admin/customers/", {
+            "full_name": "New Shop", "phone": "0955333444", "business_name": "Shop", "delivery_area": self.qudsaya.id,
+            "address": "Main street",
+        }, format="json")
+        self.assertEqual(r.status_code, 201, r.data)
+        new = User.objects.get(pk=r.data["id"])
+        self.assertEqual(new.distributor, self.dist)
+        self.assertFalse(new.has_usable_password())
+        self.assertEqual(new.addresses.count(), 1)
+        self.assertEqual(self.client.patch(f"/api/v1/admin/customers/{new.id}/", {"is_active": False}, format="json").status_code, 403)
+        self.assertEqual(self.client.patch(f"/api/v1/admin/customers/{new.id}/", {"distributor": None}, format="json").status_code, 403)
+        self.assertEqual(self.client.delete(f"/api/v1/admin/customers/{new.id}/").status_code, 405)
+        # An employee adds the store's own customer; the owner can move a customer to the distributor
+        self.login(self.employee)
+        r = self.client.post("/api/v1/admin/customers/", {"full_name": "Ours", "phone": "0955999000", "business_name": "B", "area_name": "Mezzeh"}, format="json")
+        self.assertIsNone(User.objects.get(pk=r.data["id"]).distributor)
+        self.login(self.admin)
+        r = self.client.patch(f"/api/v1/admin/customers/{self.user.id}/", {"distributor": self.dist.id}, format="json")
+        self.assertEqual(r.data["distributor_name"], "Mleiha Dist")
+
+    def test_customer_cannot_switch_distributor_alone(self):
+        self.login(self.admin)
+        other = self.client.post("/api/v1/admin/staff/", {
+            "full_name": "Qudsaya Dist", "phone": "0933777999", "password": "D1str-pass!", "is_distributor": True,
+        }, format="json").data
+        self.login(self.theirs)
+        r = self.client.patch("/api/v1/me/", {"distributor_code": other["distributor_code"]}, format="json")
+        self.assertEqual(r.status_code, 400)
+        r = self.client.patch("/api/v1/me/", {"distributor_code": "NOPE1"}, format="json")
+        self.assertEqual(r.status_code, 400)
+
+    def test_alerts_reach_the_right_people(self):
+        from apps.notifications.models import AdminNotification
+
+        theirs = AdminNotification.objects.filter(data__order_id=self.their_order).get()
+        self.assertEqual(theirs.distributor, self.dist)
+        def inbox(user):
+            self.login(user)
+            return {n["data"].get("order_id") for n in self.client.get("/api/v1/admin/inbox/").data["results"]}
+        self.assertEqual(inbox(self.dist), {self.their_order})
+        self.assertNotIn(self.their_order, inbox(self.employee))
+        self.assertIn(self.their_order, inbox(self.admin))
+
+    def test_receivables_scoped(self):
+        self.login(self.dist)
+        r = self.client.get("/api/v1/admin/receivables/")
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(all(row["id"] == self.theirs.id for row in r.data["results"]))

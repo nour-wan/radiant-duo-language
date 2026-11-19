@@ -23,9 +23,9 @@ REPLACEMENTS = {
     ],
     "account-deletion": [
         ("body_ar", "أرسل طلب حذف من بريدك المسجّل إلى info@alasfoodstuff.com بعنوان «حذف الحساب»",
-         "أرسل طلب حذف من رقمك المسجّل على واتساب +963965747889، أو إلى info@alasfoodstuff.com، بعنوان «حذف الحساب»"),
+         "أرسل طلب حذف من رقمك المسجّل على واتساب +963980387705، أو إلى info@alasfoodstuff.com، بعنوان «حذف الحساب»"),
         ("body_en", 'Email info@alasfoodstuff.com from your registered address with the subject "Delete account"',
-         'Send "Delete account" on WhatsApp from your registered number to +963965747889, or email info@alasfoodstuff.com'),
+         'Send "Delete account" on WhatsApp from your registered number to +963980387705, or email info@alasfoodstuff.com'),
     ],
 }
 

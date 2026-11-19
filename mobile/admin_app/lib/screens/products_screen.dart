@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../services/admin_api.dart';
+import '../state/admin_session.dart';
 import '../widgets/admin_widgets.dart';
 import 'product_form_screen.dart';
 
@@ -36,9 +37,13 @@ class _ProductsScreenState extends State<ProductsScreen> {
     final api = context.read<AdminApi>();
     final t = Theme.of(context);
     final lang = context.lang;
+    // Distributors see products, prices and stock but can't change them
+    final readOnly = context.watch<AdminSession>().isDistributor;
     return Scaffold(
       appBar: AppBar(title: Text(context.tr('nav.products'))),
-      floatingActionButton: FloatingActionButton.extended(onPressed: () => _open(), icon: const Icon(Icons.add), label: Text(context.tr('products.add'))),
+      floatingActionButton: readOnly
+          ? null
+          : FloatingActionButton.extended(onPressed: () => _open(), icon: const Icon(Icons.add), label: Text(context.tr('products.add'))),
       body: PagedList<AdminProduct>(
         key: ValueKey('$_q|$_category|$_lowStock'),
         load: (page) => api.products(page: page, q: _q, category: _category, lowStock: _lowStock),
@@ -82,10 +87,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
               trailing: cheapest == null
                   ? null
                   : Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Text(usd(cheapest.effectivePrice), style: const TextStyle(fontFamily: 'packages/alas_shared/Manrope', fontWeight: FontWeight.w700)),
+                      if (!readOnly)
+                        Text(usd(cheapest.effectivePrice), style: const TextStyle(fontFamily: 'packages/alas_shared/Manrope', fontWeight: FontWeight.w700)),
                       Text(money(cheapest.onSale ? cheapest.discountPriceSyp : cheapest.priceSyp), style: t.textTheme.bodySmall),
                     ]),
-              onTap: () => _open(p.id),
+              onTap: readOnly ? null : () => _open(p.id),
             ),
           );
         },

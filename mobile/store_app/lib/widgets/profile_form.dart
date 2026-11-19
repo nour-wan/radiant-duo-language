@@ -134,9 +134,14 @@ class BusinessProfile {
         address = TextEditingController(text: u?.address ?? ''),
         type = (u?.businessType.isNotEmpty ?? false) ? u!.businessType : null,
         area = (u != null && u.areaName.isNotEmpty) ? AreaChoice(u.deliveryAreaId, u.areaName) : null,
-        interests = {...?u?.interests};
+        interests = {...?u?.interests},
+        distributorCode = TextEditingController(),
+        distributorName = u?.distributorName;
 
-  final TextEditingController name, business, address;
+  final TextEditingController name, business, address, distributorCode;
+
+  /// Set once the customer is linked to a distributor (then the code can't be changed from the app).
+  final String? distributorName;
   String? type;
   AreaChoice? area;
   Set<int> interests;
@@ -149,10 +154,11 @@ class BusinessProfile {
         'area_name': area?.name ?? '',
         'address': address.text.trim(),
         'interests': interests.toList(),
+        if (distributorCode.text.trim().isNotEmpty) 'distributor_code': distributorCode.text.trim().toUpperCase(),
       };
 
   void dispose() {
-    for (final c in [name, business, address]) {
+    for (final c in [name, business, address, distributorCode]) {
       c.dispose();
     }
   }
@@ -217,6 +223,24 @@ class _BusinessProfileFieldsState extends State<BusinessProfileFields> {
         maxLines: 2,
         validator: _req,
       ),
+      const SizedBox(height: 12),
+      // A distributor who found this customer gives them a code: their orders then go to that distributor
+      if (p.distributorName != null)
+        InputDecorator(
+          decoration: InputDecoration(labelText: context.tr('profile.distributor'), prefixIcon: const Icon(Icons.handshake_outlined)),
+          child: Text(p.distributorName!),
+        )
+      else
+        TextFormField(
+          controller: p.distributorCode,
+          textCapitalization: TextCapitalization.characters,
+          decoration: InputDecoration(
+            labelText: context.tr('profile.distributor_code'),
+            helperText: context.tr('profile.distributor_code_hint'),
+            helperMaxLines: 2,
+            prefixIcon: const Icon(Icons.handshake_outlined),
+          ),
+        ),
       const SizedBox(height: 18),
       Text(context.tr('profile.interests'), style: t.textTheme.titleSmall),
       Text(context.tr('profile.interests_hint'), style: t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant)),

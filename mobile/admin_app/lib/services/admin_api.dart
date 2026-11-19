@@ -54,10 +54,16 @@ class AdminCustomer {
         creditLimit = j['credit_limit'] == null ? null : toMoney(j['credit_limit']),
         creditEnabled = j['credit_enabled'] as bool? ?? false,
         phoneVerified = j['phone_verified'] as bool? ?? false,
+        distributorId = j['distributor'] as int?,
+        distributorName = j['distributor_name'] as String?,
         dateJoined = toDate(j['date_joined']),
         lastOrderAt = j['last_order_at'] == null ? null : toDate(j['last_order_at']);
 
   final int id, orderCount;
+
+  /// The distributor this customer buys through (null = the store's own customer).
+  final int? distributorId;
+  final String? distributorName;
   final String email, fullName, phone, businessName, businessType, areaName, address;
   final List<Map<String, dynamic>> interests;
   final bool isActive, phoneVerified;
@@ -265,6 +271,12 @@ class AdminApi {
         AdminCustomer.fromJson,
       );
   Future<AdminCustomer> customer(int id) async => AdminCustomer.fromJson(await client.get('/admin/customers/$id/'));
+  /// Adds a customer (a distributor's new customers are always their own). They sign in later with
+  /// "Forgot password" in the store app.
+  Future<AdminCustomer> addCustomer(Map<String, dynamic> data) async => AdminCustomer.fromJson(await client.post('/admin/customers/', data: data));
+
+  /// Owner only: move a customer to a distributor, or back to the store (null).
+  Future<void> setCustomerDistributor(int id, int? distributorId) => client.patch('/admin/customers/$id/', data: {'distributor': distributorId});
   Future<void> setCustomerActive(int id, bool active) => client.patch('/admin/customers/$id/', data: {'is_active': active});
   Future<void> setCreditEnabled(int id, bool on) => client.patch('/admin/customers/$id/', data: {'credit_enabled': on});
   Future<void> setCreditLimit(int id, double? limit) => client.patch('/admin/customers/$id/', data: {'credit_limit': limit?.toStringAsFixed(2)});

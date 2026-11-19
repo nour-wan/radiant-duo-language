@@ -219,9 +219,17 @@ class AppUser {
         phoneVerified = j['phone_verified'] as bool? ?? false,
         creditEnabled = j['credit_enabled'] as bool? ?? false,
         showStatement = j['show_statement'] as bool? ?? true,
-        isOwner = j['is_owner'] as bool? ?? false;
+        isOwner = j['is_owner'] as bool? ?? false,
+        isDistributor = j['is_distributor'] as bool? ?? false,
+        distributorName = j['distributor_name'] as String?,
+        ownDistributorCode = j['own_distributor_code'] as String?;
 
   final int id;
+
+  /// Partner account in the admin app: sees only its own customers. [ownDistributorCode] is the code it
+  /// gives customers. For a customer, [distributorName] is the distributor they buy through.
+  final bool isDistributor;
+  final String? distributorName, ownDistributorCode;
   final String email, fullName, phone, businessName, businessType, areaName, address, language;
   final int? deliveryAreaId;
   final List<int> interests;
@@ -431,9 +439,13 @@ class OrderSummary {
         businessName = j['business_name'] as String? ?? '',
         customerPhone = j['customer_phone'] as String? ?? '',
         city = j['city'] as String? ?? '',
+        distributorName = j['distributor_name'] as String?,
         createdAt = toDate(j['created_at']);
 
   final int id;
+
+  /// Admin app: the distributor whose customer placed it (null = the store's own customer).
+  final String? distributorName;
   final String number, status, deliveryMethod, customerName, businessName, customerPhone, city;
   final double total;
   /// Admin app only (never sent to customers).
@@ -505,6 +517,7 @@ class OrderDetail {
         tracking = j['tracking'] == null ? null : Tracking.fromJson(j['tracking'] as Map<String, dynamic>),
         driverId = j['driver_id'] as int?,
         driverName = j['driver_name'] as String?,
+        distributorName = j['distributor_name'] as String?,
         createdAt = toDate(j['created_at']);
 
   final int id;
@@ -513,7 +526,7 @@ class OrderDetail {
   final LatLng? pin;
   final Tracking? tracking;
   final int? driverId;
-  final String? driverName;
+  final String? driverName, distributorName;
   final String number, status, customerName, customerPhone, customerEmail, businessName;
   final String city, area, street, addressDetails, notes, adminNote, couponCode;
   final String deliveryMethod, deliveryZone, deliveryCurrency;

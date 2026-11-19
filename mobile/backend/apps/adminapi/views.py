@@ -21,7 +21,9 @@ from apps.catalog.serializers import ImageSerializer
 from apps.core.errors import BusinessError
 from apps.core.images import process_upload
 from apps.core.pagination import Pagination
-from apps.core.permissions import IsOwner, IsStoreAdmin
+from apps.core.permissions import (
+    DISTRIBUTOR_READ, DISTRIBUTOR_SCOPED, IsOwner, IsStoreAdmin, is_distributor, scope_customers, scope_orders,
+)
 from apps.ledger import services as ledger
 from apps.ledger.models import LedgerEntry
 from apps.ledger.serializers import AdjustmentSerializer, AdminLedgerEntrySerializer, PaymentSerializer
@@ -63,16 +65,30 @@ def _end_sessions(user):
     DeviceToken.objects.filter(user=user).delete()
 
 
+def _scoped_receivables(user):
+    """(customer id, balance) rows for the customers this account may see."""
+    rows = ledger.receivables()
+    if user.is_superuser:
+        return rows
+    allowed = set(scope_customers(User.objects.filter(is_staff=False), user).values_list("id", flat=True))
+    return [(uid, b) for uid, b in rows if uid in allowed]
+
+
 def _local_day_start(day):
     return timezone.make_aware(datetime.combine(day, time.min))
 
 
 class DashboardView(AdminMixin, APIView):
+    distributor_access = DISTRIBUTOR_SCOPED
+
     def get(self, request):
         now = timezone.localtime()
         today = _local_day_start(now.date())
         month = _local_day_start(now.date().replace(day=1))
-        sales = Order.objects.filter(status__in=SALE_STATUSES)
+        user = request.user
+        orders = scope_orders(Order.objects.all(), user)
+        sales = orders.filter(status__in=SALE_STATUSES)
+        customers = scope_customers(User.objects.filter(is_staff=False), user)
 
         def summary(since):
             agg = sales.filter(created_at__gte=since).aggregate(total=Sum("total"), usd=Sum("total_usd"), count=Count("id"))
@@ -93,7 +109,7 @@ class DashboardView(AdminMixin, APIView):
             chart.append({"date": d.isoformat(), "sales": str(row["total"] if row else 0), "orders": row["count"] if row else 0})
 
         best = (
-            OrderItem.objects.filter(order__status__in=SALE_STATUSES, order__created_at__gte=today - timedelta(days=30))
+            OrderItem.objects.filter(order__in=sales, order__created_at__gte=today - timedelta(days=30))
             .values("product_id", "product_name_ar", "product_name_en")
             .annotate(quantity=Sum("quantity"), revenue=Sum("line_total"))
             .order_by("-quantity")[:5]
@@ -104,8 +120,8 @@ class DashboardView(AdminMixin, APIView):
             {
                 "today": summary(today),
                 "month": summary(month),
-                "pending_orders": Order.objects.filter(status=Order.PENDING).count(),
-                "customers": User.objects.filter(is_staff=False).count(),
+                "pending_orders": orders.filter(status=Order.PENDING).count(),
+                "customers": customers.count(),
                 "products": Product.objects.filter(is_active=True).count(),
                 "chart": chart,
                 "best_sellers": [{**b, "revenue": str(b["revenue"])} for b in best],
@@ -118,7 +134,7 @@ class DashboardView(AdminMixin, APIView):
                 ],
                 "low_stock_threshold": threshold,
                 "unread_inbox": _unread_inbox(request.user).count(),
-                "receivables_total": str(sum((b for _, b in ledger.receivables() if b > 0), ledger.ZERO)),
+                "receivables_total": str(sum((b for _, b in _scoped_receivables(user) if b > 0), ledger.ZERO)),
                 "exchange_rate": fx.status(),
             }
         )
@@ -144,6 +160,8 @@ class ImageUploadMixin:
 
 
 class CategoryViewSet(AdminMixin, ImageUploadMixin, viewsets.ModelViewSet):
+    distributor_access = DISTRIBUTOR_READ  # distributors see products and stock, never change them
+
     serializer_class = s.AdminCategorySerializer
     pagination_class = None
 
@@ -157,6 +175,8 @@ class CategoryViewSet(AdminMixin, ImageUploadMixin, viewsets.ModelViewSet):
 
 
 class ProductViewSet(AdminMixin, viewsets.ModelViewSet):
+    distributor_access = DISTRIBUTOR_READ  # distributors see products and stock, never change them
+
     serializer_class = s.AdminProductSerializer
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 
@@ -211,6 +231,7 @@ class ProductViewSet(AdminMixin, viewsets.ModelViewSet):
 
 
 class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
+    distributor_access = DISTRIBUTOR_SCOPED
     def get_serializer_class(self):
         return s.AdminOrderListSerializer if self.action == "list" else s.AdminOrderDetailSerializer
 
@@ -219,7 +240,7 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
         return invoice_response(self.get_object(), request)
 
     def get_queryset(self):
-        qs = Order.objects.annotate(item_count=Count("items")).select_related("driver").prefetch_related("items", "events__by").order_by("-created_at", "-id")
+        qs = scope_orders(Order.objects.all(), self.request.user).annotate(item_count=Count("items")).select_related("driver").prefetch_related("items", "events__by").order_by("-created_at", "-id")
         p = self.request.query_params
         if p.get("status"):
             qs = qs.filter(status__in=p["status"].split(","))
@@ -277,7 +298,7 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
     @action(detail=True, methods=["post"])
     def location(self, request, pk=None):
         """The driver's phone reports its position; {"tracking": false} tells it to stop."""
-        order = get_object_or_404(Order, pk=pk)
+        order = get_object_or_404(scope_orders(Order.objects.all(), request.user), pk=pk)
         ok = tracking.report_location(order, request.user, request.data.get("latitude"), request.data.get("longitude"))
         return Response({"tracking": ok})
 
@@ -319,13 +340,28 @@ def _balance_subquery():
     return Coalesce(Subquery(sums), Value(ledger.ZERO), output_field=DecimalField(max_digits=12, decimal_places=2))
 
 
-class CustomerViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+class CustomerViewSet(
+    AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Customers; there is no delete. Distributors see and add only their own customers."""
+
     serializer_class = s.AdminCustomerSerializer
     http_method_names = ["get", "patch", "post"]
+    distributor_access = DISTRIBUTOR_SCOPED
+
+    def get_serializer_class(self):
+        return s.AdminCustomerCreateSerializer if self.action == "create" else s.AdminCustomerSerializer
+
+    def create(self, request, *args, **kwargs):
+        data = s.AdminCustomerCreateSerializer(data=request.data, context={"request": request})
+        data.is_valid(raise_exception=True)
+        customer = data.save()
+        return Response(s.AdminCustomerSerializer(self.get_queryset().get(pk=customer.pk)).data, status=status.HTTP_201_CREATED)
 
     def get_queryset(self):
         sale = Q(orders__status__in=SALE_STATUSES)
-        qs = User.objects.filter(is_staff=False).annotate(
+        qs = scope_customers(User.objects.filter(is_staff=False), self.request.user).select_related("distributor").annotate(
             order_count=Count("orders", filter=sale),
             total_spent=Sum("orders__total", filter=sale),
             last_order_at=Max("orders__created_at"),
@@ -352,7 +388,10 @@ class CustomerViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMix
 
     def perform_update(self, serializer):
         # Buying on credit and its limit are the owner's decision
-        if {"credit_enabled", "credit_limit"} & set(self.request.data) and not self.request.user.is_superuser:
+        owner_fields = {"credit_enabled", "credit_limit", "distributor"}
+        if is_distributor(self.request.user):
+            owner_fields.add("is_active")  # a distributor can't switch a customer off (only the owner can)
+        if owner_fields & set(self.request.data) and not self.request.user.is_superuser:
             raise PermissionDenied("owner_only")
         serializer.save()
 
@@ -408,8 +447,10 @@ def _statement_file(request, customer):
 class ReceivablesView(AdminMixin, APIView):
     """Customers with an open balance, largest first. ?format=xlsx (or csv) to export."""
 
+    distributor_access = DISTRIBUTOR_SCOPED
+
     def get(self, request):
-        rows = ledger.receivables()
+        rows = _scoped_receivables(request.user)
         users = User.objects.in_bulk([uid for uid, _ in rows])
         items = [
             {
@@ -471,6 +512,8 @@ class SettingsView(OwnerMixin, APIView):
 
 
 class ExchangeRateView(AdminMixin, APIView):
+    distributor_access = DISTRIBUTOR_READ  # distributors see products and stock, never change them
+
     """GET: the dollar rate in use and where it came from (all staff).
     POST {"action": "refresh"} reads sp-today.com now; {"action": "accept", "id": n} applies a reading
     that was held back because it moved a lot (owner only)."""
@@ -540,6 +583,8 @@ class NotificationViewSet(AdminMixin, mixins.ListModelMixin, mixins.CreateModelM
 
 
 class ZoneViewSet(AdminMixin, viewsets.ModelViewSet):
+    distributor_access = DISTRIBUTOR_READ  # areas, for the add-customer form
+
     serializer_class = s.AdminZoneSerializer
     pagination_class = None
 
@@ -551,6 +596,7 @@ class ReportView(AdminMixin, APIView):
     """GET ?period=day|week|month&from=YYYY-MM-DD&to=YYYY-MM-DD[&format=xlsx|csv]"""
 
     TRUNC = {"day": TruncDay, "week": TruncWeek, "month": TruncMonth}
+    distributor_access = DISTRIBUTOR_SCOPED
 
     def get(self, request):
         p = request.query_params
@@ -562,7 +608,7 @@ class ReportView(AdminMixin, APIView):
             date_from = datetime.strptime(p["from"], "%Y-%m-%d").date() if p.get("from") else date_to - timedelta(days=default_days)
         except ValueError:
             raise BusinessError("invalid_date")
-        orders = Order.objects.filter(
+        orders = scope_orders(Order.objects.all(), request.user).filter(
             status__in=SALE_STATUSES, created_at__gte=_local_day_start(date_from), created_at__lt=_local_day_start(date_to + timedelta(days=1))
         )
         rows = (
@@ -611,8 +657,13 @@ class ReportView(AdminMixin, APIView):
         )
 
 
+def _inbox(user):
+    """Owner: every alert. Distributor: alerts about their customers. Employees: the store's own alerts."""
+    return scope_orders(AdminNotification.objects.all(), user)
+
+
 def _unread_inbox(user):
-    qs = AdminNotification.objects.all()
+    qs = _inbox(user)
     return qs.filter(created_at__gt=user.admin_inbox_seen_at) if user.admin_inbox_seen_at else qs
 
 
@@ -620,7 +671,10 @@ class AdminInboxView(AdminMixin, mixins.ListModelMixin, viewsets.GenericViewSet)
     """Alerts sent to the admin app (new orders, cancellations), newest first."""
 
     serializer_class = s.AdminInboxSerializer
-    queryset = AdminNotification.objects.all()
+    distributor_access = DISTRIBUTOR_SCOPED
+
+    def get_queryset(self):
+        return _inbox(self.request.user)
 
     def list(self, request, *args, **kwargs):
         response = super().list(request, *args, **kwargs)
