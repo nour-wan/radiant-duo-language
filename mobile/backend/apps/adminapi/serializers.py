@@ -156,12 +156,17 @@ class AdminOrderDetailSerializer(OrderDetailSerializer):
     allowed_statuses = serializers.SerializerMethodField()
     events = AdminOrderEventSerializer(many=True, read_only=True)
     payments = serializers.SerializerMethodField()
+    driver_id = serializers.IntegerField(read_only=True)
+    driver_name = serializers.SerializerMethodField()
 
     class Meta(OrderDetailSerializer.Meta):
         fields = OrderDetailSerializer.Meta.fields + [
             "customer_email", "user_id", "admin_note", "customer_deleted", "allowed_statuses", "payments",
-            "exchange_rate", "total_usd",
+            "exchange_rate", "total_usd", "driver_id", "driver_name",
         ]
+
+    def get_driver_name(self, obj):
+        return obj.driver.display_name if obj.driver_id else None
 
     def get_payments(self, obj):
         """Cash received for this order and who took it."""

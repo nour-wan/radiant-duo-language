@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../services/store_api.dart';
 import '../../state/session.dart';
+import '../../widgets/pin_field.dart';
 import '../../widgets/profile_form.dart';
 
 class AddressesScreen extends StatefulWidget {
@@ -53,7 +54,8 @@ class _AddressesScreenState extends State<AddressesScreen> {
                           if (v == 'default') {
                             await api.saveAddress(Address(
                               id: a.id, label: a.label, recipientName: a.recipientName, phone: a.phone, city: a.city,
-                              deliveryAreaId: a.deliveryAreaId, area: a.area, street: a.street, details: a.details, isDefault: true,
+                              deliveryAreaId: a.deliveryAreaId, area: a.area, street: a.street, details: a.details,
+                              latitude: a.latitude, longitude: a.longitude, isDefault: true,
                             ));
                           } else if (v == 'delete' && await confirmDialog(context, title: context.tr('addr.delete_confirm'), danger: true)) {
                             await api.deleteAddress(a.id!);
@@ -95,6 +97,7 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
   late final _details = TextEditingController(text: a?.details ?? '');
   late AreaChoice? _area = a == null || a!.area.isEmpty ? null : AreaChoice(a!.deliveryAreaId, a!.area);
   late bool _default = a?.isDefault ?? false;
+  late LatLng? _pin = a?.pin;
   DeliveryInfo? _info;
   bool _busy = false;
 
@@ -119,6 +122,8 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
         area: _area?.name ?? '',
         street: a?.street ?? '',
         details: _details.text.trim(),
+        latitude: _pin?.latitude,
+        longitude: _pin?.longitude,
         isDefault: _default,
       ));
       if (mounted) Navigator.of(context).pop(true);
@@ -149,6 +154,8 @@ class _AddressFormScreenState extends State<AddressFormScreen> {
               decoration: InputDecoration(labelText: context.tr('profile.address'), hintText: context.tr('profile.address_hint')),
               validator: _req,
             ),
+            const SizedBox(height: 12),
+            PinField(value: _pin, onChanged: (p) => setState(() => _pin = p)),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: Text(context.tr('addr.default')),

@@ -1,5 +1,17 @@
 /// Admin app strings: key → [Arabic, English].
 const adminStrings = <String, List<String>>{
+  'drv.driver': ['السائق: {n}', 'Driver: {n}'],
+  'drv.no_driver': ['ما حدا استلم توصيله لسا', 'Nobody is delivering it yet'],
+  'drv.take': ['أنا رح وصّله', 'I will deliver it'],
+  'drv.taken': ['صار التوصيل معك، وموقعك عم ينبعت للزبون', 'You are delivering it now; your location is shared with the customer'],
+  'drv.sharing': ['موقعك عم ينبعت للزبون', 'Your location is shared with the customer'],
+  'drv.not_sharing': ['موقعك مو عم ينبعت للزبون', 'Your location is not being shared'],
+  'drv.start': ['ابدأ إرسال موقعي', 'Share my location'],
+  'drv.stop': ['أوقف', 'Stop'],
+  'drv.notif_title': ['جاري توصيل الطلب', 'Delivering an order'],
+  'drv.notif_text': ['موقعك عم ينبعت للزبون لحد ما يتسلّم الطلب', 'Your location is shared with the customer until the order is delivered'],
+  'drv.permission': ['لازم تسمح للتطبيق يوصل للموقع (وتشغّل الموقع بالموبايل) حتى يشوف الزبون وين صرت.', 'Allow location access (and turn location on) so the customer can see where you are.'],
+  'drv.live': ['موقع السائق الآن', 'Driver now'],
   'title': ['لوحة تحكم آلاس', 'Alas Admin'],
   'login.title': ['دخول الإدارة', 'Admin sign in'],
   'login.sub': ['هذا التطبيق مخصص لإدارة المتجر فقط.', 'This app is for store management only.'],

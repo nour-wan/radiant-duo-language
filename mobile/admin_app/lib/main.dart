@@ -12,6 +12,7 @@ import 'screens/orders_screen.dart';
 import 'screens/shell.dart';
 import 'services/admin_api.dart';
 import 'state/admin_session.dart';
+import 'state/delivery_tracker.dart';
 import 'strings.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
@@ -31,6 +32,10 @@ Future<void> main() async {
   final session = AdminSession(client);
   client.onSessionExpired = session.expired;
   await session.restore();
+  final tracker = DeliveryTracker(prefs, api);
+  void trackerTexts() => tracker.setTexts(L10n.get(settings.lang, 'drv.notif_title'), L10n.get(settings.lang, 'drv.notif_text'));
+  trackerTexts();
+  settings.addListener(trackerTexts);
 
   final push = PushService(
     registerToken: (t) => api.registerDevice(t, settings.lang),
@@ -59,10 +64,13 @@ Future<void> main() async {
       ChangeNotifierProvider.value(value: session),
       Provider.value(value: api),
       Provider.value(value: push),
+      ChangeNotifierProvider.value(value: tracker),
     ],
     child: const AdminApp(),
   ));
   push.markReady();
+  // Still delivering when the app was closed: keep sending the position
+  if (session.loggedIn) tracker.resume();
 }
 
 class AdminApp extends StatelessWidget {

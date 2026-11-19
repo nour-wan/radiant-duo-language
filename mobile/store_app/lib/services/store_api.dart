@@ -134,6 +134,13 @@ class StoreApi {
       PageResult.fromJson(await client.get('/orders/', query: {'page': page}), OrderSummary.fromJson);
   Future<OrderDetail> order(int id) async => OrderDetail.fromJson(await client.get('/orders/$id/'));
   Future<List<int>> invoicePdf(int id, String lang) => client.getBytes('/orders/$id/invoice/', query: {'lang': lang});
+  /// While out for delivery: the driver's position and estimated arrival (null when not shared).
+  Future<({String status, Tracking? tracking})> orderTracking(int id) async {
+    final j = await client.get('/orders/$id/tracking/') as Map<String, dynamic>;
+    final t = j['tracking'];
+    return (status: j['status'] as String? ?? '', tracking: t == null ? null : Tracking.fromJson(t as Map<String, dynamic>));
+  }
+
   Future<OrderDetail> cancelOrder(int id) async => OrderDetail.fromJson(await client.post('/orders/$id/cancel/'));
   Future<Statement> statement() async => Statement.fromJson(await client.get('/me/statement/', query: {'page_size': 100}));
 

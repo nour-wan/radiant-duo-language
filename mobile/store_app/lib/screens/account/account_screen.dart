@@ -2,6 +2,7 @@ import 'package:alas_shared/alas_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../splash_screen.dart';
 import '../../state/session.dart';
 import '../../widgets/common.dart';
 import '../favorites_screen.dart';
@@ -114,6 +115,18 @@ class AccountScreen extends StatelessWidget {
                 DropdownMenuItem(value: ThemeMode.dark, child: Text(context.tr('app.theme_dark'))),
               ],
               onChanged: (m) => m == null ? null : settings.setThemeMode(m),
+            ),
+          ),
+          StatefulBuilder(
+            builder: (context, setState) => SwitchListTile(
+              secondary: const Icon(Icons.volume_up_outlined),
+              title: Text(context.tr('app.sounds')),
+              subtitle: Text(context.tr('app.sounds_hint')),
+              value: settings.prefs.getBool(SplashScreen.soundKey) ?? true,
+              onChanged: (v) async {
+                await settings.prefs.setBool(SplashScreen.soundKey, v);
+                setState(() {});
+              },
             ),
           ),
         ]),

@@ -745,3 +745,86 @@ class LanguageTests(Base):
         self.assertIn("too common", str(r.data["errors"]["password"]))
         r = self.client.post("/api/v1/auth/register/", payload, format="json")  # older apps: Arabic
         self.assertIn("شائعة", str(r.data["errors"]["password"]))
+
+
+class DeliveryTrackingTests(Base):
+    """Map pin on the address, copied to the order; the driver's live position while shipped."""
+
+    def setUp(self):
+        super().setUp()
+        self.driver = User.objects.create_user("driver@alasfoodstuff.com", "Dr1ver-pass!", full_name="Samer", is_staff=True)
+        self.other = User.objects.create_user("other@alasfoodstuff.com", "0ther-pass!", full_name="Rami", is_staff=True)
+        self.login(self.user)
+        addr = self.client.post("/api/v1/addresses/", {
+            "recipient_name": "B", "phone": "1", "area": "x", "details": "y", "latitude": "33.513800", "longitude": "36.276500",
+        }, format="json")
+        self.assertEqual(addr.status_code, 201, addr.data)
+        r = self.order([{"variant_id": self.v1.id, "quantity": 5}], address_id=addr.data["id"])
+        self.order_id = r.data["id"]
+        self.assertEqual((r.data["latitude"], r.data["longitude"]), (33.5138, 36.2765))
+        self.assertIsNone(r.data["tracking"])
+
+    def ship(self, by):
+        self.login(by)
+        for st in ("confirmed", "shipped"):
+            self.assertEqual(self.client.post(f"/api/v1/admin/orders/{self.order_id}/status/", {"status": st}, format="json").status_code, 200)
+
+    def report(self, by, lat="33.500000", lng="36.300000"):
+        self.login(by)
+        return self.client.post(f"/api/v1/admin/orders/{self.order_id}/location/", {"latitude": lat, "longitude": lng}, format="json")
+
+    def test_pin_needs_both_coordinates(self):
+        r = self.client.post("/api/v1/addresses/", {"recipient_name": "B", "phone": "1", "area": "x", "details": "y", "latitude": "33.5"}, format="json")
+        self.assertEqual(r.status_code, 400)
+        r = self.client.post("/api/v1/addresses/", {
+            "recipient_name": "B", "phone": "1", "area": "x", "details": "y", "latitude": "95", "longitude": "36"}, format="json")
+        self.assertEqual(r.status_code, 400)
+
+    def test_customer_sees_driver_and_eta_only_while_shipped(self):
+        self.assertEqual(self.report(self.driver).data, {"tracking": False})  # not out for delivery yet
+        self.ship(self.driver)
+        self.assertEqual(Order.objects.get(pk=self.order_id).driver_id, self.driver.id)
+        self.assertEqual(self.report(self.driver).data, {"tracking": True})
+        self.login(self.user)
+        t = self.client.get(f"/api/v1/orders/{self.order_id}/tracking/").data
+        self.assertEqual(t["status"], "shipped")
+        self.assertEqual((t["tracking"]["latitude"], t["tracking"]["longitude"]), (33.5, 36.3))
+        self.assertGreater(t["tracking"]["eta_minutes"], 3)
+        self.assertLess(t["tracking"]["eta_minutes"], 20)
+        self.assertEqual(self.client.get(f"/api/v1/orders/{self.order_id}/").data["tracking"]["latitude"], 33.5)
+        # Delivered: nothing is shared any more and the driver's phone is told to stop
+        self.login(self.driver)
+        self.client.post(f"/api/v1/admin/orders/{self.order_id}/status/", {"status": "delivered"}, format="json")
+        self.assertEqual(self.report(self.driver).data, {"tracking": False})
+        self.login(self.user)
+        self.assertIsNone(self.client.get(f"/api/v1/orders/{self.order_id}/tracking/").data["tracking"])
+
+    def test_stale_position_is_hidden(self):
+        self.ship(self.driver)
+        self.report(self.driver)
+        Order.objects.filter(pk=self.order_id).update(driver_location_at=timezone.now() - timedelta(minutes=30))
+        self.login(self.user)
+        self.assertIsNone(self.client.get(f"/api/v1/orders/{self.order_id}/tracking/").data["tracking"])
+
+    def test_another_employee_takes_over(self):
+        self.ship(self.driver)
+        self.report(self.driver)
+        self.login(self.other)
+        r = self.client.post(f"/api/v1/admin/orders/{self.order_id}/take-delivery/")
+        self.assertEqual((r.data["driver_id"], r.data["driver_name"]), (self.other.id, self.other.display_name))
+        self.assertEqual((r.data["latitude"], r.data["longitude"]), (33.5138, 36.2765))  # the customer's pin
+        self.assertIsNone(r.data["tracking"])  # the old driver's position is cleared
+        self.assertEqual(self.report(self.driver).data, {"tracking": False})  # the old driver's phone stops
+        self.assertEqual(self.report(self.other).data, {"tracking": True})
+
+    def test_customers_cannot_report_or_see_others(self):
+        self.ship(self.driver)
+        self.assertEqual(self.report(self.user).status_code, 403)
+        stranger = User.objects.create_user("s@example.com", "Str0ng-pass!", full_name="S", phone="0888")
+        self.login(stranger)
+        self.assertEqual(self.client.get(f"/api/v1/orders/{self.order_id}/tracking/").status_code, 404)
+
+    def test_bad_coordinates_rejected(self):
+        self.ship(self.driver)
+        self.assertEqual(self.report(self.driver, lat="abc").status_code, 400)
+        self.assertEqual(self.report(self.driver, lat="91").status_code, 400)

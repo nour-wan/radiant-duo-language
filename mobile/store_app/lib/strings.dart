@@ -5,6 +5,8 @@ const storeStrings = <String, List<String>>{
   'brand.tagline': ['مكونات غذائية بأسعار الجملة', 'Wholesale food ingredients'],
 
   // Onboarding
+  'app.sounds': ['صوت فتح التطبيق', 'Opening sound'],
+  'app.sounds_hint': ['ما بيطلع إذا الموبايل على الصامت', 'Silent when the phone is on silent'],
   'ob.skip': ['تخطي', 'Skip'],
   'ob.next': ['التالي', 'Next'],
   'ob.start': ['ابدأ التسوق', 'Start shopping'],

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:alas_shared/alas_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -59,6 +61,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             const SizedBox(height: 16),
             _Timeline(order: o),
             const SizedBox(height: 16),
+            if (o.status == 'shipped' && !o.isPickup) ...[
+              _LiveTracking(order: o, onStatusChanged: () => setState(() => _key = UniqueKey())),
+              const SizedBox(height: 12),
+            ],
             _card(context, context.tr('orders.items_title'), [
               for (final i in o.items)
                 Padding(
@@ -221,6 +227,83 @@ class _StepNote extends StatelessWidget {
         const SizedBox(width: 6),
         Expanded(child: Text(note, style: t.textTheme.bodyMedium)),
       ]),
+    );
+  }
+}
+
+
+/// While the order is out for delivery: the driver on a map with the estimated arrival, refreshed every 10 s.
+class _LiveTracking extends StatefulWidget {
+  const _LiveTracking({required this.order, required this.onStatusChanged});
+
+  final OrderDetail order;
+  final VoidCallback onStatusChanged;
+
+  @override
+  State<_LiveTracking> createState() => _LiveTrackingState();
+}
+
+class _LiveTrackingState extends State<_LiveTracking> {
+  late Tracking? _tracking = widget.order.tracking;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 10), (_) => _refresh());
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _refresh() async {
+    try {
+      final r = await context.read<StoreApi>().orderTracking(widget.order.id);
+      if (!mounted) return;
+      if (r.status != widget.order.status) {
+        _timer?.cancel();
+        widget.onStatusChanged();
+        return;
+      }
+      setState(() => _tracking = r.tracking);
+    } catch (_) {
+      // Offline for a moment: keep the last position and try again on the next tick
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context);
+    final tr = _tracking;
+    final destination = widget.order.pin;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          Row(children: [
+            const Icon(Icons.local_shipping, color: AlasColors.primary),
+            const SizedBox(width: 8),
+            Expanded(child: Text(context.tr('track.title'), style: t.textTheme.titleMedium)),
+          ]),
+          const SizedBox(height: 6),
+          if (tr == null)
+            Text(context.tr('track.waiting'), style: t.textTheme.bodyMedium?.copyWith(color: t.colorScheme.onSurfaceVariant))
+          else ...[
+            if (tr.etaMinutes != null)
+              Text(context.tr('track.eta', {'n': tr.etaMinutes}), style: t.textTheme.titleLarge?.copyWith(color: AlasColors.primary)),
+            if (tr.distanceKm != null)
+              Text(context.tr('track.distance', {'km': tr.distanceKm!.toStringAsFixed(1)}),
+                  style: t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant)),
+          ],
+          if (tr != null || destination != null) ...[
+            const SizedBox(height: 10),
+            DeliveryMap(destination: destination, driver: tr?.position, height: 220),
+          ],
+        ]),
+      ),
     );
   }
 }

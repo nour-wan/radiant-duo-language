@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:alas_shared/alas_shared.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,9 @@ import 'shell.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
+  /// Preference key: the customer can turn the opening sound off (Account → Settings).
+  static const soundKey = 'sounds.enabled';
+
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
@@ -22,16 +26,40 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   late final AnimationController _c =
       AnimationController(vsync: this, duration: const Duration(milliseconds: 3300))..addStatusListener(_onStatus);
   bool _left = false;
+  AudioPlayer? _player;
 
   @override
   void initState() {
     super.initState();
     _c.forward();
+    if (context.read<AppSettings>().prefs.getBool(SplashScreen.soundKey) ?? true) _playSound();
+  }
+
+  /// The opening sound, timed with the animation. It plays on the notification stream, so a phone
+  /// on silent or vibrate stays quiet, and it doesn't pause music the customer is listening to.
+  Future<void> _playSound() async {
+    try {
+      final p = _player = AudioPlayer();
+      await p.setAudioContext(AudioContext(
+        android: const AudioContextAndroid(
+          contentType: AndroidContentType.sonification,
+          usageType: AndroidUsageType.notificationEvent,
+          audioFocus: AndroidAudioFocus.none,
+        ),
+        iOS: AudioContextIOS(category: AVAudioSessionCategory.ambient),
+      ));
+      await p.play(AssetSource('sounds/splash.m4a'), volume: .8);
+    } catch (_) {
+      // No sound is fine
+    }
   }
 
   @override
   void dispose() {
     _c.dispose();
+    // Let the last notes ring out after the screen is gone, then free the player
+    final p = _player;
+    if (p != null) Future.delayed(const Duration(seconds: 3), p.dispose);
     super.dispose();
   }
 

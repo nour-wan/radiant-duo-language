@@ -9,7 +9,7 @@ from apps.core.errors import BusinessError
 from apps.notifications import events
 from apps.store.delivery import DeliveryArea
 
-from . import pricing
+from . import pricing, tracking
 from .invoice import invoice_response
 from .models import Order
 from .serializers import OrderDetailSerializer, OrderListSerializer, PlaceOrderSerializer, QuoteRequestSerializer
@@ -59,6 +59,8 @@ class OrderListCreateView(generics.ListAPIView):
             "street": data.get("street", ""),
             "address_details": data.get("address_details", ""),
             "notes": data.get("notes", ""),
+            "latitude": data.get("latitude") if data.get("longitude") is not None else None,
+            "longitude": data.get("longitude") if data.get("latitude") is not None else None,
         }
         method = data.get("delivery_method", Order.DELIVERY)
         area_id = data.get("delivery_area_id")
@@ -72,6 +74,8 @@ class OrderListCreateView(generics.ListAPIView):
                     area=address.area,
                     street=address.street,
                     address_details=address.details,
+                    latitude=address.latitude,
+                    longitude=address.longitude,
                 )
                 area_id = address.delivery_area_id
             if not contact["city"]:
@@ -82,7 +86,7 @@ class OrderListCreateView(generics.ListAPIView):
             if not contact["area"] or (not contact["address_details"] and not contact["street"]):
                 raise BusinessError("address_required")
         else:
-            contact.update(city="", area="", street="", address_details="")
+            contact.update(city="", area="", street="", address_details="", latitude=None, longitude=None)
         if not contact["customer_name"] or not contact["customer_phone"]:
             raise BusinessError("contact_required")
         order, created = pricing.place_order(
@@ -95,6 +99,16 @@ class OrderListCreateView(generics.ListAPIView):
                 user.business_name = contact["business_name"]
                 user.save(update_fields=["business_name"])
         return Response(OrderDetailSerializer(order).data, status=status.HTTP_201_CREATED)
+
+
+class OrderTrackingView(APIView):
+    """Light endpoint the store app polls while the order is out for delivery."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk):
+        order = get_object_or_404(Order, pk=pk, user=request.user)
+        return Response({"status": order.status, "tracking": tracking.tracking(order)})
 
 
 class OrderDetailView(generics.RetrieveAPIView):

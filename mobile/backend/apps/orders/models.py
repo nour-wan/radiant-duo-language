@@ -34,6 +34,14 @@ class Order(models.Model):
     street = models.CharField(max_length=200, blank=True)
     address_details = models.CharField(max_length=300, blank=True)
     notes = models.CharField(max_length=500, blank=True)
+    # Map pin of the delivery address (copied from the address when the order is placed)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    # Staff member delivering the order and their last reported position (live tracking while shipped)
+    driver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="deliveries")
+    driver_latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    driver_longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    driver_location_at = models.DateTimeField(null=True, blank=True)
     customer_deleted = models.BooleanField(default=False)
 
     PICKUP, DELIVERY = "pickup", "delivery"

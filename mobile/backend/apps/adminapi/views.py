@@ -28,7 +28,7 @@ from apps.ledger.serializers import AdjustmentSerializer, AdminLedgerEntrySerial
 from apps.ledger.views import statement_response
 from apps.notifications import events
 from apps.notifications.models import AdminNotification, Notification
-from apps.orders import pricing
+from apps.orders import pricing, tracking
 from apps.orders.invoice import invoice_response
 from apps.orders.models import Order, OrderItem
 from apps.promotions.models import Banner, Coupon
@@ -219,7 +219,7 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
         return invoice_response(self.get_object(), request)
 
     def get_queryset(self):
-        qs = Order.objects.annotate(item_count=Count("items")).prefetch_related("items", "events__by").order_by("-created_at", "-id")
+        qs = Order.objects.annotate(item_count=Count("items")).select_related("driver").prefetch_related("items", "events__by").order_by("-created_at", "-id")
         p = self.request.query_params
         if p.get("status"):
             qs = qs.filter(status__in=p["status"].split(","))
@@ -245,6 +245,8 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
             raise BusinessError("payment_requires_delivered")
         with transaction.atomic():
             order = pricing.change_status(self.get_object(), d["status"], note, by=request.user)
+            if order.status == Order.SHIPPED and order.delivery_method == Order.DELIVERY:
+                tracking.assign_driver(order, request.user)  # whoever sends it out delivers it
             entry = ledger.record_payment(order.user, paid, request.user, order=order) if paid else None
         transaction.on_commit(lambda: events.order_status_changed(order, note))
         if entry:
@@ -262,6 +264,22 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
         entry = ledger.record_payment(order.user, data.validated_data["amount"], request.user, order=order, note=data.validated_data["note"])
         _notify_payment(entry)
         return Response(s.AdminOrderDetailSerializer(self.get_queryset().get(pk=order.pk)).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=["post"], url_path="take-delivery")
+    def take_delivery(self, request, pk=None):
+        """This staff member delivers the order from now on (another driver couldn't go)."""
+        order = self.get_object()
+        if not tracking.is_trackable(order):
+            raise BusinessError("not_out_for_delivery")
+        tracking.assign_driver(order, request.user)
+        return Response(s.AdminOrderDetailSerializer(self.get_queryset().get(pk=order.pk)).data)
+
+    @action(detail=True, methods=["post"])
+    def location(self, request, pk=None):
+        """The driver's phone reports its position; {"tracking": false} tells it to stop."""
+        order = get_object_or_404(Order, pk=pk)
+        ok = tracking.report_location(order, request.user, request.data.get("latitude"), request.data.get("longitude"))
+        return Response({"tracking": ok})
 
     @action(detail=True, methods=["patch"])
     def note(self, request, pk=None):

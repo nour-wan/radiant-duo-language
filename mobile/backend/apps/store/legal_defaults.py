@@ -11,13 +11,15 @@ PAGES = {
 - عناوين التسليم التي تحفظها.
 - بيانات الطلبات: المنتجات والكميات والمبالغ وحالة الطلب.
 - رمز الإشعارات الخاص بجهازك لإرسال إشعارات الطلبات والعروض.
-لا نجمع بيانات الموقع الجغرافي، ولا بيانات بطاقات الدفع، ولا جهات الاتصال، ولا الصور من جهازك.
+- موقع التسليم على الخريطة: إذا اخترت تحديد مكانك على الخريطة (اختياري)، نحفظ هذا الموقع مع العنوان ليصل إليك السائق. لا نتابع موقعك، ونطلب الوصول لموقع جهازك فقط عندما تضغط «موقعي الحالي».
+- أثناء توصيل طلبك نعرض لك موقع السائق على الخريطة والوقت التقريبي للوصول، ويتوقف ذلك عند تسليم الطلب.
+لا نجمع بيانات بطاقات الدفع، ولا جهات الاتصال، ولا الصور من جهازك.
 ## كيف نستخدم البيانات
 - لإنشاء حسابك وتنفيذ طلباتك وتوصيلها والتواصل معك بشأنها.
 - لإرسال إشعارات حالة الطلب، وعروض على الأصناف التي تهمك إذا سمحت بالإشعارات.
 - لتحسين خدماتنا ومنع الاحتيال والاستخدام غير المشروع.
 ## مشاركة البيانات
-لا نبيع بياناتك ولا نشاركها مع أي جهة لأغراض تسويقية. تُخزَّن البيانات على خوادم خاصة بنا. نستخدم خدمة Firebase Cloud Messaging من Google فقط لإيصال الإشعارات إلى جهازك، وخدمة WhatsApp Business من Meta فقط لإرسال رمز التحقق إلى رقمك.
+لا نبيع بياناتك ولا نشاركها مع أي جهة لأغراض تسويقية. تُخزَّن البيانات على خوادم خاصة بنا. نستخدم خدمة Firebase Cloud Messaging من Google فقط لإيصال الإشعارات إلى جهازك، وخدمة WhatsApp Business من Meta فقط لإرسال رمز التحقق إلى رقمك. وتُعرض الخرائط من OpenStreetMap، ولا نرسل إليها بياناتك.
 ## حماية البيانات
 تُنقل جميع البيانات عبر اتصال مشفّر (HTTPS)، وتُحفظ كلمات المرور مشفّرة ولا يمكن لأحد الاطلاع عليها، ويقتصر الوصول إلى بيانات الطلبات على إدارة المتجر.
 ## الاحتفاظ بالبيانات وحذفها
@@ -33,13 +35,15 @@ PAGES = {
 - Delivery addresses you save.
 - Order data: products, quantities, amounts and order status.
 - Your device's push notification token, to send order and offer notifications.
-We do not collect location, payment card data, contacts or photos from your device.
+- Delivery location on the map: if you choose to pin your place on the map (optional), we save it with the address so the driver can find you. We do not track you; we only use your device's location when you tap "My location".
+- While your order is out for delivery, we show you the driver's position on a map and an estimated arrival time; this stops once the order is delivered.
+We do not collect payment card data, contacts or photos from your device.
 ## How we use data
 - To create your account, process and deliver your orders and contact you about them.
 - To send order status notifications, and offers on the categories you are interested in if you allow notifications.
 - To improve our services and prevent fraud and misuse.
 ## Sharing
-We do not sell your data or share it for marketing. Data is stored on our own servers. We use Google Firebase Cloud Messaging only to deliver notifications to your device, and Meta's WhatsApp Business service only to send the verification code to your number.
+We do not sell your data or share it for marketing. Data is stored on our own servers. We use Google Firebase Cloud Messaging only to deliver notifications to your device, and Meta's WhatsApp Business service only to send the verification code to your number. Maps are shown from OpenStreetMap; we do not send your data to it.
 ## Security
 All data is sent over an encrypted connection (HTTPS). Passwords are stored hashed and cannot be read by anyone. Access to order data is limited to store management.
 ## Retention and deletion

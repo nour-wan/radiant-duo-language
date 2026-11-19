@@ -199,9 +199,18 @@ class AddressSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Address
-        fields = ["id", "label", "recipient_name", "phone", "city", "delivery_area", "area", "street", "details", "is_default"]
+        fields = [
+            "id", "label", "recipient_name", "phone", "city", "delivery_area", "area", "street", "details",
+            "latitude", "longitude", "is_default",
+        ]
+        extra_kwargs = {
+            "latitude": {"min_value": -90, "max_value": 90},
+            "longitude": {"min_value": -180, "max_value": 180},
+        }
 
     def validate(self, data):
+        if ("latitude" in data) != ("longitude" in data) or (data.get("latitude") is None) != (data.get("longitude") is None):
+            raise serializers.ValidationError({"latitude": "Send both latitude and longitude, or neither."})
         area = data.get("delivery_area")
         if area is not None:
             data["area"] = area.name_ar

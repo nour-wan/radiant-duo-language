@@ -2,6 +2,8 @@
 /// for display only — every real calculation happens on the server.
 library;
 
+import 'package:latlong2/latlong.dart';
+
 import 'api/api_client.dart' show PageResult;
 
 double toMoney(dynamic v) => v == null ? 0 : (v is num ? v.toDouble() : double.tryParse(v.toString()) ?? 0);
@@ -319,6 +321,8 @@ class Address {
         area = j['area'] as String? ?? '',
         street = j['street'] as String? ?? '',
         details = j['details'] as String? ?? '',
+        latitude = toMoneyOrNull(j['latitude']),
+        longitude = toMoneyOrNull(j['longitude']),
         isDefault = j['is_default'] as bool? ?? false;
 
   Address({
@@ -331,12 +335,19 @@ class Address {
     this.area = '',
     this.street = '',
     this.details = '',
+    this.latitude,
+    this.longitude,
     this.isDefault = false,
   });
 
   final int? id, deliveryAreaId;
   final String label, recipientName, phone, city, area, street, details;
   final bool isDefault;
+
+  /// Map pin (both set or both null).
+  final double? latitude, longitude;
+
+  LatLng? get pin => latitude != null && longitude != null ? LatLng(latitude!, longitude!) : null;
 
   String get oneLine => [area, street, details].where((s) => s.trim().isNotEmpty).join('، ');
 
@@ -349,6 +360,8 @@ class Address {
         'area': area,
         'street': street,
         'details': details,
+        'latitude': latitude?.toStringAsFixed(6),
+        'longitude': longitude?.toStringAsFixed(6),
         'is_default': isDefault,
       };
 }
@@ -431,6 +444,25 @@ class OrderSummary {
   bool get isPickup => deliveryMethod == 'pickup';
 }
 
+/// The driver's position while an order is out for delivery.
+class Tracking {
+  Tracking.fromJson(Map<String, dynamic> j)
+      : position = toPoint(j['latitude'], j['longitude'])!,
+        updatedAt = toDate(j['updated_at']),
+        distanceKm = toMoneyOrNull(j['distance_km']),
+        etaMinutes = j['eta_minutes'] as int?;
+
+  final LatLng position;
+  final DateTime? updatedAt;
+  final double? distanceKm;
+  final int? etaMinutes;
+}
+
+LatLng? toPoint(Object? lat, Object? lng) {
+  final a = toMoneyOrNull(lat), b = toMoneyOrNull(lng);
+  return a == null || b == null ? null : LatLng(a, b);
+}
+
 class OrderDetail {
   OrderDetail.fromJson(Map<String, dynamic> j)
       : id = j['id'] as int,
@@ -469,9 +501,19 @@ class OrderDetail {
         userId = j['user_id'] as int?,
         customerDeleted = j['customer_deleted'] as bool? ?? false,
         allowedStatuses = (j['allowed_statuses'] as List? ?? []).cast<String>(),
+        pin = toPoint(j['latitude'], j['longitude']),
+        tracking = j['tracking'] == null ? null : Tracking.fromJson(j['tracking'] as Map<String, dynamic>),
+        driverId = j['driver_id'] as int?,
+        driverName = j['driver_name'] as String?,
         createdAt = toDate(j['created_at']);
 
   final int id;
+
+  /// The customer's map pin, the driver's live position (while shipped) and who is delivering (admin only).
+  final LatLng? pin;
+  final Tracking? tracking;
+  final int? driverId;
+  final String? driverName;
   final String number, status, customerName, customerPhone, customerEmail, businessName;
   final String city, area, street, addressDetails, notes, adminNote, couponCode;
   final String deliveryMethod, deliveryZone, deliveryCurrency;

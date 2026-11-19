@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:alas_shared/alas_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +7,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'statement_screen.dart';
 
 import '../services/admin_api.dart';
+import '../state/admin_session.dart';
+import '../state/delivery_tracker.dart';
 import '../widgets/admin_widgets.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -109,11 +113,50 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
   Object? _error;
   final _note = TextEditingController();
   bool _busy = false;
+  Timer? _live;
 
   @override
   void initState() {
     super.initState();
     _load();
+    // While out for delivery, refresh so the driver's position on the map stays current
+    _live = Timer.periodic(const Duration(seconds: 15), (_) {
+      if (_order?.status == 'shipped' && !_busy) _load();
+    });
+  }
+
+  @override
+  void dispose() {
+    _live?.cancel();
+    _note.dispose();
+    super.dispose();
+  }
+
+  int? get _me => context.read<AdminSession>().user?.id;
+
+  /// Start or stop sharing this phone's location to match the order.
+  Future<void> _syncTracking(OrderDetail o) async {
+    final tracker = context.read<DeliveryTracker>();
+    if (o.status == 'shipped' && !o.isPickup && o.driverId != null && o.driverId == _me) {
+      if (!await tracker.start(o.id) && mounted) showSnack(context, context.tr('drv.permission'), error: true);
+    } else if (tracker.orders.contains(o.id)) {
+      await tracker.stop(o.id);
+    }
+  }
+
+  Future<void> _takeDelivery() async {
+    setState(() => _busy = true);
+    try {
+      final o = await context.read<AdminApi>().takeDelivery(widget.orderId);
+      if (!mounted) return;
+      setState(() => _order = o);
+      await _syncTracking(o);
+      if (mounted) showSnack(context, context.tr('drv.taken'));
+    } catch (e) {
+      if (mounted) showSnack(context, context.trError(e), error: true);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
   }
 
   Future<void> _load() async {
@@ -181,6 +224,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
       if (!mounted) return;
       setState(() => _order = o);
       showSnack(context, context.tr('order.updated'));
+      await _syncTracking(o);
     } catch (e) {
       if (mounted) showSnack(context, context.trError(e), error: true);
     } finally {
@@ -209,6 +253,47 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
     } catch (e) {
       if (mounted) showSnack(context, context.trError(e), error: true);
     }
+  }
+
+  /// Customer's pin with directions, who is delivering, and the live position while shipped.
+  Widget _deliveryMap(BuildContext context, OrderDetail o) {
+    final t = Theme.of(context);
+    final tracker = context.watch<DeliveryTracker>();
+    final mine = o.driverId != null && o.driverId == _me;
+    final shipped = o.status == 'shipped';
+    final driverAt = mine ? (tracker.lastPosition ?? o.tracking?.position) : o.tracking?.position;
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      if (o.pin != null) ...[
+        DeliveryMap(destination: o.pin, driver: shipped ? driverAt : null, height: 200),
+        const SizedBox(height: 8),
+        FilledButton.icon(
+          onPressed: () => openDirections(o.pin!),
+          icon: const Icon(Icons.directions),
+          label: Text(context.tr('map.directions')),
+        ),
+      ] else
+        Text(context.tr('map.no_pin'), style: t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant)),
+      if (shipped) ...[
+        const Divider(height: 20),
+        Row(children: [
+          const Icon(Icons.local_shipping_outlined, size: 20),
+          const SizedBox(width: 8),
+          Expanded(child: Text(o.driverName == null ? context.tr('drv.no_driver') : context.tr('drv.driver', {'n': o.driverName}))),
+          if (!mine) TextButton(onPressed: _busy ? null : _takeDelivery, child: Text(context.tr('drv.take'))),
+        ]),
+        if (mine)
+          Row(children: [
+            Icon(tracker.isTracking(o.id) ? Icons.my_location : Icons.location_disabled,
+                size: 18, color: tracker.isTracking(o.id) ? AlasColors.primary : AlasColors.destructive),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(context.tr(tracker.isTracking(o.id) ? 'drv.sharing' : 'drv.not_sharing'),
+                  style: t.textTheme.bodySmall?.copyWith(color: tracker.isTracking(o.id) ? AlasColors.primary : AlasColors.destructive)),
+            ),
+            if (!tracker.isTracking(o.id)) TextButton(onPressed: () => _syncTracking(o), child: Text(context.tr('drv.start'))),
+          ]),
+      ],
+    ]);
   }
 
   @override
@@ -272,6 +357,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                     FormCard(title: context.tr(o.isPickup ? 'delivery.pickup' : 'delivery.delivery'), children: [
                       if (!o.isPickup) ...[
                         Text(o.address),
+                        _deliveryMap(context, o),
                         if (o.deliveryZone.isNotEmpty) Text('${context.tr('order.zone')}: ${o.deliveryZone}', style: t.textTheme.bodySmall),
                         Text('${context.tr('order.delivery_fee')}: ${o.deliveryFee.toStringAsFixed(0)} ${o.deliveryCurrency}',
                             style: t.textTheme.titleSmall?.copyWith(color: t.colorScheme.primary)),

@@ -95,6 +95,9 @@ class Address(models.Model):
     area = models.CharField(max_length=120, blank=True)
     street = models.CharField(max_length=200, blank=True)
     details = models.CharField(max_length=300, blank=True)
+    # Pin the customer placed on the map (for the driver); optional
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     is_default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 

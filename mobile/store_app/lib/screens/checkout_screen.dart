@@ -8,6 +8,7 @@ import '../services/store_api.dart';
 import '../state/cart.dart';
 import '../state/session.dart';
 import '../widgets/common.dart';
+import '../widgets/pin_field.dart';
 import '../widgets/profile_form.dart';
 import 'account/legal_screen.dart';
 import 'orders/order_detail_screen.dart';
@@ -31,6 +32,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   List<Address>? _addresses;
   int? _addressId; // null = new address
   AreaChoice? _newArea;
+  LatLng? _newPin;
   String _method = 'delivery';
   bool _saveAddress = true;
   bool _placing = false;
@@ -95,6 +97,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           deliveryAreaId: _newArea?.id,
           area: _newArea?.name ?? '',
           details: _details.text.trim(),
+          latitude: _newPin?.latitude,
+          longitude: _newPin?.longitude,
           isDefault: (_addresses ?? []).isEmpty,
         ));
         addressId = _addressId = saved.id;
@@ -112,6 +116,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           'delivery_area_id': _newArea?.id,
           'area': _newArea?.name ?? '',
           'address_details': _details.text.trim(),
+          if (_newPin != null) 'latitude': _newPin!.latitude.toStringAsFixed(6),
+          if (_newPin != null) 'longitude': _newPin!.longitude.toStringAsFixed(6),
         },
         'notes': _notes.text.trim(),
         // The total the customer saw; if the dollar rate moved since, the server asks to confirm again
@@ -238,6 +244,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
+  Address? get _selectedAddress => _addressId == null ? null : _addresses?.where((a) => a.id == _addressId).firstOrNull;
+
+  Future<void> _pinAddress(Address a, LatLng p) async {
+    try {
+      final saved = await context.read<StoreApi>().saveAddress(Address(
+        id: a.id, label: a.label, recipientName: a.recipientName, phone: a.phone, city: a.city, deliveryAreaId: a.deliveryAreaId,
+        area: a.area, street: a.street, details: a.details, latitude: p.latitude, longitude: p.longitude, isDefault: a.isDefault,
+      ));
+      if (!mounted) return;
+      setState(() => _addresses = [for (final x in _addresses ?? <Address>[]) x.id == saved.id ? saved : x]);
+    } catch (e) {
+      if (mounted) showSnack(context, context.trError(e), error: true);
+    }
+  }
+
   Widget _addressSection(BuildContext context, DeliveryInfo info) {
     final q = context.watch<Cart>().quote;
     const newAddress = -1;
@@ -260,6 +281,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           RadioListTile<int>(contentPadding: EdgeInsets.zero, value: newAddress, title: Text(context.tr('co.new_address'))),
         ]),
       ),
+      // A saved address without a map pin: offer to add one (saved on the address for next time)
+      if (_selectedAddress case final a? when a.pin == null) ...[
+        PinField(value: null, onChanged: (p) => _pinAddress(a, p)),
+        const SizedBox(height: 4),
+      ],
       if (_addressId == null) ...[
         AreaField(
           info: info,
@@ -277,6 +303,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           decoration: InputDecoration(labelText: context.tr('profile.address'), hintText: context.tr('profile.address_hint')),
           validator: _required,
         ),
+        const SizedBox(height: 12),
+        PinField(value: _newPin, onChanged: (p) => setState(() => _newPin = p)),
         CheckboxListTile(
           contentPadding: EdgeInsets.zero,
           value: _saveAddress,

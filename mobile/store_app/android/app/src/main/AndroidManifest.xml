@@ -7,12 +7,17 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- "Use my location" when pinning an address on the map (only while the app is open) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:label="Alas Foodstuff"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"
         android:usesCleartextTraffic="false">
+        <!-- The customer app never tracks location in the background: drop the plugin's background service -->
+        <service android:name="com.baseflow.geolocator.GeolocatorLocationService" tools:node="remove"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

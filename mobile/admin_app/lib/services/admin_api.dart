@@ -211,6 +211,16 @@ class AdminApi {
       await client.post('/admin/orders/$id/status/', data: {'status': status, 'note': note, if (paidAmount != null) 'paid_amount': paidAmount.toStringAsFixed(2)}));
   Future<OrderDetail> recordOrderPayment(int id, double amount, String note) async => OrderDetail.fromJson(
       await client.post('/admin/orders/$id/payment/', data: {'amount': amount.toStringAsFixed(2), 'note': note}));
+  /// This employee delivers the order from now on.
+  Future<OrderDetail> takeDelivery(int id) async => OrderDetail.fromJson(await client.post('/admin/orders/$id/take-delivery/'));
+
+  /// Sends the driver's position; false means stop (delivered, cancelled or taken over).
+  Future<bool> reportLocation(int id, double lat, double lng) async {
+    final r = await client.post<Map<String, dynamic>>('/admin/orders/$id/location/',
+        data: {'latitude': lat.toStringAsFixed(6), 'longitude': lng.toStringAsFixed(6)});
+    return r['tracking'] == true;
+  }
+
   Future<OrderDetail> setNote(int id, String note) async => OrderDetail.fromJson(await client.patch('/admin/orders/$id/note/', data: {'admin_note': note}));
   Future<List<int>> exportOrders({String? status}) => client.getBytes('/admin/orders/export/', query: {'format': 'xlsx', 'lang': moneyLang, if (status != null) 'status': status});
 
