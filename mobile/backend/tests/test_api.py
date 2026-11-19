@@ -949,3 +949,82 @@ class DistributorTests(Base):
         r = self.client.get("/api/v1/admin/receivables/")
         self.assertEqual(r.status_code, 200)
         self.assertTrue(all(row["id"] == self.theirs.id for row in r.data["results"]))
+
+
+class DriverTests(DistributorTests):
+    """A distributor hands an order to their delivery driver, who sees only that order and delivers it."""
+
+    def add_driver(self, by, name="Samer", phone="0933123456", **extra):
+        self.login(by)
+        r = self.client.post("/api/v1/admin/drivers/", {"full_name": name, "phone": phone, "password": "Dr1ver-pass!", **extra}, format="json")
+        self.assertEqual(r.status_code, 201, r.data)
+        return User.objects.get(pk=r.data["id"])
+
+    def test_distributor_hands_order_to_driver(self):
+        driver = self.add_driver(self.dist)
+        self.assertEqual(driver.works_for, self.dist)
+        # The driver sees nothing until an order is handed to them
+        self.assertEqual(self.ids("/api/v1/admin/orders/", driver), set())
+        self.login(self.dist)
+        names = {p["name"] for p in self.client.get(f"/api/v1/admin/orders/{self.their_order}/drivers/").data}
+        self.assertEqual(names, {"Mleiha Dist", "Samer"})
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "confirmed"}, format="json")
+        r = self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "shipped", "driver_id": driver.id}, format="json")
+        self.assertEqual(r.status_code, 200, r.data)
+        self.assertEqual(r.data["driver_id"], driver.id)
+        # The driver: only this order; shares location; marks it delivered with the cash
+        self.assertEqual(self.ids("/api/v1/admin/orders/", driver), {self.their_order})
+        self.assertEqual(self.client.get(f"/api/v1/admin/orders/{self.own_order}/").status_code, 404)
+        r = self.client.post(f"/api/v1/admin/orders/{self.their_order}/location/", {"latitude": "33.5", "longitude": "36.3"}, format="json")
+        self.assertEqual(r.data, {"tracking": True})
+        self.assertEqual(self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "cancelled"}, format="json").status_code, 403)
+        total = Order.objects.get(pk=self.their_order).total
+        r = self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "delivered", "paid_amount": str(total)}, format="json")
+        self.assertEqual(r.status_code, 200, r.data)
+
+    def test_driver_is_shut_out_of_everything_else(self):
+        driver = self.add_driver(self.dist)
+        self.login(driver)
+        for path in ["/api/v1/admin/customers/", "/api/v1/admin/dashboard/", "/api/v1/admin/products/", "/api/v1/admin/reports/",
+                     "/api/v1/admin/receivables/", "/api/v1/admin/inbox/", "/api/v1/admin/drivers/", "/api/v1/admin/staff/",
+                     "/api/v1/admin/orders/export/"]:
+            self.assertEqual(self.client.get(path).status_code, 403, path)
+
+    def test_drivers_belong_to_their_side(self):
+        mine = self.add_driver(self.dist)
+        store_driver = self.add_driver(self.admin, name="Store Driver", phone="0933654321")
+        self.assertIsNone(store_driver.works_for)
+        # A distributor can't hand their order to the store's driver, nor see the store's drivers
+        self.login(self.dist)
+        self.assertEqual({d["id"] for d in self.client.get("/api/v1/admin/drivers/").data}, {mine.id})
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "confirmed"}, format="json")
+        r = self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "shipped", "driver_id": store_driver.id}, format="json")
+        self.assertEqual(r.data["code"], "driver_not_allowed")
+        # Employees can't manage drivers; the owner sees all of them
+        self.login(self.employee)
+        self.assertEqual(self.client.get("/api/v1/admin/drivers/").status_code, 403)
+        self.login(self.admin)
+        self.assertEqual({d["id"] for d in self.client.get("/api/v1/admin/drivers/").data}, {mine.id, store_driver.id})
+
+    def test_hand_over_to_another_driver(self):
+        first = self.add_driver(self.dist)
+        second = self.add_driver(self.dist, name="Rami", phone="0933999888")
+        self.login(self.dist)
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "confirmed"}, format="json")
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "shipped", "driver_id": first.id}, format="json")
+        r = self.client.post(f"/api/v1/admin/orders/{self.their_order}/assign-driver/", {"driver_id": second.id}, format="json")
+        self.assertEqual(r.data["driver_name"], "Rami")
+        self.assertEqual(self.ids("/api/v1/admin/orders/", first), set())
+        self.assertEqual(self.ids("/api/v1/admin/orders/", second), {self.their_order})
+
+
+class DistributorContactTests(DistributorTests):
+    def test_linked_customer_contacts_the_distributor(self):
+        self.client.force_authenticate(None)
+        store = self.client.get("/api/v1/settings/").data
+        self.login(self.theirs)
+        theirs = self.client.get("/api/v1/settings/").data
+        self.assertEqual((theirs["whatsapp"], theirs["mobile"], theirs["phone"]), ("+963933777888", "0933777888", ""))
+        self.assertEqual(theirs["distributor_name"], "Mleiha Dist")
+        self.login(self.user)
+        self.assertEqual(self.client.get("/api/v1/settings/").data["whatsapp"], store["whatsapp"])

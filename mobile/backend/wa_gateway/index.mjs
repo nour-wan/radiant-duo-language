@@ -33,6 +33,37 @@ function wipeAuth() {
   fs.rmSync(AUTH_DIR, { recursive: true, force: true });
 }
 
+// What we sent in the last 24 hours, by message id. When a phone can't decrypt a message (its
+// encryption session changed, e.g. after this service restarted) it asks us to send it again; without
+// the text WhatsApp shows "Waiting for this message" forever. Kept on disk so a restart doesn't lose it.
+const SENT_FILE = process.env.WA_SENT_FILE || `${AUTH_DIR}/../sent-messages.json`;
+const SENT_TTL_MS = 24 * 60 * 60 * 1000;
+const sent = new Map();
+try {
+  for (const [id, v] of Object.entries(JSON.parse(fs.readFileSync(SENT_FILE, 'utf8')))) {
+    if (Date.now() - v.t < SENT_TTL_MS) sent.set(id, v);
+  }
+} catch {
+  // first run, or nothing saved yet
+}
+let saveTimer = null;
+function rememberSent(msg, text) {
+  if (!msg?.key?.id) return;
+  sent.set(msg.key.id, { text, t: Date.now() });
+  for (const [id, v] of sent) {
+    if (Date.now() - v.t > SENT_TTL_MS || sent.size > 2000) sent.delete(id);
+    else break; // oldest first
+  }
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      fs.writeFileSync(SENT_FILE, JSON.stringify(Object.fromEntries(sent)), { mode: 0o600 });
+    } catch (e) {
+      logger.error(e, 'could not save sent messages');
+    }
+  }, 500);
+}
+
 async function start() {
   clearTimeout(restartTimer);
   fs.mkdirSync(AUTH_DIR, { recursive: true, mode: 0o700 });
@@ -46,6 +77,11 @@ async function start() {
     browser: Browsers.ubuntu('Alas Foodstuff'),
     markOnlineOnConnect: false,
     syncFullHistory: false,
+    // Lets WhatsApp re-send a message a phone couldn't decrypt (see rememberSent)
+    getMessage: async (key) => {
+      const hit = sent.get(key.id);
+      return hit ? { conversation: hit.text } : undefined;
+    },
   });
   sock = s;
   s.ev.on('creds.update', saveCreds);
@@ -80,7 +116,8 @@ function send(to, text) {
     const jid = `${String(to).replace(/\D/g, '')}@s.whatsapp.net`;
     const [found] = await sock.onWhatsApp(jid);
     if (!found?.exists) throw Object.assign(new Error('not_on_whatsapp'), { http: 422 });
-    await sock.sendMessage(found.jid, { text });
+    const msg = await sock.sendMessage(found.jid, { text });
+    rememberSent(msg, text);
     await new Promise((r) => setTimeout(r, SEND_GAP_MS));
   });
   queue = job.catch(() => {});

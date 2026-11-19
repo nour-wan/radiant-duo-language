@@ -14,6 +14,9 @@ class AdminSession extends ChangeNotifier {
   /// Partner account: only its own customers, their orders and its own sales.
   bool get isDistributor => !isOwner && (user?.isDistributor ?? false);
 
+  /// Delivery account: only the orders handed to it (deliver, cash, location).
+  bool get isDriver => !isOwner && (user?.isDriver ?? false);
+
   Future<void> restore() async {
     await client.tokens.load();
     if (!client.tokens.hasSession) return;

@@ -221,6 +221,7 @@ class AppUser {
         showStatement = j['show_statement'] as bool? ?? true,
         isOwner = j['is_owner'] as bool? ?? false,
         isDistributor = j['is_distributor'] as bool? ?? false,
+        isDriver = j['is_driver'] as bool? ?? false,
         distributorName = j['distributor_name'] as String?,
         ownDistributorCode = j['own_distributor_code'] as String?;
 
@@ -230,6 +231,9 @@ class AppUser {
   /// gives customers. For a customer, [distributorName] is the distributor they buy through.
   final bool isDistributor;
   final String? distributorName, ownDistributorCode;
+
+  /// Delivery account in the admin app: sees only the orders handed to it.
+  final bool isDriver;
   final String email, fullName, phone, businessName, businessType, areaName, address, language;
   final int? deliveryAreaId;
   final List<int> interests;

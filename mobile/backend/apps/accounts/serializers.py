@@ -73,13 +73,13 @@ class UserSerializer(ProfileFieldsMixin, serializers.ModelSerializer):
         fields = [
             "id", "email", "full_name", "phone", "phone_verified", "business_name", "business_type", "delivery_area",
             "area_name", "address", "interests", "language", "is_staff", "has_password", "profile_complete",
-            "credit_enabled", "show_statement", "is_owner", "is_distributor", "distributor_name", "own_distributor_code",
+            "credit_enabled", "show_statement", "is_owner", "is_distributor", "is_driver", "distributor_name", "own_distributor_code",
             "distributor_code", "date_joined",
         ]
         # The phone changes only through a WhatsApp code (me/phone/)
         read_only_fields = [
             "id", "email", "phone", "phone_verified", "is_staff", "has_password", "profile_complete", "credit_enabled",
-            "is_distributor", "date_joined",
+            "is_distributor", "is_driver", "date_joined",
         ]
 
     def get_distributor_name(self, obj):

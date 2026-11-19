@@ -213,8 +213,27 @@ class AdminApi {
       );
   Future<OrderDetail> order(int id) async => OrderDetail.fromJson(await client.get('/admin/orders/$id/'));
   Future<List<int>> invoicePdf(int id, String lang) => client.getBytes('/admin/orders/$id/invoice/', query: {'lang': lang});
-  Future<OrderDetail> setStatus(int id, String status, {String note = '', double? paidAmount}) async => OrderDetail.fromJson(
-      await client.post('/admin/orders/$id/status/', data: {'status': status, 'note': note, if (paidAmount != null) 'paid_amount': paidAmount.toStringAsFixed(2)}));
+  Future<OrderDetail> setStatus(int id, String status, {String note = '', double? paidAmount, int? driverId}) async => OrderDetail.fromJson(
+      await client.post('/admin/orders/$id/status/', data: {
+        'status': status,
+        'note': note,
+        if (paidAmount != null) 'paid_amount': paidAmount.toStringAsFixed(2),
+        if (driverId != null) 'driver_id': driverId,
+      }));
+
+  /// Who an order can be handed to for delivery: [{id, name, is_driver, is_me}].
+  Future<List<Map<String, dynamic>>> orderDrivers(int id) async =>
+      ((await client.get('/admin/orders/$id/drivers/')) as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+
+  /// Hand an order that is out for delivery to another driver.
+  Future<OrderDetail> assignDriver(int id, int driverId) async =>
+      OrderDetail.fromJson(await client.post('/admin/orders/$id/assign-driver/', data: {'driver_id': driverId}));
+
+  /// Delivery accounts (owner: all; distributor: their own).
+  Future<List<Map<String, dynamic>>> drivers() async =>
+      ((await client.get('/admin/drivers/')) as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+  Future<void> addDriver(Map<String, dynamic> data) => client.post('/admin/drivers/', data: data);
+  Future<void> updateDriver(int id, Map<String, dynamic> data) => client.patch('/admin/drivers/$id/', data: data);
   Future<OrderDetail> recordOrderPayment(int id, double amount, String note) async => OrderDetail.fromJson(
       await client.post('/admin/orders/$id/payment/', data: {'amount': amount.toStringAsFixed(2), 'note': note}));
   /// This employee delivers the order from now on.

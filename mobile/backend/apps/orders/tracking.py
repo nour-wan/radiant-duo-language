@@ -4,6 +4,7 @@ import math
 from datetime import timedelta
 from decimal import Decimal
 
+from django.db import models
 from django.utils import timezone
 
 from apps.core.errors import BusinessError
@@ -83,3 +84,25 @@ def report_location(order, user, latitude, longitude):
         driver_latitude=coordinate(latitude, 90), driver_longitude=coordinate(longitude, 180), driver_location_at=timezone.now()
     )
     return True
+
+
+def eligible_drivers(order):
+    """Who may deliver [order]: a distributor's order goes to that distributor or their drivers; the
+    store's own orders to the store's drivers or employees."""
+    from apps.accounts.models import User
+
+    active = User.objects.filter(is_active=True, is_staff=True)
+    if order.distributor_id:
+        return active.filter(models.Q(pk=order.distributor_id) | models.Q(is_driver=True, works_for_id=order.distributor_id))
+    return active.filter(is_distributor=False, is_superuser=False).filter(
+        models.Q(is_driver=True, works_for__isnull=True) | models.Q(is_driver=False)
+    ) | active.filter(is_superuser=True)
+
+
+def hand_to(order, user, driver):
+    """[user] hands [order] to [driver] for delivery. Raises BusinessError if that driver can't take it."""
+    if driver.pk != user.pk and not eligible_drivers(order).filter(pk=driver.pk).exists():
+        raise BusinessError("driver_not_allowed")
+    changed = order.driver_id != driver.pk
+    assign_driver(order, driver)
+    return changed

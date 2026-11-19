@@ -1,5 +1,10 @@
 import 'package:alas_shared/alas_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../services/admin_api.dart';
+import '../state/admin_session.dart';
+import '../state/delivery_tracker.dart';
 
 import 'customers_screen.dart';
 import 'dashboard_screen.dart';
@@ -18,7 +23,44 @@ class _AdminShellState extends State<AdminShell> {
   int _index = 0;
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  void initState() {
+    super.initState();
+    if (context.read<AdminSession>().isDriver) _resumeDeliveries();
+  }
+
+  /// A driver opening the app: keep sharing the location for every order still out for delivery.
+  Future<void> _resumeDeliveries() async {
+    final api = context.read<AdminApi>();
+    final tracker = context.read<DeliveryTracker>();
+    try {
+      final page = await api.orders(status: 'shipped');
+      for (final o in page.items.where((o) => !o.isPickup)) {
+        if (!tracker.orders.contains(o.id)) await tracker.start(o.id);
+      }
+    } catch (_) {
+      // Offline: the order screen starts it when opened
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (context.watch<AdminSession>().isDriver) {
+      return Scaffold(
+        body: IndexedStack(index: _index.clamp(0, 1), children: [
+          OrdersScreen(title: context.tr('drv.my_deliveries')),
+          const MoreScreen(),
+        ]),
+        bottomNavigationBar: NavigationBar(
+          selectedIndex: _index.clamp(0, 1),
+          onDestinationSelected: (i) => setState(() => _index = i),
+          destinations: [
+            NavigationDestination(icon: const Icon(Icons.local_shipping_outlined), selectedIcon: const Icon(Icons.local_shipping), label: context.tr('drv.my_deliveries')),
+            NavigationDestination(icon: const Icon(Icons.menu), label: context.tr('nav.more')),
+          ],
+        ),
+      );
+    }
+    return Scaffold(
         body: IndexedStack(index: _index, children: [
           DashboardScreen(onOpenOrders: () => setState(() => _index = 1)),
           const OrdersScreen(),
@@ -38,4 +80,5 @@ class _AdminShellState extends State<AdminShell> {
           ],
         ),
       );
+  }
 }

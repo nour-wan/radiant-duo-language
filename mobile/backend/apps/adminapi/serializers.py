@@ -195,6 +195,8 @@ class AdminOrderDetailSerializer(OrderDetailSerializer):
 class StatusChangeSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=[s for s, _ in Order.STATUSES])
     note = serializers.CharField(required=False, allow_blank=True, max_length=500)
+    # Out for delivery: who delivers it (default: whoever sends it out)
+    driver_id = serializers.IntegerField(required=False, allow_null=True)
     # Cash received on delivery (recorded as a payment on the customer's account)
     paid_amount = serializers.DecimalField(max_digits=12, decimal_places=2, required=False, allow_null=True, min_value=Decimal("0"))
 
@@ -447,9 +449,9 @@ class StaffSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             "id", "full_name", "phone", "email", "is_owner", "is_active", "last_login", "date_joined", "password",
-            "is_distributor", "distributor_code", "customer_count", "month_sales",
+            "is_distributor", "distributor_code", "customer_count", "month_sales", "is_driver",
         ]
-        read_only_fields = ["id", "email", "is_owner", "last_login", "date_joined"]
+        read_only_fields = ["id", "email", "is_owner", "last_login", "date_joined", "is_driver"]
 
     def get_customer_count(self, obj):
         return obj.distributor_customers.count() if obj.is_distributor else None
@@ -550,3 +552,59 @@ def _new_distributor_code():
         code = "D" + "".join(secrets.choice(alphabet) for _ in range(4))
         if not User.objects.filter(distributor_code=code).exists():
             return code
+
+
+class DriverSerializer(serializers.ModelSerializer):
+    """A delivery account: sees only the orders handed to it, shares its location while delivering."""
+
+    password = serializers.CharField(write_only=True, required=False)
+    phone = serializers.CharField(max_length=32, required=False)
+    works_for_name = serializers.SerializerMethodField()
+    active_deliveries = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ["id", "full_name", "phone", "is_active", "last_login", "password", "works_for", "works_for_name", "active_deliveries"]
+        read_only_fields = ["id", "last_login", "works_for_name", "active_deliveries"]
+        extra_kwargs = {"works_for": {"required": False, "allow_null": True}}
+
+    def get_works_for_name(self, obj):
+        return obj.works_for.display_name if obj.works_for_id else None
+
+    def get_active_deliveries(self, obj):
+        return Order.objects.filter(driver=obj, status=Order.SHIPPED).count()
+
+    validate_phone = StaffSerializer.validate_phone
+    validate_password = StaffSerializer.validate_password
+
+    def validate_works_for(self, value):
+        if value is not None and not value.is_distributor:
+            raise serializers.ValidationError("invalid")
+        return value
+
+    def validate(self, data):
+        if self.instance is None:
+            for f in ("full_name", "phone", "password"):
+                if not str(data.get(f, "")).strip():
+                    raise serializers.ValidationError({f: "required"})
+        by = self.context["request"].user
+        if not by.is_superuser:
+            data.pop("works_for", None)  # a distributor's drivers always work for them
+        return data
+
+    def create(self, data):
+        by = self.context["request"].user
+        works_for = data.get("works_for") if by.is_superuser else by
+        return User.objects.create_user(
+            phone=data["phone"], password=data["password"], full_name=data["full_name"].strip(),
+            is_staff=True, phone_verified=True, is_driver=True, works_for=works_for,
+        )
+
+    def update(self, user, data):
+        password = data.pop("password", None)
+        for k, v in data.items():
+            setattr(user, k, v)
+        if password:
+            user.set_password(password)
+        user.save()
+        return user

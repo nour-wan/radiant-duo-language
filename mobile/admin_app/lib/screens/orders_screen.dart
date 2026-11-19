@@ -146,14 +146,42 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
     }
   }
 
-  Future<void> _takeDelivery() async {
+  /// Hand an order that is already out for delivery to someone else.
+  Future<void> _changeDriver(OrderDetail o) async {
+    final api = context.read<AdminApi>();
+    List<Map<String, dynamic>> drivers;
+    try {
+      drivers = await api.orderDrivers(o.id);
+    } catch (e) {
+      if (mounted) showSnack(context, context.trError(e), error: true);
+      return;
+    }
+    if (!mounted) return;
+    final picked = await showDialog<int>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        title: Text(ctx.tr('drv.who')),
+        children: [
+          for (final d in drivers)
+            SimpleDialogOption(
+              onPressed: () => Navigator.pop(ctx, d['id'] as int),
+              child: Row(children: [
+                Icon(d['id'] == o.driverId ? Icons.radio_button_checked : Icons.radio_button_off, size: 18),
+                const SizedBox(width: 8),
+                Expanded(child: Text(d['is_me'] == true ? ctx.tr('drv.me', {'n': d['name']}) : '${d['name']}')),
+              ]),
+            ),
+        ],
+      ),
+    );
+    if (picked == null || picked == o.driverId || !mounted) return;
     setState(() => _busy = true);
     try {
-      final o = await context.read<AdminApi>().takeDelivery(widget.orderId);
+      final fresh = await api.assignDriver(o.id, picked);
       if (!mounted) return;
-      setState(() => _order = o);
-      await _syncTracking(o);
-      if (mounted) showSnack(context, context.tr('drv.taken'));
+      setState(() => _order = fresh);
+      await _syncTracking(fresh);
+      if (mounted) showSnack(context, context.tr('drv.handed', {'n': fresh.driverName ?? ''}));
     } catch (e) {
       if (mounted) showSnack(context, context.trError(e), error: true);
     } finally {
@@ -180,11 +208,38 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
     final paidCtl = TextEditingController();
     final o = _order!;
     final askPaid = status == 'delivered' && o.userId != null;
+    // Out for delivery: choose who takes it (the driver then shares their location with the customer)
+    var drivers = <Map<String, dynamic>>[];
+    int? driverId;
+    if (status == 'shipped' && !o.isPickup) {
+      try {
+        drivers = await context.read<AdminApi>().orderDrivers(o.id);
+      } catch (_) {}
+      if (!mounted) return;
+      driverId = (drivers.where((d) => d['is_driver'] == true).firstOrNull ?? drivers.where((d) => d['is_me'] == true).firstOrNull)?['id'] as int?;
+    }
     final ok = await showDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialog) => AlertDialog(
         title: Text(ctx.tr('order.to', {'s': statusLabel(ctx, status, pickup: o.isPickup)})),
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (drivers.isNotEmpty) ...[
+            DropdownButtonFormField<int>(
+              initialValue: driverId,
+              isExpanded: true,
+              decoration: InputDecoration(labelText: ctx.tr('drv.who'), prefixIcon: const Icon(Icons.local_shipping_outlined)),
+              items: [
+                for (final d in drivers)
+                  DropdownMenuItem(
+                    value: d['id'] as int,
+                    child: Text(d['is_me'] == true ? ctx.tr('drv.me', {'n': d['name']}) : '${d['name']}'),
+                  ),
+              ],
+              onChanged: (v) => setDialog(() => driverId = v),
+            ),
+            const SizedBox(height: 8),
+          ],
           if (status == 'cancelled') Text(ctx.tr('order.cancel_warning'), style: const TextStyle(color: AlasColors.destructive)),
           TextField(controller: noteCtl, decoration: InputDecoration(labelText: ctx.tr('order.status_note'))),
           if (askPaid) ...[
@@ -217,12 +272,14 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
           FilledButton(onPressed: () => Navigator.pop(ctx, true), child: Text(ctx.tr('app.confirm'))),
         ],
       ),
+      ),
     );
     if (ok != true || !mounted) return;
     setState(() => _busy = true);
     try {
       final paid = parseAmount(paidCtl.text);
-      final o = await context.read<AdminApi>().setStatus(widget.orderId, status, note: noteCtl.text.trim(), paidAmount: paid != null && paid > 0 ? paid : null);
+      final o = await context.read<AdminApi>()
+          .setStatus(widget.orderId, status, note: noteCtl.text.trim(), paidAmount: paid != null && paid > 0 ? paid : null, driverId: driverId);
       if (!mounted) return;
       setState(() => _order = o);
       showSnack(context, context.tr('order.updated'));
@@ -281,7 +338,7 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
           const Icon(Icons.local_shipping_outlined, size: 20),
           const SizedBox(width: 8),
           Expanded(child: Text(o.driverName == null ? context.tr('drv.no_driver') : context.tr('drv.driver', {'n': o.driverName}))),
-          if (!mine) TextButton(onPressed: _busy ? null : _takeDelivery, child: Text(context.tr('drv.take'))),
+          if (!context.read<AdminSession>().isDriver) TextButton(onPressed: _busy ? null : () => _changeDriver(o), child: Text(context.tr('dist.change'))),
         ]),
         if (mine)
           Row(children: [
@@ -326,7 +383,8 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
                     if (o.allowedStatuses.isNotEmpty)
                       FormCard(title: context.tr('order.change_status'), children: [
                         Wrap(spacing: 8, runSpacing: 8, children: [
-                          for (final s in o.allowedStatuses)
+                          // A driver only marks their delivery as delivered
+                          for (final s in o.allowedStatuses.where((s) => !context.read<AdminSession>().isDriver || s == 'delivered'))
                             FilledButton.tonal(
                               style: s == 'cancelled' ? FilledButton.styleFrom(foregroundColor: AlasColors.destructive) : null,
                               onPressed: _busy ? null : () => _changeStatus(s),

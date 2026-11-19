@@ -22,7 +22,7 @@ from apps.core.errors import BusinessError
 from apps.core.images import process_upload
 from apps.core.pagination import Pagination
 from apps.core.permissions import (
-    DISTRIBUTOR_READ, DISTRIBUTOR_SCOPED, IsOwner, IsStoreAdmin, is_distributor, scope_customers, scope_orders,
+    DISTRIBUTOR_READ, DISTRIBUTOR_SCOPED, IsOwner, IsStoreAdmin, is_distributor, is_driver, scope_customers, scope_orders,
 )
 from apps.ledger import services as ledger
 from apps.ledger.models import LedgerEntry
@@ -232,6 +232,14 @@ class ProductViewSet(AdminMixin, viewsets.ModelViewSet):
 
 class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     distributor_access = DISTRIBUTOR_SCOPED
+    driver_access = True
+    # A driver sees only the orders handed to them and can only deliver them (status, cash, location)
+    DRIVER_ACTIONS = {"list", "retrieve", "status", "payment", "location", "invoice"}
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        if is_driver(request.user) and self.action not in self.DRIVER_ACTIONS:
+            raise PermissionDenied("not_allowed")
     def get_serializer_class(self):
         return s.AdminOrderListSerializer if self.action == "list" else s.AdminOrderDetailSerializer
 
@@ -264,11 +272,20 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
         paid = d.get("paid_amount")
         if paid and (d["status"] != Order.DELIVERED or not self.get_object().user_id):
             raise BusinessError("payment_requires_delivered")
+        if is_driver(request.user) and d["status"] != Order.DELIVERED:
+            raise PermissionDenied("not_allowed")  # a driver only marks their deliveries as delivered
+        driver = None
+        if d.get("driver_id"):
+            driver = get_object_or_404(User, pk=d["driver_id"], is_staff=True, is_active=True)
+        handed = False
         with transaction.atomic():
             order = pricing.change_status(self.get_object(), d["status"], note, by=request.user)
             if order.status == Order.SHIPPED and order.delivery_method == Order.DELIVERY:
-                tracking.assign_driver(order, request.user)  # whoever sends it out delivers it
+                # Out for delivery: with the chosen driver, or whoever sent it out
+                handed = tracking.hand_to(order, request.user, driver or request.user) and (driver or request.user) != request.user
             entry = ledger.record_payment(order.user, paid, request.user, order=order) if paid else None
+        if handed:
+            transaction.on_commit(lambda: events.delivery_assigned(order))
         transaction.on_commit(lambda: events.order_status_changed(order, note))
         if entry:
             _notify_payment(entry)
@@ -293,6 +310,26 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
         if not tracking.is_trackable(order):
             raise BusinessError("not_out_for_delivery")
         tracking.assign_driver(order, request.user)
+        return Response(s.AdminOrderDetailSerializer(self.get_queryset().get(pk=order.pk)).data)
+
+    @action(detail=True, methods=["get"])
+    def drivers(self, request, pk=None):
+        """Who this order can be handed to for delivery."""
+        order = self.get_object()
+        people = tracking.eligible_drivers(order).order_by("-is_driver", "full_name")
+        return Response([
+            {"id": u.id, "name": u.display_name, "is_driver": u.is_driver, "is_me": u.pk == request.user.pk} for u in people
+        ])
+
+    @action(detail=True, methods=["post"], url_path="assign-driver")
+    def assign_driver(self, request, pk=None):
+        """Hand an order that is out for delivery to another driver (the customer then follows them)."""
+        order = self.get_object()
+        if not tracking.is_trackable(order):
+            raise BusinessError("not_out_for_delivery")
+        driver = get_object_or_404(User, pk=request.data.get("driver_id"), is_staff=True, is_active=True)
+        if tracking.hand_to(order, request.user, driver) and driver.pk != request.user.pk:
+            events.delivery_assigned(order)
         return Response(s.AdminOrderDetailSerializer(self.get_queryset().get(pk=order.pk)).data)
 
     @action(detail=True, methods=["post"])
@@ -764,6 +801,33 @@ class StaffViewSet(OwnerMixin, mixins.ListModelMixin, mixins.CreateModelMixin, m
         password_changed = bool(serializer.validated_data.get("password"))
         user = serializer.save()
         if (was_active and not user.is_active) or (password_changed and user.pk != self.request.user.pk):
+            _end_sessions(user)
+
+
+class DriverViewSet(AdminMixin, mixins.ListModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
+    """Delivery accounts. The owner sees every driver (the store's and the distributors'); a
+    distributor sees and adds only their own. Employees can't manage drivers."""
+
+    serializer_class = s.DriverSerializer
+    pagination_class = None
+    http_method_names = ["get", "post", "patch"]
+    distributor_access = DISTRIBUTOR_SCOPED
+
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        if not (request.user.is_superuser or is_distributor(request.user)):
+            raise PermissionDenied("owner_only")
+
+    def get_queryset(self):
+        qs = User.objects.filter(is_driver=True).select_related("works_for").order_by("-is_active", "full_name", "id")
+        return qs if self.request.user.is_superuser else qs.filter(works_for=self.request.user)
+
+    def perform_update(self, serializer):
+        user = serializer.instance
+        was_active = user.is_active
+        password_changed = bool(serializer.validated_data.get("password"))
+        user = serializer.save()
+        if (was_active and not user.is_active) or password_changed:
             _end_sessions(user)
 
 

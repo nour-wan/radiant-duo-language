@@ -222,3 +222,17 @@ def exchange_rate_problem(kind, last_ok=None, held=None):
             f"Last successful update: {when}. Prices use the last known rate. You can set a manual rate in Store settings → Dollar rate.",
             {"kind": "exchange_rate", "screen": "exchange_rate"},
         )
+
+
+def delivery_assigned(order):
+    """Tell the driver an order was handed to them (push to their admin app only)."""
+    if not order.driver_id:
+        return
+    tokens = list(DeviceToken.objects.filter(app=DeviceToken.ADMIN, user_id=order.driver_id, user__is_active=True))
+    who = order.business_name or order.customer_name
+    fcm.send_localized_async(
+        tokens,
+        {"ar": ("عندك توصيلة جديدة 🚚", f"{order.number} — {who} — {order.area}"),
+         "en": ("New delivery 🚚", f"{order.number} — {who} — {order.area}")},
+        {"kind": "admin_order", "order_id": order.id, "number": order.number},
+    )

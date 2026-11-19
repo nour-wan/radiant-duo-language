@@ -79,6 +79,13 @@ class User(AbstractUser):
         "self", on_delete=models.SET_NULL, null=True, blank=True, related_name="distributor_customers",
         limit_choices_to={"is_distributor": True},
     )
+    # Drivers: delivery accounts in the admin app that see only the orders handed to them. A driver
+    # works for a distributor (works_for) or for the store itself (null).
+    is_driver = models.BooleanField(default=False)
+    works_for = models.ForeignKey(
+        "self", on_delete=models.SET_NULL, null=True, blank=True, related_name="drivers",
+        limit_choices_to={"is_distributor": True},
+    )
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

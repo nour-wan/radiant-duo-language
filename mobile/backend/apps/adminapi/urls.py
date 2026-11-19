@@ -17,6 +17,7 @@ router.register("notifications", views.NotificationViewSet, basename="admin-noti
 router.register("zones", views.ZoneViewSet, basename="admin-zone")
 router.register("inbox", views.AdminInboxView, basename="admin-inbox")
 router.register("staff", views.StaffViewSet, basename="admin-staff")
+router.register("drivers", views.DriverViewSet, basename="admin-driver")
 
 urlpatterns = [
     path("auth/login/", AdminLoginView.as_view()),

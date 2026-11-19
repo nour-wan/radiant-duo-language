@@ -77,7 +77,15 @@ class SettingsView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
-        return Response(PublicSettingsSerializer(StoreSettings.load()).data)
+        data = PublicSettingsSerializer(StoreSettings.load()).data
+        # A customer who buys through a distributor talks to that distributor: calls and WhatsApp
+        # (contact screen, product questions) go to the distributor's number instead of the store's.
+        user = request.user
+        distributor = getattr(user, "distributor", None) if user.is_authenticated else None
+        if distributor is not None and distributor.is_active and distributor.phone:
+            local = "0" + distributor.phone[4:] if distributor.phone.startswith("+963") else distributor.phone
+            data.update(mobile=local, whatsapp=distributor.phone, phone="", distributor_name=distributor.display_name)
+        return Response(data)
 
 
 class LegalView(APIView):

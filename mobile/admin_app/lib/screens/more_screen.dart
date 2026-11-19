@@ -10,6 +10,7 @@ import '../widgets/admin_widgets.dart';
 import 'manage_screens.dart';
 import 'notify_screen.dart';
 import 'reports_screen.dart';
+import 'drivers_screen.dart';
 import 'staff_screens.dart';
 import 'exchange_rate_screen.dart';
 import 'whatsapp_screen.dart';
@@ -23,6 +24,7 @@ class MoreScreen extends StatelessWidget {
     final session = context.watch<AdminSession>();
     final owner = session.isOwner;
     final distributor = session.isDistributor;
+    final driver = session.isDriver;
     void open(Widget w) => Navigator.of(context).push(MaterialPageRoute(builder: (_) => w));
     Widget tile(IconData i, String key, Widget page) =>
         ListTile(leading: Icon(i), title: Text(context.tr(key)), trailing: const Icon(Icons.chevron_right), onTap: () => open(page));
@@ -34,7 +36,13 @@ class MoreScreen extends StatelessWidget {
             leading: CircleAvatar(
                 child: Icon(owner ? Icons.workspace_premium_outlined : (distributor ? Icons.handshake_outlined : Icons.badge_outlined))),
             title: Text(session.user?.displayName ?? ''),
-            subtitle: Text(context.tr(owner ? 'staff.role_owner' : (distributor ? 'staff.role_distributor' : 'staff.role_employee'))),
+            subtitle: Text(context.tr(owner
+                ? 'staff.role_owner'
+                : distributor
+                    ? 'staff.role_distributor'
+                    : driver
+                        ? 'staff.role_driver'
+                        : 'staff.role_employee')),
           ),
         ),
         if (distributor && (session.user?.ownDistributorCode ?? '').isNotEmpty) ...[
@@ -46,15 +54,19 @@ class MoreScreen extends StatelessWidget {
           Card(
             child: Column(children: [
               tile(Icons.groups_outlined, 'staff.title', const StaffScreen()),
+              tile(Icons.local_shipping_outlined, 'drv.title', const DriversScreen()),
               tile(Icons.price_check, 'collect.title', const CollectionsScreen()),
               tile(Icons.history, 'audit.title', const AuditLogScreen()),
             ]),
           ),
           const SizedBox(height: 12),
         ],
-        if (distributor) ...[
+        if (driver) ...[
+          // A driver's menu: only their own settings below
+        ] else if (distributor) ...[
           Card(
             child: Column(children: [
+              tile(Icons.local_shipping_outlined, 'drv.title', const DriversScreen()),
               tile(Icons.bar_chart, 'more.reports', const ReportsScreen()),
               tile(Icons.account_balance_wallet_outlined, 'more.receivables', const ReceivablesScreen()),
             ]),

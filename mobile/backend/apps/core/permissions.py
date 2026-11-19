@@ -17,7 +17,12 @@ class IsStoreAdmin(BasePermission):
         user = request.user
         if not (user and user.is_authenticated and user.is_active and user.is_staff):
             return False
-        if getattr(user, "is_distributor", False) and not user.is_superuser:
+        if user.is_superuser:
+            return True
+        if getattr(user, "is_driver", False):
+            # Drivers only see the orders handed to them (the view limits the actions)
+            return bool(getattr(view, "driver_access", False))
+        if getattr(user, "is_distributor", False):
             access = getattr(view, "distributor_access", None)
             if access == DISTRIBUTOR_READ:
                 return request.method in SAFE_METHODS
@@ -39,10 +44,17 @@ def is_distributor(user):
     return bool(getattr(user, "is_distributor", False)) and not user.is_superuser
 
 
+def is_driver(user):
+    return bool(getattr(user, "is_driver", False)) and not user.is_superuser
+
+
 def scope_orders(qs, user, field="distributor"):
-    """Owner: everything. Distributor: only orders of their customers. Employees: only the store's own."""
+    """Owner: everything. Distributor: only orders of their customers. Driver: only orders handed to
+    them. Employees: only the store's own."""
     if user.is_superuser:
         return qs
+    if is_driver(user):
+        return qs.filter(driver=user) if qs.model.__name__ == "Order" else qs.none()
     if is_distributor(user):
         return qs.filter(**{field: user})
     return qs.filter(**{f"{field}__isnull": True})

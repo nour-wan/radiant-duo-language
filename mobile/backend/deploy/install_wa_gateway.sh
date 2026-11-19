@@ -23,11 +23,21 @@ chown root:alaswakey /etc/alas-wa/key
 chmod 640 /etc/alas-wa/key
 
 install -d -o root -g root -m 755 "$APP"
-rsync -a --exclude node_modules "$SRC/" "$APP/"
+# Restart the gateway only when its code or service file actually changed: every restart renews
+# WhatsApp's encryption sessions, and an unneeded one can delay codes on customers' phones.
+CHANGED="$(rsync -rci --exclude node_modules "$SRC/" "$APP/")"  # content only, not owners/times
 (cd "$APP" && npm install --omit=dev --no-audit --no-fund --loglevel=error)
 chown -R root:root "$APP"
 
-install -m 644 "$SRC/../deploy/alas-wa.service" /etc/systemd/system/alas-wa.service
+if ! cmp -s "$SRC/../deploy/alas-wa.service" /etc/systemd/system/alas-wa.service; then
+  install -m 644 "$SRC/../deploy/alas-wa.service" /etc/systemd/system/alas-wa.service
+  CHANGED="${CHANGED}service"
+fi
 systemctl daemon-reload
 systemctl enable -q alas-wa.service
-systemctl restart alas-wa.service
+if [ -n "$CHANGED" ] || ! systemctl is-active --quiet alas-wa.service; then
+  systemctl restart alas-wa.service
+  echo "    gateway restarted"
+else
+  echo "    gateway unchanged (not restarted)"
+fi

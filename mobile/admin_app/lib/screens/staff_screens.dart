@@ -175,7 +175,9 @@ class _StaffScreenState extends State<StaffScreen> {
                             backgroundColor: w['is_active'] == true ? t.colorScheme.primaryContainer : t.colorScheme.surfaceContainerHighest,
                             child: Icon(w['is_owner'] == true
                                 ? Icons.workspace_premium_outlined
-                                : (w['is_distributor'] == true ? Icons.handshake_outlined : Icons.badge_outlined)),
+                                : (w['is_distributor'] == true
+                                    ? Icons.handshake_outlined
+                                    : (w['is_driver'] == true ? Icons.local_shipping_outlined : Icons.badge_outlined))),
                           ),
                           title: Text(
                             [
