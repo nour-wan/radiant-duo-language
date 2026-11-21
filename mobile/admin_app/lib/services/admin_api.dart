@@ -244,9 +244,10 @@ class AdminApi {
   Future<OrderDetail> takeDelivery(int id) async => OrderDetail.fromJson(await client.post('/admin/orders/$id/take-delivery/'));
 
   /// Sends the driver's position; false means stop (delivered, cancelled or taken over).
-  Future<bool> reportLocation(int id, double lat, double lng) async {
+  /// Sends the driver's recorded points ({latitude, longitude, at}); false means stop.
+  Future<bool> reportLocation(int id, List<Map<String, dynamic>> points) async {
     final r = await client.post<Map<String, dynamic>>('/admin/orders/$id/location/',
-        data: {'latitude': lat.toStringAsFixed(6), 'longitude': lng.toStringAsFixed(6)});
+        data: {'points': points, 'sent_at': DateTime.now().toUtc().toIso8601String()});
     return r['tracking'] == true;
   }
 

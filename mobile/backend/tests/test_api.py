@@ -1065,3 +1065,45 @@ class PinLaterTests(Base):
         self.assertEqual(r.status_code, 201, r.data)
         r = self.order([{"variant_id": self.v1.id, "quantity": 5}], address_details="")
         self.assertEqual(r.data["code"], "address_required")
+
+
+class RouteTests(DriverTests):
+    def test_route_keeps_offline_points_in_order(self):
+        driver = self.add_driver(self.dist)
+        self.login(self.dist)
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "confirmed"}, format="json")
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "shipped", "driver_id": driver.id}, format="json")
+        self.login(driver)
+        now = timezone.now()
+        url = f"/api/v1/admin/orders/{self.their_order}/location/"
+        self.client.post(url, {"latitude": "33.500000", "longitude": "36.300000"}, format="json")
+        # Back online: three points the phone kept, oldest first
+        backlog = [{"latitude": f"33.50{i}000", "longitude": "36.300000", "at": (now - timedelta(minutes=4 - i)).isoformat()} for i in range(1, 4)]
+        r = self.client.post(url, {"points": backlog}, format="json")
+        self.assertEqual(r.data, {"tracking": True})
+        self.login(self.dist)
+        d = self.client.get(f"/api/v1/admin/orders/{self.their_order}/").data
+        self.assertEqual(len(d["route"]), 4)
+        self.assertEqual([p[0] for p in d["route"]], [33.501, 33.502, 33.503, 33.5])  # by recording time
+        self.assertEqual(d["tracking"]["latitude"], 33.5)  # the newest point is the current position
+        self.assertIsNotNone(d["last_seen_at"])
+        # The route stays after delivery
+        self.login(driver)
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "delivered"}, format="json")
+        self.login(self.dist)
+        self.assertEqual(len(self.client.get(f"/api/v1/admin/orders/{self.their_order}/").data["route"]), 4)
+
+    def test_phone_clock_error_is_corrected(self):
+        driver = self.add_driver(self.dist)
+        self.login(self.dist)
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "confirmed"}, format="json")
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/status/", {"status": "shipped", "driver_id": driver.id}, format="json")
+        self.login(driver)
+        phone_now = timezone.now() - timedelta(minutes=40)  # the phone's clock is 40 minutes behind
+        self.client.post(f"/api/v1/admin/orders/{self.their_order}/location/", {
+            "sent_at": phone_now.isoformat(),
+            "points": [{"latitude": "33.5", "longitude": "36.3", "at": (phone_now - timedelta(seconds=30)).isoformat()}],
+        }, format="json")
+        self.login(self.dist)
+        d = self.client.get(f"/api/v1/admin/orders/{self.their_order}/").data
+        self.assertIsNotNone(d["tracking"])  # not taken as 40 minutes old

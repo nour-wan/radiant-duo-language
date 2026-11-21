@@ -121,3 +121,19 @@ class OrderEvent(models.Model):
 
     class Meta:
         ordering = ["created_at", "id"]
+
+
+class DeliveryPoint(models.Model):
+    """One position of the driver while an order was out for delivery: together they draw the route.
+    Points recorded while offline arrive later in a batch, with the time the phone recorded them."""
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="delivery_points")
+    driver = models.ForeignKey("accounts.User", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    latitude = models.DecimalField(max_digits=9, decimal_places=6)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    recorded_at = models.DateTimeField(db_index=True)
+    received_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["recorded_at", "id"]
+        indexes = [models.Index(fields=["order", "recorded_at"])]

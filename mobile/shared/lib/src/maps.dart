@@ -181,9 +181,12 @@ class _LocationPickerScreenState extends State<LocationPickerScreen> {
 
 /// A small map showing the customer's place and, while delivering, the driver.
 class DeliveryMap extends StatefulWidget {
-  const DeliveryMap({super.key, this.destination, this.driver, this.height = 200, this.onTap});
+  const DeliveryMap({super.key, this.destination, this.driver, this.route = const [], this.height = 200, this.onTap});
 
   final LatLng? destination, driver;
+
+  /// The road the driver took (drawn as a line).
+  final List<LatLng> route;
   final double height;
   final VoidCallback? onTap;
 
@@ -201,13 +204,15 @@ class _DeliveryMapState extends State<DeliveryMap> {
     if (_ready && (old.driver != widget.driver || old.destination != widget.destination)) _fit();
   }
 
-  List<LatLng> get _points => [?widget.destination, ?widget.driver];
+  List<LatLng> get _points => [?widget.destination, ?widget.driver, if (widget.driver == null && widget.route.isNotEmpty) widget.route.last];
 
-  /// Both points in view (not closer than street level), or the one point.
+  /// The points and the whole route in view (not closer than street level), or the one point.
   CameraFit? get _cameraFit {
-    final points = _points;
-    if (points.length < 2 || const Distance().as(LengthUnit.Meter, points[0], points[1]) < 150) return null;
-    return CameraFit.coordinates(coordinates: points, padding: const EdgeInsets.all(48), maxZoom: 17);
+    final all = [..._points, ...widget.route];
+    if (all.length < 2) return null;
+    final box = LatLngBounds.fromPoints(all);
+    if (const Distance().as(LengthUnit.Meter, box.southWest, box.northEast) < 150) return null;
+    return CameraFit.coordinates(coordinates: all, padding: const EdgeInsets.all(48), maxZoom: 17);
   }
 
   LatLng get _center {
@@ -244,6 +249,7 @@ class _DeliveryMapState extends State<DeliveryMap> {
           ),
           children: [
             ...mapBaseLayers(),
+            if (widget.route.length > 1) routeLayer(widget.route),
             MarkerLayer(markers: [
               if (widget.destination != null)
                 Marker(point: widget.destination!, width: 44, height: 44, alignment: Alignment.topCenter, child: const PlacePin()),
@@ -269,9 +275,12 @@ class MapPoint {
 
 /// A map showing several points at once (e.g. every driver on the road), zoomed to fit them all.
 class MultiPointMap extends StatefulWidget {
-  const MultiPointMap({super.key, required this.points, this.height});
+  const MultiPointMap({super.key, required this.points, this.routes = const [], this.height});
 
   final List<MapPoint> points;
+
+  /// Routes driven so far (one line per delivery).
+  final List<List<LatLng>> routes;
 
   /// null = fill the space it is given.
   final double? height;
@@ -319,6 +328,8 @@ class _MultiPointMapState extends State<MultiPointMap> {
       ),
       children: [
         ...mapBaseLayers(),
+        for (final r in widget.routes)
+          if (r.length > 1) routeLayer(r),
         MarkerLayer(markers: [
           for (final p in widget.points)
             Marker(
@@ -334,3 +345,9 @@ class _MultiPointMapState extends State<MultiPointMap> {
     return widget.height == null ? map : SizedBox(height: widget.height, child: map);
   }
 }
+
+
+/// A driver's route as a line on the map, with a white edge so it shows on any street colour.
+Widget routeLayer(List<LatLng> route) => PolylineLayer(polylines: [
+      Polyline(points: route, strokeWidth: 5, color: const Color(0xFF2E6A47), borderStrokeWidth: 2, borderColor: const Color(0xCCFFFFFF)),
+    ]);

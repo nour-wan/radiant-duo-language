@@ -167,10 +167,18 @@ class AdminOrderDetailSerializer(OrderDetailSerializer):
     class Meta(OrderDetailSerializer.Meta):
         fields = OrderDetailSerializer.Meta.fields + [
             "customer_email", "user_id", "admin_note", "customer_deleted", "allowed_statuses", "payments",
-            "exchange_rate", "total_usd", "driver_id", "driver_name", "distributor_name",
+            "exchange_rate", "total_usd", "driver_id", "driver_name", "distributor_name", "route", "last_seen_at",
         ]
 
     distributor_name = serializers.SerializerMethodField()
+    # The driver's route (kept after delivery too) and when their phone last reported
+    route = serializers.SerializerMethodField()
+    last_seen_at = serializers.DateTimeField(source="driver_location_at", read_only=True)
+
+    def get_route(self, obj):
+        from apps.orders import tracking
+
+        return tracking.route(obj)
 
     def get_distributor_name(self, obj):
         return obj.distributor.display_name if obj.distributor_id else None

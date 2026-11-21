@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from apps.core.errors import BusinessError
 
-from .models import Order
+from .models import DeliveryPoint, Order
 
 # A position older than this is not shown to the customer (the driver's phone stopped reporting)
 FRESH_FOR = timedelta(minutes=15)
@@ -72,18 +72,72 @@ def assign_driver(order, user):
     return order
 
 
-def report_location(order, user, latitude, longitude):
-    """The driver's phone reports where it is. Returns False when tracking should stop."""
+# Points a phone kept while offline are accepted if recorded within this window
+MAX_BACKLOG = timedelta(hours=12)
+MAX_POINTS_PER_REPORT = 500
+
+
+def _parse(value):
+    from django.utils.dateparse import parse_datetime
+
+    try:
+        at = parse_datetime(str(value)) if value else None
+    except ValueError:
+        return None
+    if at is not None and timezone.is_naive(at):
+        at = timezone.make_aware(at)
+    return at
+
+
+def _when(value, now, skew):
+    """The time the phone recorded a point, moved by the phone's clock error and kept within
+    [now - MAX_BACKLOG, now]."""
+    at = _parse(value)
+    if at is None:
+        return now
+    return min(max(at + skew, now - MAX_BACKLOG), now)
+
+
+def report_location(order, user, points, sent_at=None):
+    """The driver's phone reports where it is: one point now, or several it kept while offline
+    ([{latitude, longitude, at}]). Every point is kept for the route. Returns False when tracking
+    should stop (delivered, cancelled or handed to someone else)."""
     if not is_trackable(order):
         return False
     if order.driver_id is None:
         assign_driver(order, user)
     elif order.driver_id != user.pk:
-        return False  # someone else took over this delivery
-    Order.objects.filter(pk=order.pk).update(
-        driver_latitude=coordinate(latitude, 90), driver_longitude=coordinate(longitude, 180), driver_location_at=timezone.now()
-    )
+        return False
+    now = timezone.now()
+    # The phone's clock may be off: [sent_at] is its own time when it sent this report
+    phone_now = _parse(sent_at)
+    skew = (now - phone_now) if phone_now is not None and abs(now - phone_now) < MAX_BACKLOG else timedelta(0)
+    rows = []
+    for p in points[:MAX_POINTS_PER_REPORT]:
+        if not isinstance(p, dict):
+            raise BusinessError("invalid_location")
+        rows.append(DeliveryPoint(
+            order=order, driver=user, latitude=coordinate(p.get("latitude"), 90),
+            longitude=coordinate(p.get("longitude"), 180), recorded_at=_when(p.get("at"), now, skew),
+        ))
+    if not rows:
+        raise BusinessError("invalid_location")
+    DeliveryPoint.objects.bulk_create(rows)
+    latest = max(rows, key=lambda r: r.recorded_at)
+    if order.driver_location_at is None or latest.recorded_at >= order.driver_location_at:
+        Order.objects.filter(pk=order.pk).update(
+            driver_latitude=latest.latitude, driver_longitude=latest.longitude, driver_location_at=latest.recorded_at
+        )
     return True
+
+
+def route(order, limit=600):
+    """The driver's route for this order as [[lat, lng], ...], thinned to at most [limit] points."""
+    pts = list(order.delivery_points.values_list("latitude", "longitude"))
+    if len(pts) > limit:
+        step = len(pts) / limit
+        pts = [pts[int(i * step)] for i in range(limit - 1)] + [pts[-1]]
+    return [[float(a), float(b)] for a, b in pts]
 
 
 def eligible_drivers(order):

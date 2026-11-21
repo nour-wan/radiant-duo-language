@@ -81,7 +81,16 @@ class _LiveDeliveriesScreenState extends State<LiveDeliveriesScreen> {
           : rows == null
               ? const LoadingView()
               : Column(children: [
-                  Expanded(flex: 3, child: MultiPointMap(points: points)),
+                  Expanded(
+                    flex: 3,
+                    child: MultiPointMap(points: points, routes: [
+                      for (final r in rows)
+                        [
+                          for (final p in (r['route'] as List? ?? []))
+                            if (p is List && p.length == 2) ?toPoint(p[0], p[1]),
+                        ],
+                    ]),
+                  ),
                   Expanded(
                     flex: 2,
                     child: rows.isEmpty
@@ -103,6 +112,7 @@ class _LiveDeliveriesScreenState extends State<LiveDeliveriesScreen> {
                                     if ((r['area'] as String?)?.isNotEmpty == true) r['area'],
                                     if (owner && r['distributor_name'] != null) context.tr('dist.via', {'n': r['distributor_name']}),
                                     if (tr == null) context.tr('track.waiting') else if (eta != null) context.tr('track.eta', {'n': eta}),
+                                    if (tr != null && tr['updated_at'] != null) _ago(context, toDate(tr['updated_at'])),
                                   ].join(' · ')),
                                   trailing: const Icon(Icons.chevron_left),
                                   onTap: () => _open(r['id'] as int),
@@ -132,4 +142,10 @@ class _DriverBadge extends StatelessWidget {
             child: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700)),
           ),
       ]);
+}
+
+
+String _ago(BuildContext context, DateTime at) {
+  final mins = DateTime.now().difference(at).inMinutes;
+  return mins < 1 ? context.tr('live.seen_now') : context.tr('live.seen_ago', {'n': mins});
 }

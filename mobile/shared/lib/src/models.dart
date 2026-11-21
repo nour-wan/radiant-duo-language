@@ -522,6 +522,11 @@ class OrderDetail {
         driverId = j['driver_id'] as int?,
         driverName = j['driver_name'] as String?,
         distributorName = j['distributor_name'] as String?,
+        route = [
+          for (final p in (j['route'] as List? ?? []))
+            if (p is List && p.length == 2) ?toPoint(p[0], p[1]),
+        ],
+        lastSeenAt = j['last_seen_at'] == null ? null : toDate(j['last_seen_at']),
         createdAt = toDate(j['created_at']);
 
   final int id;
@@ -531,6 +536,10 @@ class OrderDetail {
   final Tracking? tracking;
   final int? driverId;
   final String? driverName, distributorName;
+
+  /// Admin app: the road the driver took (kept after delivery) and when their phone last reported.
+  final List<LatLng> route;
+  final DateTime? lastSeenAt;
   final String number, status, customerName, customerPhone, customerEmail, businessName;
   final String city, area, street, addressDetails, notes, adminNote, couponCode;
   final String deliveryMethod, deliveryZone, deliveryCurrency;

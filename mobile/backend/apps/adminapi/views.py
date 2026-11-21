@@ -329,6 +329,7 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
                 "latitude": float(o.latitude) if o.latitude is not None else None,
                 "longitude": float(o.longitude) if o.longitude is not None else None,
                 "tracking": tracking.tracking(o),
+                "route": tracking.route(o, limit=200),
             }
             for o in orders
         ])
@@ -357,7 +358,10 @@ class OrderViewSet(AdminMixin, mixins.ListModelMixin, mixins.RetrieveModelMixin,
     def location(self, request, pk=None):
         """The driver's phone reports its position; {"tracking": false} tells it to stop."""
         order = get_object_or_404(scope_orders(Order.objects.all(), request.user), pk=pk)
-        ok = tracking.report_location(order, request.user, request.data.get("latitude"), request.data.get("longitude"))
+        points = request.data.get("points")
+        if not isinstance(points, list):  # older app builds send a single position
+            points = [{"latitude": request.data.get("latitude"), "longitude": request.data.get("longitude")}]
+        ok = tracking.report_location(order, request.user, points, sent_at=request.data.get("sent_at"))
         return Response({"tracking": ok})
 
     @action(detail=True, methods=["patch"])

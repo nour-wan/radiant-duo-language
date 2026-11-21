@@ -334,14 +334,26 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       // Out for delivery: where the driver is now (and the estimated arrival when the customer pinned their place)
       if (shipped && !mine) ...[
-        if (driverAt == null)
+        if (o.lastSeenAt == null)
           Text(context.tr('track.waiting'), style: t.textTheme.bodyMedium?.copyWith(color: t.colorScheme.onSurfaceVariant))
         else if (eta != null)
           Text(context.tr('track.eta', {'n': eta}), style: t.textTheme.titleMedium?.copyWith(color: AlasColors.primary)),
+        if (o.lastSeenAt != null) _LastSeen(at: o.lastSeenAt!),
         const SizedBox(height: 6),
       ],
-      if (o.pin != null || (shipped && driverAt != null))
-        DeliveryMap(destination: o.pin, driver: shipped ? driverAt : null, height: 220),
+      if (mine && shipped && tracker.pending > 3)
+        Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(context.tr('live.queued', {'n': tracker.pending}), style: t.textTheme.bodySmall?.copyWith(color: AlasColors.warning)),
+        ),
+      // The road the driver took: live while delivering, and kept after delivery
+      if (o.pin != null || (shipped && driverAt != null) || o.route.length > 1)
+        DeliveryMap(
+          destination: o.pin,
+          driver: shipped ? (driverAt ?? (o.route.isNotEmpty ? o.route.last : null)) : null,
+          route: o.route,
+          height: 240,
+        ),
       if (o.pin != null) ...[
         const SizedBox(height: 8),
         FilledButton.icon(
@@ -551,4 +563,29 @@ class _AdminOrderScreenState extends State<AdminOrderScreen> {
         Expanded(child: Text(label, style: bold ? Theme.of(context).textTheme.titleSmall : null)),
         Text(value, style: TextStyle(fontFamily: 'packages/alas_shared/Manrope', fontWeight: bold ? FontWeight.w700 : null)),
       ]);
+}
+
+
+/// "Last location 2 min ago" — in orange when the driver's phone has been quiet for a while
+/// (screen off with the app stopped, no signal, or location turned off).
+class _LastSeen extends StatelessWidget {
+  const _LastSeen({required this.at});
+
+  final DateTime at;
+
+  @override
+  Widget build(BuildContext context) {
+    final mins = DateTime.now().difference(at).inMinutes;
+    final quiet = mins >= 2;
+    final text = mins < 1 ? context.tr('live.seen_now') : context.tr('live.seen_ago', {'n': mins});
+    return Row(children: [
+      Icon(quiet ? Icons.signal_cellular_connected_no_internet_4_bar : Icons.gps_fixed, size: 16,
+          color: quiet ? AlasColors.warning : AlasColors.primary),
+      const SizedBox(width: 6),
+      Expanded(
+        child: Text(quiet ? '$text — ${context.tr('live.quiet')}' : text,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(color: quiet ? AlasColors.warning : null)),
+      ),
+    ]);
+  }
 }
